@@ -16,5 +16,9 @@
     "@types/node": "^24.0.3",
     "@types/winston": "^2.4.4",
     "concurrently": "^8.0.1"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.9.0",
+    "prisma": "^6.9.0"
   }
 }
