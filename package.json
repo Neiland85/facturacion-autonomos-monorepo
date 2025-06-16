@@ -10,7 +10,9 @@
   "scripts": {
     "dev:backend": "yarn workspace backend dev",
     "dev:frontend": "yarn workspace frontend dev",
-    "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\""
+    "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\"",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
@@ -19,6 +21,7 @@
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
-    "prisma": "^6.9.0"
+    "prisma": "^6.9.0",
+    "swagger-ui-express": "^5.0.1"
   }
 }

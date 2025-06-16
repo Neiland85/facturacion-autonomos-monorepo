@@ -1,0 +1,99 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "Facturación Autónomos API",
+    "version": "1.0.0",
+    "description": "Documentación de la API para la gestión de facturación de autónomos.",
+    "license": {
+      "name": "Apache 2.0",
+      "url": "https://www.apache.org/licenses/LICENSE-2.0.html"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.facturacion-autonomos.com",
+      "description": "Servidor de producción"
+    },
+    {
+      "url": "https://staging.facturacion-autonomos.com",
+      "description": "Servidor de pruebas"
+    }
+  ],
+  "paths": {
+    "/api/pdf/generate-pdf": {
+      "post": {
+        "operationId": "generateInvoicePDF",
+        "summary": "Generar factura en PDF",
+        "description": "Genera un archivo PDF basado en los datos proporcionados.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "clientName": {
+                    "type": "string",
+                    "example": "Juan Pérez"
+                  },
+                  "invoiceNumber": {
+                    "type": "string",
+                    "example": "12345"
+                  },
+                  "items": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "properties": {
+                        "description": {
+                          "type": "string",
+                          "example": "Producto A"
+                        },
+                        "price": {
+                          "type": "number",
+                          "example": 50
+                        }
+                      }
+                    }
+                  },
+                  "total": {
+                    "type": "number",
+                    "example": 150
+                  }
+                },
+                "required": [
+                  "clientName",
+                  "invoiceNumber",
+                  "items",
+                  "total"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "PDF generado exitosamente."
+          },
+          "400": {
+            "description": "Solicitud inválida."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT"
+      }
+    }
+  }
+}

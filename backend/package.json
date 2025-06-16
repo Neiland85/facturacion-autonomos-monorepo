@@ -7,7 +7,9 @@
     "dev": "nodemon src/index.ts",
     "start": "node src/index.js",
     "build": "tsc",
-    "test": "jest"
+    "test": "jest",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix"
   },
   "dependencies": {
     "@prisma/client": "^4.16.2",
