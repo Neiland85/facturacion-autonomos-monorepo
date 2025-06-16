@@ -6,7 +6,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "test": "jest"
   },
   "dependencies": {
     "@ai-sdk/openai": "latest",
@@ -64,7 +66,7 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
-    "zod": "latest"
+    "zod": "^3.22.3"
   },
   "devDependencies": {
     "@types/node": "^22",
