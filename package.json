@@ -1,8 +1,20 @@
 {
   "name": "facturacion-autonomos-monorepo",
   "private": true,
-  "workspaces": ["backend", "frontend"],
+  "workspaces": [
+    "backend",
+    "frontend"
+  ],
   "license": "Apache-2.0",
-  "description": "Monorepo modular para facturación de autónomos: Next.js frontend y backend desacoplado Node.js. Escalable, con CI/CD."
+  "description": "Monorepo modular para facturación de autónomos: Next.js frontend y backend desacoplado Node.js. Escalable, con CI/CD.",
+  "scripts": {
+    "dev:backend": "yarn workspace backend dev",
+    "dev:frontend": "yarn workspace frontend dev",
+    "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\""
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.3",
+    "@types/winston": "^2.4.4",
+    "concurrently": "^8.0.1"
+  }
 }
-
