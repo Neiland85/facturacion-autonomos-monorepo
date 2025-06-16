@@ -1,6 +1,6 @@
 # 🌐 Frontend - Facturación Autónomos
 
-![Animated Title](https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&size=24&duration=3000&color=00F7FF&center=true&vCenter=true&lines=Frontend+de+Facturaci%C3%B3n+Aut%C3%B3nomos)
+![Animated Title](https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&size=24&duration=3000&color=00F7FF&center=true&vCenter=true&lines=Frontend+Tributariapp%C3%B3n+Aut%C3%B3nomos)
 
 El frontend proporciona una interfaz de usuario moderna y responsiva para la gestión de facturación.
 
