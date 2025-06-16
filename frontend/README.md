@@ -63,3 +63,7 @@ El informe se generará en el directorio `coverage/`.
 ---
 
 > **Nota:** Asegúrate de mantener las pruebas actualizadas al realizar cambios en los componentes.
+
+---
+
+© 2025 Neil Muñoz Lago ([Neiland85](https://github.com/Neiland85)). Todos los derechos reservados.

@@ -85,6 +85,157 @@
           }
         ]
       }
+    },
+    "/api/users": {
+      "get": {
+        "operationId": "getUsers",
+        "summary": "Obtener lista de usuarios",
+        "description": "Devuelve una lista de todos los usuarios registrados.",
+        "responses": {
+          "200": {
+            "description": "Lista de usuarios obtenida exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "123"
+                      },
+                      "name": {
+                        "type": "string",
+                        "example": "Juan Pérez"
+                      },
+                      "email": {
+                        "type": "string",
+                        "example": "juan.perez@example.com"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/invoices": {
+      "get": {
+        "operationId": "getInvoices",
+        "summary": "Obtener lista de facturas",
+        "description": "Devuelve una lista de todas las facturas registradas.",
+        "responses": {
+          "200": {
+            "description": "Lista de facturas obtenida exitosamente.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "id": {
+                        "type": "string",
+                        "example": "456"
+                      },
+                      "clientName": {
+                        "type": "string",
+                        "example": "Juan Pérez"
+                      },
+                      "total": {
+                        "type": "number",
+                        "example": 150.0
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Solicitud inválida."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
+    },
+    "/api/expenses/management": {
+      "post": {
+        "operationId": "manageExpenses",
+        "summary": "Gestionar gastos",
+        "description": "Permite gestionar gastos mediante OCR y clasificación automática.",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "expenseType": {
+                    "type": "string",
+                    "example": "Transporte"
+                  },
+                  "amount": {
+                    "type": "number",
+                    "example": 50.75
+                  },
+                  "date": {
+                    "type": "string",
+                    "format": "date",
+                    "example": "2025-06-17"
+                  },
+                  "description": {
+                    "type": "string",
+                    "example": "Taxi al aeropuerto"
+                  }
+                },
+                "required": [
+                  "expenseType",
+                  "amount",
+                  "date"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Gasto gestionado exitosamente."
+          },
+          "400": {
+            "description": "Solicitud inválida."
+          },
+          "500": {
+            "description": "Error interno del servidor."
+          }
+        },
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ]
+      }
     }
   },
   "components": {
