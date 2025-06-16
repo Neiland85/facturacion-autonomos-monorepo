@@ -23,4 +23,6 @@ Este proyecto está bajo la licencia Apache 2.0. **Este repositorio no es de có
 
 ---
 
+© 2025 Neil Muñoz Lago ([Neiland85](https://github.com/Neiland85)). Todos los derechos reservados.
+
 > **Nota:** Para más detalles, consulta los README específicos en los directorios `backend` y `frontend`.

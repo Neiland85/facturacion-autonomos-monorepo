@@ -22,7 +22,7 @@ app.use('/api', router);
 app.use('/api/pdf', pdfRoutes);
 
 // Documentación API - Swagger
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocument as any));
 
 // Iniciar servidor
 app.listen(PORT, () => {
