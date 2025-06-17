@@ -1,0 +1,118 @@
+.reportsContainer {
+  max-width: 1000px;
+  margin: 20px auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  font-family: sans-serif;
+  color: #333;
+}
+
+.reportsHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 15px;
+  margin-bottom: 25px;
+}
+
+.reportsHeader h1 {
+  font-size: 2em;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.backLink {
+  text-decoration: none;
+  color: #3498db;
+  font-weight: bold;
+  padding: 8px 15px;
+  border: 1px solid #3498db;
+  border-radius: 5px;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+.backLink:hover {
+  background-color: #3498db;
+  color: #fff;
+}
+
+.reportsSection h2,
+.alertsSection h2 {
+  font-size: 1.5em;
+  color: #34495e;
+  margin-top: 0;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #3498db;
+  padding-bottom: 5px;
+  display: inline-block;
+}
+
+.reportItem,
+.alertItem {
+  background-color: #ecf0f1;
+  padding: 15px;
+  margin-bottom: 15px;
+  border-radius: 5px;
+  border-left: 5px solid #3498db;
+}
+
+.reportItem h3,
+.alertItem h3 {
+  margin-top: 0;
+  margin-bottom: 8px;
+  font-size: 1.2em;
+}
+
+.reportItem p,
+.alertItem p {
+  margin-bottom: 5px;
+  font-size: 0.95em;
+  line-height: 1.6;
+}
+
+.reportItem a,
+.alertItem a {
+  color: #2980b9;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.reportItem a:hover,
+.alertItem a:hover {
+  text-decoration: underline;
+}
+
+.alertItem.urgent {
+  border-left-color: #e74c3c;
+  background-color: #fdecea;
+}
+
+.alertItem.urgent h3 {
+  color: #c0392b;
+}
+
+.alertItem.warning {
+  border-left-color: #f39c12;
+  background-color: #fef6e7;
+}
+
+.alertItem.warning h3 {
+  color: #d35400;
+}
+
+.alertItem.info {
+  border-left-color: #3498db;
+  background-color: #eaf5fb;
+}
+
+.reportsFooter {
+  text-align: center;
+  margin-top: 30px;
+  padding-top: 15px;
+  border-top: 1px solid #eee;
+  font-size: 0.9em;
+  color: #7f8c8d;
+}
