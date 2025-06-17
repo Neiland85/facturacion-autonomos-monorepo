@@ -1,6 +1,5 @@
 import { Router } from 'express';
 import { getUsers, createUser } from '../controllers/userController';
-import { getInvoices, createInvoice } from '../controllers/invoiceController';
 import { handleVoiceCommand } from '../controllers/voiceController';
 import { getBankAccounts } from '../controllers/bankController';
 import { setup2FA, verify2FA, setupWebAuthn, verifyWebAuthn } from '../controllers/securityController';
@@ -11,12 +10,8 @@ const router = Router();
 router.get('/users', getUsers);
 router.post('/users', createUser);
 
-// Rutas de facturas
-router.get('/invoices', getInvoices);
-router.post('/invoices', createInvoice);
-
 // Ruta para procesar comandos de voz
-router.post('/api/voice-command', handleVoiceCommand);
+router.post('/voice-command', handleVoiceCommand); // Corregido: sin /api aquí
 
 // Ruta para obtener cuentas bancarias
 router.post('/api/bank-accounts', getBankAccounts);
