@@ -41,22 +41,23 @@ jobs:
         run: npm ci
 
       - name: Run unit tests
-        run: npm run test
+        run: npm run test --if-present
 
       - name: Install Playwright browsers
         run: npx playwright install --with-deps
 
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: npm run test:e2e --if-present
         env:
           DATABASE_URL: postgresql://test:test@localhost:5432/test
 
       - name: Upload coverage reports
-        uses: codecov/codecov-action@v3
+        uses: codecov/codecov-action@v4
         with:
           files: ./coverage/lcov.info
           flags: unittests
           name: codecov-umbrella
+          fail_ci_if_error: false
 
       - name: Upload test results
         if: always()

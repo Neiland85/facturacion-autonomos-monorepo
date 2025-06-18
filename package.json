@@ -12,14 +12,22 @@
     "dev:frontend": "yarn workspace frontend dev",
     "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\"",
     "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "test": "jest --config jest.config.base.js",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui",
+    "test:ci": "npm run test && npm run test:e2e"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.3",
     "@types/supertest": "^6.0.3",
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "eslint": "^9.29.0"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
