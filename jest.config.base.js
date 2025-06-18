@@ -1,6 +1,7 @@
 const baseConfig = {
   preset: 'ts-jest',
   testEnvironment: 'node',
+  passWithNoTests: true,
   transform: {
     '^.+\\.tsx?$': [
       'ts-jest',

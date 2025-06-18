@@ -19,15 +19,29 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:ci": "npm run test && npm run test:e2e"
+    "test:ci": "npm run test && npm run test:e2e",
+    "prepare": "husky"
   },
   "devDependencies": {
+    "@commitlint/cli": "^19.8.1",
+    "@commitlint/config-conventional": "^19.8.1",
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.3",
     "@types/supertest": "^6.0.3",
+    "@typescript-eslint/eslint-plugin": "^8.34.1",
+    "@typescript-eslint/parser": "^8.34.1",
     "concurrently": "^8.2.2",
-    "eslint": "^9.29.0"
+    "eslint": "^9.29.0",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-import": "^2.31.0",
+    "eslint-plugin-prettier": "^5.5.0",
+    "husky": "^9.1.7",
+    "jest-junit": "^16.0.0",
+    "lint-staged": "^16.1.2",
+    "prettier": "^3.5.3",
+    "ts-jest": "^29.4.0",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
