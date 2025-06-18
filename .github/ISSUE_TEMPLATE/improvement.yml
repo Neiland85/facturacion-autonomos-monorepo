@@ -1,0 +1,87 @@
+name: 🚀 Propuesta de Mejora
+description: Sugiere una mejora para el proyecto
+title: "[MEJORA]: "
+labels: ["enhancement"]
+
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por tomarte el tiempo de sugerir una mejora. Por favor, proporciona todos los detalles posibles.
+
+  - type: dropdown
+    id: area
+    attributes:
+      label: Área de Mejora
+      description: ¿Qué área del proyecto se beneficiaría de esta mejora?
+      options:
+        - Frontend
+        - Backend
+        - Infraestructura
+        - DevOps
+        - Testing
+        - Documentación
+        - Rendimiento
+        - UX/UI
+        - Seguridad
+        - Otro
+    validations:
+      required: true
+
+  - type: textarea
+    id: current-situation
+    attributes:
+      label: Situación Actual
+      description: Describe la situación actual que quieres mejorar
+      placeholder: "Actualmente, el proceso de..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: proposed-solution
+    attributes:
+      label: Solución Propuesta
+      description: Describe tu propuesta de mejora en detalle
+      placeholder: "Propongo implementar..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: benefits
+    attributes:
+      label: Beneficios Esperados
+      description: ¿Qué beneficios traería esta mejora?
+      placeholder: "Esta mejora permitiría..."
+    validations:
+      required: true
+
+  - type: textarea
+    id: implementation
+    attributes:
+      label: Detalles de Implementación
+      description: Si tienes ideas sobre cómo implementar esta mejora, compártelas aquí
+      placeholder: "La implementación podría incluir..."
+    validations:
+      required: false
+
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmaciones
+      description: Por favor, confirma lo siguiente
+      options:
+        - label: He verificado que no existe una propuesta similar
+          required: true
+        - label: Esta mejora no romperá funcionalidades existentes
+          required: true
+        - label: He considerado el impacto en el rendimiento y la mantenibilidad
+          required: true
+
+  - type: input
+    id: additional-context
+    attributes:
+      label: Contexto Adicional
+      description: Enlaces a recursos, ejemplos o cualquier información adicional relevante
+      placeholder: "https://ejemplo.com/recurso-relevante"
+    validations:
+      required: false

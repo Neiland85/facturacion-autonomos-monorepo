@@ -1,0 +1,52 @@
+name: CI/CD
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck --if-present
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+  build:
+    needs: validate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build packages
+        run: |
+          npm run build --workspace=@tributariapp/core
+          npm run build --workspace=@tributariapp/services
+
+      - name: Build apps
+        run: |
+          npm run build --workspace=@tributariapp/api
+          npm run build --workspace=@tributariapp/web

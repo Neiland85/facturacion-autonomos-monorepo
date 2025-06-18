@@ -1,5 +1,5 @@
 {
-  "name": "facturacion-autonomos-backend",
+  "name": "@tributariapp/api",
   "version": "1.0.0",
   "description": "Backend para la gestión de facturación de autónomos",
   "main": "src/index.js",

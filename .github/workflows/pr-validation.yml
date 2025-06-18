@@ -1,0 +1,62 @@
+name: Pull Request Validation
+
+on:
+  pull_request:
+    branches:
+      - main
+      - dev
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Type check
+        run: npm run typecheck
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Test
+        run: npm run test
+
+      - name: Check conventional commits
+        uses: wagoid/commitlint-github-action@v5
+
+      - name: Block merging if checks fail
+        if: ${{ failure() }}
+        run: |
+          echo "::error::Las validaciones han fallado. Por favor, corrige los errores antes de hacer merge."
+          exit 1
+
+  update-pr:
+    needs: validate
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request' && github.event.pull_request.base.ref == 'main'
+    steps:
+      - name: Auto-merge dev to main validation
+        run: |
+          if [[ "${{ github.event.pull_request.head.ref }}" != "dev" ]]; then
+            echo "::error::Los PRs a main solo están permitidos desde la rama dev"
+            exit 1
+          fi
+
+      - name: Verify branch is up to date
+        run: |
+          if [[ "${{ github.event.pull_request.mergeable_state }}" == "behind" ]]; then
+            echo "::error::La rama dev necesita ser actualizada con los últimos cambios de main"
+            exit 1
+          fi

@@ -2,8 +2,8 @@
   "name": "facturacion-autonomos-monorepo",
   "private": true,
   "workspaces": [
-    "backend",
-    "frontend"
+    "apps/*",
+    "packages/*"
   ],
   "license": "Apache-2.0",
   "description": "Monorepo modular para facturación de autónomos: Next.js frontend y backend desacoplado Node.js. Escalable, con CI/CD.",

@@ -1,0 +1,73 @@
+openapi: 3.0.0
+info:
+  title: TributariApp API
+  version: '1.0.0'
+  description: API para gestión fiscal de autónomos
+
+servers:
+  - url: http://localhost:3001/api
+    description: Desarrollo
+  - url: https://api.tributariapp.com
+    description: Producción
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+  schemas:
+    Factura:
+      type: object
+      required:
+        - numero
+        - fecha
+        - emisor
+        - receptor
+        - conceptos
+      properties:
+        numero:
+          type: string
+        fecha:
+          type: string
+          format: date-time
+        emisor:
+          $ref: '#/components/schemas/Empresa'
+        receptor:
+          $ref: '#/components/schemas/Empresa'
+        conceptos:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineaFactura'
+    
+    Empresa:
+      type: object
+      required:
+        - nombre
+        - nif
+      properties:
+        nombre:
+          type: string
+        nif:
+          type: string
+        direccion:
+          type: string
+
+paths:
+  /facturas:
+    post:
+      summary: Crear nueva factura
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Factura'
+      responses:
+        '201':
+          description: Factura creada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Factura'
