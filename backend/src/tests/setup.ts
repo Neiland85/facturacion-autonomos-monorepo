@@ -20,3 +20,9 @@ jest.mock('axios', () => {
 beforeEach(() => {
   jest.clearAllMocks();
 });
+
+// Configuración adicional para Jest
+jest.setTimeout(30000);
+
+// Añadir tipos explícitos para Jest
+/// <reference types="jest" />

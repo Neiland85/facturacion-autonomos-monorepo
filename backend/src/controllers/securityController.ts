@@ -2,6 +2,12 @@ import { Request, Response } from 'express';
 import { generate2FASecret, getQRCode, verify2FACode } from '../modules/security/2fa';
 import { generateWebAuthnRegistrationOptions, verifyWebAuthnRegistration } from '../modules/security/webauthn';
 
+// Ajustar tipos para WebAuthn
+interface WebAuthnResponse {
+  response: any;
+  expectedChallenge: string;
+}
+
 // 2FA Endpoints
 export const setup2FA = async (req: Request, res: Response) => {
   try {

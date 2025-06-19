@@ -1,9 +1,10 @@
 import { Request, Response } from 'express';
-import OpenAI from 'openai';
+import { Configuration, OpenAIApi } from 'openai';
 
-const openai = new OpenAI({
+const configuration = new Configuration({ 
   apiKey: process.env.OPENAI_API_KEY,
 });
+const openaiApi = new OpenAIApi(configuration);
 
 export const handleVoiceCommand = async (req: Request, res: Response) => {
   const { command } = req.body;
@@ -13,7 +14,7 @@ export const handleVoiceCommand = async (req: Request, res: Response) => {
   }
 
   try {
-    const response = await openai.chat.completions.create({
+    const response = await openaiApi.chat.completions.create({
       model: 'gpt-4',
       messages: [{ role: 'user', content: `Eres un asistente administrativo. Responde a esta solicitud: ${command}` }],
       max_tokens: 150,

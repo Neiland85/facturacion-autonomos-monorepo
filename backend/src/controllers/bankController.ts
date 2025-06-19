@@ -5,6 +5,12 @@ import { getCaixaBankAccounts } from '../modules/banks/caixabank';
 import { getSabadellAccounts } from '../modules/banks/sabadell';
 import { getBankinterAccounts } from '../modules/banks/bankinter';
 
+// Ajustar tipos para cuentas bancarias
+interface BankAccount {
+  accountNumber: string;
+  balance: number;
+}
+
 export const getBankAccounts = async (req: Request, res: Response) => {
   const { bank, accessToken } = req.body;
 

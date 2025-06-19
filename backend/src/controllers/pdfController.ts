@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import PDFDocument from 'pdfkit';
+import PDFDocument = require('pdfkit');
 
 export const generateInvoicePDF = (req: Request, res: Response) => {
   const { clientName, invoiceNumber, items, total } = req.body;
