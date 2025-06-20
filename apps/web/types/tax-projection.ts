@@ -1,4 +1,5 @@
-// This file would be shared or its content accessible by both frontend and backend
+// Este archivo contiene tipos compartidos para proyecciones fiscales.
+
 export interface QuarterlyFinancials {
   quarter: string // e.g., "T1 2024"
   income: number

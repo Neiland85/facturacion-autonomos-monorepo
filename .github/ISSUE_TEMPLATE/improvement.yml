@@ -37,8 +37,6 @@ body:
       label: "Áreas afectadas"
       description: "Seleccione las áreas del proyecto que se verán afectadas por esta mejora."
       options:
-        - label: "Frontend"
-        - label: "Backend"
         - label: "Documentación"
         - label: "Infraestructura"
 

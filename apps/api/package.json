@@ -1,7 +1,7 @@
 {
-  "name": "facturacion-autonomos-backend",
+  "name": "facturacion-autonomos-api",
   "version": "1.0.0",
-  "description": "Backend para la gestión de facturación de autónomos",
+  "description": "API para la gestión de facturación de autónomos",
   "main": "src/index.js",
   "scripts": {
     "dev": "nodemon src/index.ts",

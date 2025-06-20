@@ -1,8 +1,6 @@
-# 🌐 Frontend - Facturación Autónomos
+# 🌐 Facturación Autónomos
 
-![Animated Title](https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&size=24&duration=3000&color=00F7FF&center=true&vCenter=true&lines=Frontend+Tributariapp+Próximamente)
-
-El frontend proporciona una interfaz de usuario moderna y responsiva para la gestión de facturación.
+El cliente web proporciona una interfaz de usuario moderna y responsiva para la gestión de facturación.
 
 ## 📦 Tecnologías
 

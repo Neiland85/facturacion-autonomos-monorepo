@@ -5,11 +5,11 @@ import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { TrendProjectionChart } from "@/components/charts/trend-projection-chart"
-import type {
-  TaxProjectionModuleData, // This will now be the combined response type
+import {
+  ProjectionResponse,
   QuarterlyFinancials,
   TaxProjection,
-  ProjectionAdvice,
+  ProjectionAdvice
 } from "@/types/tax-projection"
 import { AlertTriangle, TrendingUp, Lightbulb, Info, ServerCrash } from "lucide-react"
 import { Separator } from "@/components/ui/separator"
@@ -25,47 +25,33 @@ const formatCurrency = (value: number) =>
 const mockApiHistoricalData: QuarterlyFinancials[] = [
   { quarter: "T1 2024", income: 12000, expenses: 4000, vatPaid: 1500, irpfPaid: 1600 },
   { quarter: "T2 2024", income: 15000, expenses: 5500, vatPaid: 1800, irpfPaid: 1900 },
-  { quarter: "T3 2024", income: 13500, expenses: 4800, vatPaid: 1650, irpfPaid: 1740 },
-]
+  { quarter: "T3 2024", income: 13500, expenses: 4800, vatPaid: 1650, irpfPaid: 1740 }
+];
 
 const mockApiProjectionAndAdvice = (
   historicalData: QuarterlyFinancials[],
 ): { projection: TaxProjection; advice: ProjectionAdvice[] } => {
   const nextQuarterStr = () => {
     const lastQ = historicalData[historicalData.length - 1].quarter
-    const [lastT, lastYStr] = lastQ.split(" ")
-    let nextQNum = Number.parseInt(lastT.substring(1)) + 1
-    let nextYear = Number.parseInt(lastYStr)
+    const [lastT, lastYStr] = lastQ.split(" ");
+    let nextQNum = Number.parseInt(lastT.substring(1)) + 1;
+    let nextYear = Number.parseInt(lastYStr);
     if (nextQNum > 4) {
-      nextQNum = 1
-      nextYear += 1
+      nextQNum = 1;
+      nextYear += 1;
     }
-    return `T${nextQNum} ${nextYear}`
+    const nextQuarterStr = `T${nextQNum} ${nextYear}`;
+    return nextQuarterStr
   }
   const projection = {
     nextQuarter: nextQuarterStr(),
-    projectedVat: 1750, // Example fixed values, backend would calculate
+    projectedVat: 1750, // Example fixed values, calculated dynamically
     projectedIrpf: 1850,
   }
-  const advice = [
-    {
-      id: "backend_vat_advice",
-      text: `Basado en tus tendencias, tu próximo pago de IVA podría rondar los ${formatCurrency(projection.projectedVat)}. Considera optimizar gastos deducibles.`,
-      type: "vat",
-      severity: "suggestion",
-    },
-    {
-      id: "backend_irpf_advice",
-      text: `Tu IRPF proyectado es de ${formatCurrency(projection.projectedIrpf)}. Si tus ingresos aumentan un 10%, este pago podría subir a ${formatCurrency(projection.projectedIrpf * 1.15)}.`,
-      type: "irpf",
-      severity: "info",
-    },
-    {
-      id: "backend_general_advice",
-      text: "Es un buen momento para revisar tu planificación fiscal anual y asegurarte de que estás aprovechando todas las deducciones aplicables.",
-      type: "general",
-      severity: "suggestion",
-    },
+  const advice: ProjectionAdvice[] = [
+    { id: "vat_advice", text: "Revisar IVA", type: "vat", severity: "warning" },
+    { id: "irpf_advice", text: "Revisar IRPF", type: "irpf", severity: "suggestion" },
+    { id: "general_advice", text: "Revisar general", type: "general", severity: "info" }
   ]
   return { projection, advice }
 }
@@ -96,7 +82,8 @@ const AdviceCard: React.FC<{ adviceItem: ProjectionAdvice }> = ({ adviceItem }) 
 }
 
 export default function TaxProjectionModule() {
-  const [data, setData] = useState<TaxProjectionModuleData | null>(null)
+  const [data, setData] = useState<ProjectionResponse | null>(null)
+  const [historicalData, setHistoricalData] = useState<QuarterlyFinancials[]>([]);
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
@@ -130,7 +117,6 @@ export default function TaxProjectionModule() {
       const projectionResult = mockApiProjectionAndAdvice(historicalData)
 
       setData({
-        historicalData,
         projection: projectionResult.projection,
         advice: projectionResult.advice,
       })
@@ -145,6 +131,15 @@ export default function TaxProjectionModule() {
       setIsLoading(false)
     }
   }
+
+  useEffect(() => {
+    // Simular la carga de datos históricos
+    setHistoricalData([
+      { quarter: "T1 2024", income: 12000, expenses: 4000, vatPaid: 1500, irpfPaid: 1600 },
+      { quarter: "T2 2024", income: 15000, expenses: 5500, vatPaid: 1800, irpfPaid: 1900 },
+      { quarter: "T3 2024", income: 13500, expenses: 4800, vatPaid: 1650, irpfPaid: 1740 }
+    ]);
+  }, []);
 
   useEffect(() => {
     fetchData()
@@ -196,15 +191,15 @@ export default function TaxProjectionModule() {
     )
   }
 
-  const { historicalData, projection, advice } = data
+  const { projection, advice } = data || { projection: null, advice: [] };
 
   const vatChartData = [
-    ...historicalData.map((q) => ({ name: q.quarter, historical: q.vatPaid })),
+    ...historicalData.map((q: { quarter: string; vatPaid: number }) => ({ name: q.quarter, historical: q.vatPaid })),
     { name: projection.nextQuarter, projected: projection.projectedVat },
   ]
 
   const irpfChartData = [
-    ...historicalData.map((q) => ({ name: q.quarter, historical: q.irpfPaid })),
+    ...historicalData.map((q: { quarter: string; irpfPaid: number }) => ({ name: q.quarter, historical: q.irpfPaid })),
     { name: projection.nextQuarter, projected: projection.projectedIrpf },
   ]
 
@@ -267,7 +262,7 @@ export default function TaxProjectionModule() {
                 Consejos y Observaciones
               </h3>
               <div className="space-y-3">
-                {advice.map((adv) => (
+                {advice.map((adv: ProjectionAdvice) => (
                   <AdviceCard key={adv.id} adviceItem={adv} />
                 ))}
               </div>

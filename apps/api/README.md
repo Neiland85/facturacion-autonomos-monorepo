@@ -1,8 +1,6 @@
-# 🛠️ Backend - Facturación Autónomos
+# 🛠️ Facturación Autónomos
 
-![Animated Title](https://readme-typing-svg.herokuapp.com?font=JetBrains+Mono&size=24&duration=3000&color=00F7FF&center=true&vCenter=true&lines=Backend+de+Facturaci%C3%B3n+Aut%C3%B3nomos)
-
-El backend proporciona una API RESTful para la gestión de usuarios, facturas y clientes.
+La API proporciona servicios RESTful para la gestión de usuarios, facturas y clientes.
 
 ## 📦 Tecnologías
 
