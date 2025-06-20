@@ -2,21 +2,17 @@
   "name": "facturacion-autonomos-monorepo",
   "private": true,
   "workspaces": [
-    "apps/api",
     "apps/web"
   ],
   "license": "Apache-2.0",
   "description": "Monorepo modular para facturación de autónomos: Next.js y Node.js desacoplados. Escalable, con CI/CD.",
   "scripts": {
-    "dev:api": "yarn workspace apps/api dev",
     "dev:web": "yarn workspace apps/web dev",
-    "dev": "concurrently \"yarn dev:api\" \"yarn dev:web\"",
-    "build:api": "yarn workspace apps/api build",
+    "dev": "yarn dev:web",
     "build:web": "yarn workspace apps/web build",
-    "build": "yarn build:api && yarn build:web",
-    "start:api": "yarn workspace apps/api start",
+    "build": "yarn build:web",
     "start:web": "yarn workspace apps/web start",
-    "start": "concurrently \"yarn start:api\" \"yarn start:web\"",
+    "start": "yarn start:web",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "test": "jest"
@@ -47,10 +43,6 @@
     "speakeasy": "^2.0.0",
     "swagger-ui-express": "^5.0.1",
     "tesseract.js": "^6.0.1",
-    "xml-crypto": "^6.1.2",
-    "xmlbuilder2": "^3.1.1"
-  },
-  "resolutions": {
-    "@types/express": "^^5.0.3"
+    "xml-crypto": "^6.1.2"
   }
 }
