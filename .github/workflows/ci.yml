@@ -74,10 +74,10 @@ jobs:
       - name: List project directories
         run: ls -la
 
-      - name: Update Yarn to 3.x
+      - name: Force Yarn 3.x usage
         run: |
-          npm install -g yarn@latest
           yarn set version stable
+          yarn --version
 
       - name: Run tests
         env:
