@@ -71,6 +71,9 @@ jobs:
       - name: Clear Yarn cache
         run: yarn cache clean
 
+      - name: List project directories
+        run: ls -la
+
       - name: Run tests
         env:
           NODE_OPTIONS: --max-old-space-size=4096
