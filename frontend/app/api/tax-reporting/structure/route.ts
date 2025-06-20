@@ -2,9 +2,12 @@ import { NextResponse, type NextRequest } from "next/server"
 import { neon } from "@neondatabase/serverless"
 import type { TaxReportingStructure, OCRInvoiceData, ExpenseCategory, IncomeCategory } from "@/types/ocr"
 
+// Validación de la variable de entorno
+if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith("postgresql://")) {
+  throw new Error("DATABASE_URL debe tener el formato correcto: postgresql://user:password@host.tld/dbname")
+}
 const sql = neon(process.env.DATABASE_URL!)
 
-// Helper function to get the current quarter
 function getCurrentQuarter(): { quarter: string; year: number } {
   const now = new Date()
   const month = now.getMonth() + 1
@@ -19,6 +22,10 @@ function getCurrentQuarter(): { quarter: string; year: number } {
   return { quarter, year }
 }
 
+/**
+ * GET /tax-reporting/structure
+ * Devuelve la estructura fiscal agregada para un usuario y periodo
+ */
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams
@@ -34,7 +41,7 @@ export async function GET(request: NextRequest) {
     const targetQuarter = quarterParam || currentQuarter
     const targetYear = yearParam ? Number.parseInt(yearParam, 10) : currentYear
 
-    // Fetch all processed invoices for the specified period
+    // Consulta de facturas procesadas
     const invoicesResult = await sql`
       SELECT 
         invoice_data,
@@ -49,21 +56,13 @@ export async function GET(request: NextRequest) {
 
     const processedInvoices: OCRInvoiceData[] = invoicesResult.map((row: any) => JSON.parse(row.invoice_data))
 
-    // Calculate aggregated tax reporting structure
+    // Inicialización de agregados
     let vatCollected = 0
     let vatPaid = 0
     let totalIncome = 0
     let totalExpenses = 0
 
-    const expensesByCategory: Record<
-      ExpenseCategory,
-      {
-        totalAmount: number
-        vatDeductible: number
-        invoiceCount: number
-        averageAmount: number
-      }
-    > = {
+    const expensesByCategory: Record<ExpenseCategory, { totalAmount: number; vatDeductible: number; invoiceCount: number; averageAmount: number }> = {
       office_supplies: { totalAmount: 0, vatDeductible: 0, invoiceCount: 0, averageAmount: 0 },
       professional_services: { totalAmount: 0, vatDeductible: 0, invoiceCount: 0, averageAmount: 0 },
       travel_accommodation: { totalAmount: 0, vatDeductible: 0, invoiceCount: 0, averageAmount: 0 },
@@ -79,15 +78,7 @@ export async function GET(request: NextRequest) {
       other_deductible: { totalAmount: 0, vatDeductible: 0, invoiceCount: 0, averageAmount: 0 },
     }
 
-    const incomeByCategory: Record<
-      IncomeCategory,
-      {
-        totalAmount: number
-        vatCollected: number
-        invoiceCount: number
-        averageAmount: number
-      }
-    > = {
+    const incomeByCategory: Record<IncomeCategory, { totalAmount: number; vatCollected: number; invoiceCount: number; averageAmount: number }> = {
       professional_services: { totalAmount: 0, vatCollected: 0, invoiceCount: 0, averageAmount: 0 },
       product_sales: { totalAmount: 0, vatCollected: 0, invoiceCount: 0, averageAmount: 0 },
       consulting: { totalAmount: 0, vatCollected: 0, invoiceCount: 0, averageAmount: 0 },
@@ -96,7 +87,7 @@ export async function GET(request: NextRequest) {
       other_income: { totalAmount: 0, vatCollected: 0, invoiceCount: 0, averageAmount: 0 },
     }
 
-    // Process each invoice for categorization
+    // Procesar cada factura
     processedInvoices.forEach((invoice) => {
       const amount = invoice.totalAmount || 0
       const vatAmount = invoice.vatAmount || 0
@@ -108,7 +99,6 @@ export async function GET(request: NextRequest) {
           expensesByCategory[category].totalAmount += amount
           expensesByCategory[category].vatDeductible += vatAmount * deductibilityFactor
           expensesByCategory[category].invoiceCount += 1
-
           totalExpenses += amount
           vatPaid += vatAmount * deductibilityFactor
         }
@@ -118,29 +108,27 @@ export async function GET(request: NextRequest) {
           incomeByCategory[category].totalAmount += amount
           incomeByCategory[category].vatCollected += vatAmount
           incomeByCategory[category].invoiceCount += 1
-
           totalIncome += amount
           vatCollected += vatAmount
         }
       }
     })
 
-    // Calculate averages
+    // Calcular promedios
     Object.values(expensesByCategory).forEach((cat) => {
       if (cat.invoiceCount > 0) {
         cat.averageAmount = cat.totalAmount / cat.invoiceCount
       }
     })
-
     Object.values(incomeByCategory).forEach((cat) => {
       if (cat.invoiceCount > 0) {
         cat.averageAmount = cat.totalAmount / cat.invoiceCount
       }
     })
 
-    const deductibleExpenses = totalExpenses // Simplified for now
+    const deductibleExpenses = totalExpenses
     const netIncome = totalIncome - deductibleExpenses
-    const estimatedIRPF = Math.max(0, netIncome * 0.2) // 20% simplified rate
+    const estimatedIRPF = Math.max(0, netIncome * 0.2)
 
     const taxReportingStructure: TaxReportingStructure = {
       quarter: targetQuarter,
