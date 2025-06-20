@@ -83,3 +83,12 @@ jobs:
         env:
           NODE_OPTIONS: --max-old-space-size=4096
         run: yarn test
+
+      - name: List root directories
+        run: ls -la
+
+      - name: List apps directory
+        run: ls -la apps
+
+      - name: Verify Yarn workspaces
+        run: yarn workspaces list
