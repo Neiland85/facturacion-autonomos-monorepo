@@ -1,19 +1,15 @@
-import express from 'express';
+import express, { Request, Response } from 'express'; // Corregir importación de Response
 import swaggerUi from 'swagger-ui-express';
 import * as fs from 'fs';
 import * as path from 'path';
 import yaml from 'js-yaml';
-import { Request, Response, NextFunction } from 'express';
 
 const app = express();
 
 // Middleware para parsear JSON
-app.use(express.json());
-
-// Habilitar CORS
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+app.use((req: Request, res: any, next: Function) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
   next();
 });
 
@@ -29,24 +25,34 @@ try {
 }
 
 // Configurar Swagger UI correctamente con tipos
-app.use('/api-docs', swaggerUi.serve, (req: Request, res: Response, next: NextFunction) => {
+app.use('/api-docs', swaggerUi.serve, (req: Request, res: any, next: Function) => {
   swaggerUi.setup(swaggerDocument)(req, res, next);
 });
 
+// Middleware de ejemplo
+app.use((req: Request, res: any, next: Function) => {
+  console.log('Middleware ejecutado');
+  next();
+});
+
 // Ruta de ejemplo
-app.get('/health', (req, res) => {
+app.get('/health', (req: Request, res: any) => {
   res.status(200).json({ status: 'OK' });
 });
 
 // Ruta raíz
-app.get('/', (req, res) => {
+app.get('/', (req: Request, res: any) => {
   res.status(200).json({ message: 'Servidor funcionando correctamente' });
 });
 
 // Middleware para manejar errores
-app.use((err: Error, req: Request, res: Response, next: NextFunction) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Ocurrió un error en el servidor' });
+app.use((err: Error, req: Request, res: any, next: Function) => {
+  console.error('Error capturado por el middleware:', err.message);
+
+  res.status(500).json({
+    error: 'Ocurrió un error inesperado en el servidor',
+    details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+  });
 });
 
 export default app;
