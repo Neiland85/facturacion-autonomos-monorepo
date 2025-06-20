@@ -59,6 +59,18 @@ jobs:
           NODE_OPTIONS: --max-old-space-size=4096
         run: yarn install --frozen-lockfile
 
+      - name: Debug Yarn workspaces
+        run: |
+          echo "Yarn version:"
+          yarn --version
+          echo "Detected workspaces:"
+          yarn workspaces list
+          echo "Root package.json:"
+          cat package.json
+
+      - name: Clear Yarn cache
+        run: yarn cache clean
+
       - name: Run tests
         env:
           NODE_OPTIONS: --max-old-space-size=4096
