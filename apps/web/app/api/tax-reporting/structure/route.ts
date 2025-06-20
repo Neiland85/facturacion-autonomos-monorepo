@@ -4,6 +4,11 @@ import type { TaxReportingStructure, OCRInvoiceData, ExpenseCategory, IncomeCate
 
 const sql = neon(process.env.DATABASE_URL!)
 
+// Validar DATABASE_URL con un mensaje más claro
+if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith("postgresql://")) {
+  throw new Error("DATABASE_URL debe tener el formato correcto: postgresql://user:password@host.tld/dbname. Verifica tu archivo .env.");
+}
+
 // Helper function to get the current quarter
 function getCurrentQuarter(): { quarter: string; year: number } {
   const now = new Date()
@@ -153,7 +158,7 @@ export async function GET(request: NextRequest) {
       netIncome,
       estimatedIRPF,
       expensesByCategory,
-      incomeByCategory,
+      incomeByCategory: {},
       processedInvoices,
       validationSummary: {
         totalProcessed: processedInvoices.length,

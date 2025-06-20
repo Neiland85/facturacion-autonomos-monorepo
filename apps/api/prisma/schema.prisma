@@ -1,5 +1,3 @@
-// Esquema de Prisma para la base de datos
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -9,23 +7,50 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  invoices Invoice[]
+model Cliente {
+  id        Int       @id @default(autoincrement())
+  nombre    String
+  email     String
+  direccion String
+  usuarioId Int
+  createdAt DateTime  @default(now())
+  Usuario   Usuario   @relation(fields: [usuarioId], references: [id])
+  Factura   Factura[]
 }
 
-model Invoice {
-  id          Int      @id @default(autoincrement())
-  clientId    Int
-  amount      Float
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+model Factura {
+  id        Int      @id @default(autoincrement())
+  numero    String   @unique
+  fecha     DateTime
+  total     Float
+  usuarioId Int
+  clienteId Int
+  pdfUrl    String?
+  createdAt DateTime @default(now())
+  Cliente   Cliente  @relation(fields: [clienteId], references: [id])
+  Usuario   Usuario  @relation(fields: [usuarioId], references: [id])
+}
 
-  User User @relation(fields: [clientId], references: [id])
+model Usuario {
+  id        Int       @id @default(autoincrement())
+  nombre    String
+  email     String    @unique
+  password  String
+  createdAt DateTime  @default(now())
+  Cliente   Cliente[]
+  Factura   Factura[]
+}
+
+model ProcessedInvoice {
+  id                Int       @id @default(autoincrement())
+  originalFileName  String
+  fileSize          Int
+  fileType          String
+  blobUrl           String
+  extractedAt       DateTime  @default(now())
+  confidence        Float
+  processingStatus  String
+  invoiceData       Json
+  suggestions       String[]
+  createdAt         DateTime  @default(now())
 }

@@ -8,11 +8,11 @@
   "license": "Apache-2.0",
   "description": "Monorepo modular para facturación de autónomos: Next.js y Node.js desacoplados. Escalable, con CI/CD.",
   "scripts": {
-    "dev:web": "yarn workspace apps/web dev",
+    "dev:web": "yarn workspace web dev",
     "dev": "yarn dev:web",
-    "build:web": "yarn workspace apps/web build",
+    "build:web": "NODE_ENV=production yarn workspace web build",
     "build": "yarn build:web",
-    "start:web": "yarn workspace apps/web start",
+    "start:web": "yarn workspace web start",
     "start": "yarn start:web",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -50,5 +50,6 @@
     "tesseract.js": "^6.0.1",
     "typescript": "^5.1.0",
     "xml-crypto": "^6.1.2"
-  }
+  },
+  "packageManager": "yarn@4.9.2+sha512.1fc009bc09d13cfd0e19efa44cbfc2b9cf6ca61482725eb35bbc5e257e093ebf4130db6dfe15d604ff4b79efd8e1e8e99b25fa7d0a6197c9f9826358d4d65c3c"
 }

@@ -1,71 +1,77 @@
 import { NextResponse, type NextRequest } from "next/server"
 import type { OCRProcessingResult, OCRInvoiceData } from "@/types/ocr"
 import { OcrInvoiceDataSchema } from "@/types/ocr"
-import { fal } from "@fal-ai/serverless-client"
+import fal from "@fal-ai/serverless-client"
 import { generateObject } from "ai"
 import { openai } from "@ai-sdk/openai"
 import { put } from "@vercel/blob" // Import Vercel Blob SDK
 
 // Ensure FAL_API_KEY and OPENAI_API_KEY are set in environment variables
 if (!process.env.FAL_API_KEY) {
-  throw new Error("FAL_API_KEY is not set")
+  throw new Error("FAL_API_KEY is not set. Please define it in your environment variables.")
 }
 if (!process.env.OPENAI_API_KEY) {
-  throw new Error("OPENAI_API_KEY is not set")
+  throw new Error("OPENAI_API_KEY is not set. Please define it in your environment variables.")
 }
 // BLOB_READ_WRITE_TOKEN is usually injected by Vercel, but good to be aware
 if (!process.env.BLOB_READ_WRITE_TOKEN && process.env.NODE_ENV === "development") {
   console.warn("BLOB_READ_WRITE_TOKEN is not set. Vercel Blob uploads might fail locally if not configured.")
 }
 
+// Definición del tipo OcrInvoiceItem
+interface OcrInvoiceItem {
+  description?: string
+  quantity?: number
+  unitPrice?: number
+  totalPrice?: number
+  vatRate?: number
+}
+
+// Corrección de tipos y valores undefined
 async function processOCRWithFalAndAI(file: File): Promise<OCRProcessingResult> {
   const startTime = Date.now()
   let blobUploadUrl: string | undefined = undefined
 
   try {
-    // 0. Upload file to Vercel Blob
+    // Validación del archivo
+    if (!file || !file.name || !file.type) {
+      throw new Error("Archivo inválido o no proporcionado.")
+    }
+
+    // Subida del archivo a Vercel Blob
     console.log(`Uploading ${file.name} to Vercel Blob...`)
     const blob = await put(`invoices/${file.name}`, file, {
-      access: "public", // Or 'private' if you handle signed URLs for access
-      addRandomSuffix: true, // Good practice to avoid overwrites
+      access: "public",
+      addRandomSuffix: true,
     })
     blobUploadUrl = blob.url
     console.log(`File uploaded to Vercel Blob: ${blobUploadUrl}`)
 
-    // 1. Perform raw OCR using Fal AI
+    // OCR con Fal AI
     console.log("Sending file to Fal AI for OCR...")
     const falResult = await fal.run("fal-ai/document-parser", {
       input: {
-        // Fal AI document-parser expects a file blob, not a URL for this model
         image_file: new Blob([await file.arrayBuffer()], { type: file.type }),
       },
     })
 
-    if (!falResult || !falResult.text) {
-      throw new Error("Fal AI OCR did not return text content.")
+    if (!falResult || typeof falResult.text !== "string") {
+      throw new Error("Fal AI OCR no devolvió contenido de texto válido.")
     }
 
-    const rawOcrText = falResult.text as string
+    const rawOcrText = falResult.text
     console.log("Raw OCR Text extracted:", rawOcrText.substring(0, 500) + "...")
 
-    // 2. Use AI SDK to extract structured data from raw OCR text
+    // Extracción de datos estructurados
     console.log("Extracting structured data using AI SDK...")
     const { object: extractedData } = await generateObject({
       model: openai("gpt-4o"),
       schema: OcrInvoiceDataSchema,
       prompt: `Extract the following invoice data from the provided text. If a field is not found, omit it.
-    Ensure dates are in YYYY-MM-DD format if possible. Categorize the expense appropriately.
-    
-    Invoice Text:
-    ${rawOcrText}
-    
-    Expected fields: invoiceNumber, invoiceDate (YYYY-MM-DD), supplierName, supplierNIF, subtotal, vatRate, vatAmount, totalAmount, taxCategory (type, category, description, quarterlyReportingCode, annualReportingCode), deductibilityPercentage, items (description, quantity, unitPrice, totalPrice, vatRate).
-    
-    For taxCategory.category, use one of: "professional_services", "office_supplies", "travel_accommodation", "meals_entertainment", "equipment_software", "utilities", "rent", "insurance", "marketing_advertising", "training_education", "telecommunications", "vehicle_transport", "other_deductible".
-    For taxCategory.type, use "expense".
-    For quarterlyReportingCode and annualReportingCode, provide a plausible code if the category is clear, otherwise use "N/A".
-    For deductibilityPercentage, assume 100 unless it's 'meals_entertainment' (50).
-    `,
+      Ensure dates are in YYYY-MM-DD format if possible. Categorize the expense appropriately.
+      Invoice Text:
+      ${rawOcrText}
+      Expected fields: invoiceNumber, invoiceDate, supplierName, supplierNIF, subtotal, vatRate, vatAmount, totalAmount, taxCategory, deductibilityPercentage, items.`,
     })
 
     const processedData: OCRInvoiceData = {
@@ -75,14 +81,14 @@ async function processOCRWithFalAndAI(file: File): Promise<OCRProcessingResult> 
       vatRate: extractedData.vatRate ? Number(extractedData.vatRate) : undefined,
       vatAmount: extractedData.vatAmount ? Number(extractedData.vatAmount) : undefined,
       totalAmount: extractedData.totalAmount ? Number(extractedData.totalAmount) : undefined,
-      items: extractedData.items?.map((item) => ({
+      items: extractedData.items?.map((item: OcrInvoiceItem) => ({
         ...item,
         quantity: item.quantity ? Number(item.quantity) : undefined,
         unitPrice: item.unitPrice ? Number(item.unitPrice) : undefined,
         totalPrice: item.totalPrice ? Number(item.totalPrice) : undefined,
         vatRate: item.vatRate ? Number(item.vatRate) : undefined,
       })),
-    } as OCRInvoiceData
+    }
 
     const confidence =
       (processedData.invoiceNumber && processedData.totalAmount && processedData.supplierName ? 0.95 : 0.7) +
@@ -94,12 +100,12 @@ async function processOCRWithFalAndAI(file: File): Promise<OCRProcessingResult> 
         ...processedData,
         id: `ocr_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
         extractedAt: new Date(),
-        confidence: confidence,
+        confidence,
         processingStatus: "extracted",
         originalFileName: file.name,
         fileSize: file.size,
         fileType: file.type,
-        blobUrl: blobUploadUrl, // Store the Vercel Blob URL
+        blobUrl: blobUploadUrl,
       },
       processingTime: Date.now() - startTime,
       suggestions: [
