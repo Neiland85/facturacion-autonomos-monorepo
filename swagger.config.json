@@ -1,0 +1,26 @@
+{
+  "swagger": {
+    "ui": "swagger-ui-express",
+    "spec": "apps/api/openapi.yaml"
+  },
+  "openapi": {
+    "version": "3.1.0",
+    "info": {
+      "title": "Facturación Autónomos API",
+      "description": "API para gestionar la facturación de autónomos.",
+      "version": "1.0.0"
+    },
+    "paths": {
+      "/facturas": {
+        "get": {
+          "summary": "Obtener todas las facturas",
+          "responses": {
+            "200": {
+              "description": "Lista de facturas"
+            }
+          }
+        }
+      }
+    }
+  }
+}
