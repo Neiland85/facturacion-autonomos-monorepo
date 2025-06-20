@@ -74,10 +74,20 @@ jobs:
       - name: List project directories
         run: ls -la
 
-      - name: Force Yarn 3.x usage
-        run: |
-          yarn set version stable
-          yarn --version
+      - name: Enable Corepack
+        run: corepack enable
+
+      - name: Remove global Yarn
+        run: npm uninstall -g yarn
+
+      - name: Verify Yarn version before setup
+        run: yarn --version
+
+      - name: Set Yarn to stable version
+        run: yarn set version stable
+
+      - name: Verify Yarn version after setup
+        run: yarn --version
 
       - name: Run tests
         env:
