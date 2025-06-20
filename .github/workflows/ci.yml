@@ -74,10 +74,10 @@ jobs:
       - name: List project directories
         run: ls -la
 
-      - name: Upgrade Yarn to latest version
+      - name: Update Yarn to 3.x
         run: |
-          corepack enable
-          corepack prepare yarn@stable --activate
+          npm install -g yarn@latest
+          yarn set version stable
 
       - name: Run tests
         env:
