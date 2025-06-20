@@ -78,13 +78,16 @@ jobs:
         run: corepack enable
 
       - name: Remove preinstalled Yarn
-        run: sudo rm -rf $(which yarn)
+        run: sudo rm -rf $(which yarn) || true
 
-      - name: Install Yarn 3.x
-        run: corepack prepare yarn@stable --activate
+      - name: Install Yarn 3.x globally
+        run: npm install -g yarn@latest
 
-      - name: Verify Yarn version
+      - name: Verify Yarn version globally
         run: yarn --version
+
+      - name: Debug environment
+        run: env
 
       - name: Run tests
         env:
