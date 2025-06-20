@@ -9,6 +9,17 @@ const nextConfig = {
   images: {
     unoptimized: true,
   },
-}
+  experimental: {
+    scrollRestoration: true,
+  },
+  async rewrites() {
+    return [
+      {
+        source: '/api/:path*',
+        destination: 'http://localhost:3000/api/:path*', // URL del backend
+      },
+    ];
+  },
+};
 
-export default nextConfig
+export default nextConfig;

@@ -1,0 +1,50 @@
+name: "Mejora"
+description: "Proporcione detalles sobre la mejora que desea proponer."
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Gracias por contribuir con una mejora. Por favor, complete la información a continuación para ayudarnos a entender su propuesta.
+
+  - type: input
+    id: titulo
+    attributes:
+      label: "Título de la mejora"
+      description: "Proporcione un título breve y claro para la mejora."
+      placeholder: "Ejemplo: Mejorar el rendimiento de la API"
+
+  - type: textarea
+    id: descripcion
+    attributes:
+      label: "Descripción"
+      description: "Describa la mejora en detalle. Incluya el problema que resuelve o el beneficio que aporta."
+      placeholder: "Explique su propuesta aquí..."
+
+  - type: dropdown
+    id: prioridad
+    attributes:
+      label: "Prioridad"
+      description: "Seleccione el nivel de prioridad para esta mejora."
+      options:
+        - "Baja"
+        - "Media"
+        - "Alta"
+
+  - type: checkboxes
+    id: areas_afectadas
+    attributes:
+      label: "Áreas afectadas"
+      description: "Seleccione las áreas del proyecto que se verán afectadas por esta mejora."
+      options:
+        - label: "Frontend"
+        - label: "Backend"
+        - label: "Documentación"
+        - label: "Infraestructura"
+
+  - type: textarea
+    id: notas_adicionales
+    attributes:
+      label: "Notas adicionales"
+      description: "Agregue cualquier información adicional que considere relevante."
+      placeholder: "Notas opcionales..."

@@ -2,24 +2,37 @@
   "name": "facturacion-autonomos-monorepo",
   "private": true,
   "workspaces": [
-    "backend",
-    "frontend"
+    "apps/api",
+    "apps/web"
   ],
   "license": "Apache-2.0",
   "description": "Monorepo modular para facturación de autónomos: Next.js frontend y backend desacoplado Node.js. Escalable, con CI/CD.",
   "scripts": {
-    "dev:backend": "yarn workspace backend dev",
-    "dev:frontend": "yarn workspace frontend dev",
-    "dev": "concurrently \"yarn dev:backend\" \"yarn dev:frontend\"",
+    "dev:api": "yarn workspace apps/api dev",
+    "dev:web": "yarn workspace apps/web dev",
+    "dev": "concurrently \"yarn dev:api\" \"yarn dev:web\"",
+    "build:api": "yarn workspace apps/api build",
+    "build:web": "yarn workspace apps/web build",
+    "build": "yarn build:api && yarn build:web",
+    "start:api": "yarn workspace apps/api start",
+    "start:web": "yarn workspace apps/web start",
+    "start": "concurrently \"yarn start:api\" \"yarn start:web\"",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
+    "@types/js-yaml": "^4.0.9",
     "@types/node": "^24.0.3",
     "@types/supertest": "^6.0.3",
-    "concurrently": "^8.2.2"
+    "@types/swagger-ui-express": "^4.1.8",
+    "@types/winston": "^2.4.4",
+    "concurrently": "^8.2.2",
+    "jest": "^30.0.2",
+    "openapi-types": "^12.1.3",
+    "swagger-schema-official": "^2.0.0-bab6bed",
+    "ts-jest": "^29.4.0"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
@@ -27,6 +40,7 @@
     "ajv": "^8.17.1",
     "express-rate-limit": "^7.5.0",
     "helmet": "^8.1.0",
+    "js-yaml": "^4.1.0",
     "prisma": "^6.9.0",
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0",
@@ -34,5 +48,8 @@
     "tesseract.js": "^6.0.1",
     "xml-crypto": "^6.1.2",
     "xmlbuilder2": "^3.1.1"
+  },
+  "resolutions": {
+    "@types/express": "4.17.17"
   }
 }

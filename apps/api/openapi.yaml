@@ -1,0 +1,40 @@
+openapi: 3.0.3
+info:
+  title: Facturación Autónomos API
+  description: API para gestionar la facturación de autónomos.
+  version: 1.0.0
+  license:
+    name: Apache 2.0
+    url: https://www.apache.org/licenses/LICENSE-2.0
+servers:
+  - url: https://api.facturacion-autonomos.com
+    description: Servidor de producción
+paths:
+  /facturas:
+    get:
+      summary: Obtener todas las facturas
+      operationId: obtenerFacturas
+      responses:
+        '200':
+          description: Lista de facturas
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: string
+                    total:
+                      type: number
+        '400':
+          description: Solicitud incorrecta
+      security:
+        - apiKeyAuth: []
+components:
+  securitySchemes:
+    apiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
