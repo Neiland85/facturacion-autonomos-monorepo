@@ -1,0 +1,606 @@
+openapi: 3.0.3
+info:
+  title: Tax Calculator API
+  description: |
+    API para cálculos fiscales y tributarios especializados
+    
+    ## Características principales:
+    - Cálculos de IVA e IRPF
+    - Validación de datos fiscales
+    - Simulaciones tributarias
+    - Informes fiscales automatizados
+    
+  version: 1.0.0
+  contact:
+    name: Equipo de Desarrollo
+    email: dev@facturacion-autonomos.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.facturacion-autonomos.com/tax/v1
+    description: Servidor de producción
+  - url: https://staging-api.facturacion-autonomos.com/tax/v1
+    description: Servidor de staging
+  - url: http://localhost:3002/v1
+    description: Servidor de desarrollo
+
+security:
+  - bearerAuth: []
+  - apiKey: []
+
+paths:
+  /calcular/iva:
+    post:
+      summary: Calcular IVA
+      description: Calcula el IVA aplicable según la base imponible y tipo
+      tags:
+        - Cálculos Fiscales
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - baseImponible
+                - tipoIVA
+              properties:
+                baseImponible:
+                  type: number
+                  format: decimal
+                  minimum: 0
+                  description: Base imponible
+                  example: 100.00
+                tipoIVA:
+                  type: number
+                  format: decimal
+                  enum: [0, 4, 10, 21]
+                  description: Tipo de IVA aplicable
+                  example: 21
+                regimenEspecial:
+                  type: string
+                  enum: [general, recargo_equivalencia, exento]
+                  default: general
+      responses:
+        '200':
+          description: Cálculo realizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      baseImponible:
+                        type: number
+                        format: decimal
+                        example: 100.00
+                      tipoIVA:
+                        type: number
+                        format: decimal
+                        example: 21
+                      importeIVA:
+                        type: number
+                        format: decimal
+                        example: 21.00
+                      total:
+                        type: number
+                        format: decimal
+                        example: 121.00
+        '400':
+          $ref: '#/components/responses/BadRequest'
+
+  /calcular/irpf:
+    post:
+      summary: Calcular IRPF
+      description: Calcula la retención de IRPF aplicable
+      tags:
+        - Cálculos Fiscales
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - baseImponible
+                - tipoIRPF
+              properties:
+                baseImponible:
+                  type: number
+                  format: decimal
+                  minimum: 0
+                  example: 100.00
+                tipoIRPF:
+                  type: number
+                  format: decimal
+                  minimum: 0
+                  maximum: 47
+                  example: 15
+                actividadEconomica:
+                  type: string
+                  description: Código de actividad económica
+                  example: "631120"
+      responses:
+        '200':
+          description: Cálculo realizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: object
+                    properties:
+                      baseImponible:
+                        type: number
+                        format: decimal
+                        example: 100.00
+                      tipoIRPF:
+                        type: number
+                        format: decimal
+                        example: 15
+                      importeIRPF:
+                        type: number
+                        format: decimal
+                        example: 15.00
+                      neto:
+                        type: number
+                        format: decimal
+                        example: 85.00
+
+  /calcular/completo:
+    post:
+      summary: Cálculo fiscal completo
+      description: Realiza todos los cálculos fiscales (IVA + IRPF)
+      tags:
+        - Cálculos Fiscales
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculoCompleto'
+      responses:
+        '200':
+          description: Cálculo completo realizado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ResultadoCalculoCompleto'
+
+  /simulaciones/autonomo:
+    post:
+      summary: Simulación fiscal para autónomo
+      description: Simula la carga fiscal anual de un autónomo
+      tags:
+        - Simulaciones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - ingresosBrutos
+                - gastos
+                - regimenIRPF
+              properties:
+                ingresosBrutos:
+                  type: number
+                  format: decimal
+                  minimum: 0
+                  example: 50000.00
+                gastos:
+                  type: number
+                  format: decimal
+                  minimum: 0
+                  example: 10000.00
+                regimenIRPF:
+                  type: string
+                  enum: [estimacion_directa, estimacion_objetiva, modulos]
+                  example: estimacion_directa
+                tarifaAutonomos:
+                  type: number
+                  format: decimal
+                  minimum: 0
+                  example: 294.00
+                  description: Cuota mensual de autónomos
+      responses:
+        '200':
+          description: Simulación realizada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/SimulacionAutonomo'
+
+  /validaciones/nif:
+    post:
+      summary: Validar NIF/CIF/NIE
+      description: Valida la estructura y dígito de control de documentos españoles
+      tags:
+        - Validaciones
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - documento
+              properties:
+                documento:
+                  type: string
+                  description: NIF, CIF o NIE a validar
+                  example: "12345678Z"
+      responses:
+        '200':
+          description: Validación realizada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  valido:
+                    type: boolean
+                    example: true
+                  tipo:
+                    type: string
+                    enum: [NIF, CIF, NIE]
+                    example: NIF
+                  mensaje:
+                    type: string
+                    example: "Documento válido"
+
+  /tipos/iva:
+    get:
+      summary: Obtener tipos de IVA vigentes
+      description: Lista todos los tipos de IVA aplicables en España
+      tags:
+        - Configuración Fiscal
+      responses:
+        '200':
+          description: Lista de tipos de IVA
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tipo:
+                          type: number
+                          format: decimal
+                          example: 21
+                        nombre:
+                          type: string
+                          example: "General"
+                        descripcion:
+                          type: string
+                          example: "Tipo general del 21%"
+                        vigente:
+                          type: boolean
+                          example: true
+                        fechaVigencia:
+                          type: string
+                          format: date
+                          example: "2012-09-01"
+
+  /tipos/irpf:
+    get:
+      summary: Obtener tipos de IRPF
+      description: Lista los tipos de retención de IRPF más comunes
+      tags:
+        - Configuración Fiscal
+      responses:
+        '200':
+          description: Lista de tipos de IRPF
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tipo:
+                          type: number
+                          format: decimal
+                          example: 15
+                        descripcion:
+                          type: string
+                          example: "Profesionales liberales"
+                        actividadesAplicables:
+                          type: array
+                          items:
+                            type: string
+                          example: ["631120", "702000"]
+
+  /calendario/fiscal:
+    get:
+      summary: Calendario fiscal
+      description: Obtiene las fechas importantes del calendario fiscal
+      tags:
+        - Información Fiscal
+      parameters:
+        - name: año
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 2020
+            maximum: 2030
+          example: 2024
+      responses:
+        '200':
+          description: Calendario fiscal del año
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  año:
+                    type: integer
+                    example: 2024
+                  eventos:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        fecha:
+                          type: string
+                          format: date
+                          example: "2024-01-30"
+                        evento:
+                          type: string
+                          example: "Presentación IVA 4T 2023"
+                        tipo:
+                          type: string
+                          enum: [iva, irpf, renta, autonomos]
+                          example: iva
+                        obligatorio:
+                          type: boolean
+                          example: true
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  schemas:
+    CalculoCompleto:
+      type: object
+      required:
+        - baseImponible
+        - tipoIVA
+      properties:
+        baseImponible:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 100.00
+        tipoIVA:
+          type: number
+          format: decimal
+          enum: [0, 4, 10, 21]
+          example: 21
+        tipoIRPF:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 47
+          default: 0
+          example: 15
+        regimenIVA:
+          type: string
+          enum: [general, recargo_equivalencia, exento]
+          default: general
+        recargoEquivalencia:
+          type: number
+          format: decimal
+          minimum: 0
+          example: 1.75
+
+    ResultadoCalculoCompleto:
+      type: object
+      properties:
+        baseImponible:
+          type: number
+          format: decimal
+          example: 100.00
+        iva:
+          type: object
+          properties:
+            tipo:
+              type: number
+              format: decimal
+              example: 21
+            importe:
+              type: number
+              format: decimal
+              example: 21.00
+        irpf:
+          type: object
+          properties:
+            tipo:
+              type: number
+              format: decimal
+              example: 15
+            importe:
+              type: number
+              format: decimal
+              example: 15.00
+        recargoEquivalencia:
+          type: object
+          properties:
+            tipo:
+              type: number
+              format: decimal
+              example: 1.75
+            importe:
+              type: number
+              format: decimal
+              example: 1.75
+        totales:
+          type: object
+          properties:
+            subtotal:
+              type: number
+              format: decimal
+              example: 121.00
+            retencion:
+              type: number
+              format: decimal
+              example: 15.00
+            total:
+              type: number
+              format: decimal
+              example: 106.00
+
+    SimulacionAutonomo:
+      type: object
+      properties:
+        ingresosBrutos:
+          type: number
+          format: decimal
+          example: 50000.00
+        gastosDeducibles:
+          type: number
+          format: decimal
+          example: 10000.00
+        baseImponible:
+          type: number
+          format: decimal
+          example: 40000.00
+        irpf:
+          type: object
+          properties:
+            tipo:
+              type: number
+              format: decimal
+              example: 19.5
+            cuota:
+              type: number
+              format: decimal
+              example: 7800.00
+        cuotasAutonomos:
+          type: object
+          properties:
+            mensual:
+              type: number
+              format: decimal
+              example: 294.00
+            anual:
+              type: number
+              format: decimal
+              example: 3528.00
+        iva:
+          type: object
+          properties:
+            repercutido:
+              type: number
+              format: decimal
+              example: 10500.00
+            soportado:
+              type: number
+              format: decimal
+              example: 2100.00
+            diferencia:
+              type: number
+              format: decimal
+              example: 8400.00
+        resumen:
+          type: object
+          properties:
+            beneficioNeto:
+              type: number
+              format: decimal
+              example: 28672.00
+            cargaFiscalTotal:
+              type: number
+              format: decimal
+              example: 19728.00
+            porcentajeCargaFiscal:
+              type: number
+              format: decimal
+              example: 39.46
+
+  responses:
+    BadRequest:
+      description: Petición incorrecta
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "BAD_REQUEST"
+              message:
+                type: string
+                example: "Los parámetros enviados no son válidos"
+              timestamp:
+                type: string
+                format: date-time
+              path:
+                type: string
+
+    Unauthorized:
+      description: No autorizado
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "UNAUTHORIZED"
+              message:
+                type: string
+                example: "Token de autenticación requerido"
+
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              error:
+                type: string
+                example: "INTERNAL_SERVER_ERROR"
+              message:
+                type: string
+                example: "Ha ocurrido un error interno"
+
+tags:
+  - name: Cálculos Fiscales
+    description: Operaciones de cálculo de impuestos
+  - name: Simulaciones
+    description: Simulaciones fiscales y tributarias
+  - name: Validaciones
+    description: Validación de datos fiscales
+  - name: Configuración Fiscal
+    description: Configuración y tipos fiscales
+  - name: Información Fiscal
+    description: Información y calendario fiscal
