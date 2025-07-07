@@ -1,0 +1,113 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: web-service
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    app: web
+    environment: ${ENVIRONMENT}
+spec:
+  selector:
+    app: web
+  ports:
+    - port: 3002
+      targetPort: 3000
+      name: http
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    app: web
+    environment: ${ENVIRONMENT}
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+        environment: ${ENVIRONMENT}
+    spec:
+      containers:
+        - name: web
+          image: ${WEB_IMAGE}:${CI_COMMIT_SHA}
+          ports:
+            - containerPort: 3000
+          env:
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: facturacion-config
+                  key: NODE_ENV
+            - name: PORT
+              value: "3000"
+            - name: API_FACTURAS_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: facturacion-config
+                  key: API_FACTURAS_URL
+            - name: API_TAX_CALCULATOR_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: facturacion-config
+                  key: API_TAX_CALCULATOR_URL
+            - name: NEXT_PUBLIC_API_URL
+              value: "https://api-facturacion.${KUBE_DOMAIN}"
+            - name: NEXTAUTH_URL
+              value: "https://facturacion.${KUBE_DOMAIN}"
+            - name: NEXTAUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: facturacion-secret
+                  key: JWT_SECRET
+            - name: NEXT_PUBLIC_ENVIRONMENT
+              valueFrom:
+                configMapKeyRef:
+                  name: facturacion-config
+                  key: NODE_ENV
+            - name: SENTRY_DSN
+              valueFrom:
+                secretKeyRef:
+                  name: facturacion-secret
+                  key: SENTRY_DSN
+                  optional: true
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 60
+            periodSeconds: 30
+            timeoutSeconds: 10
+            successThreshold: 1
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 3
+          startupProbe:
+            httpGet:
+              path: /
+              port: 3000
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            successThreshold: 1
+            failureThreshold: 12

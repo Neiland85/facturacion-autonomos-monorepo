@@ -1,0 +1,259 @@
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.ClienteController = void 0;
+const client_1 = require("@prisma/client");
+const uuid_1 = require("uuid");
+const fiscal_1 = require("../utils/fiscal");
+const prisma = new client_1.PrismaClient();
+class ClienteController {
+    async getClientes(req, res) {
+        try {
+            const page = parseInt(req.query.page) || 1;
+            const limit = parseInt(req.query.limit) || 20;
+            const buscar = req.query.buscar;
+            const skip = (page - 1) * limit;
+            const where = {};
+            if (buscar) {
+                where.OR = [
+                    { nombre: { contains: buscar, mode: 'insensitive' } },
+                    { nif: { contains: buscar, mode: 'insensitive' } },
+                    { email: { contains: buscar, mode: 'insensitive' } }
+                ];
+            }
+            const [clientes, total] = await Promise.all([
+                prisma.cliente.findMany({
+                    where,
+                    skip,
+                    take: limit,
+                    orderBy: { nombre: 'asc' }
+                }),
+                prisma.cliente.count({ where })
+            ]);
+            const totalPages = Math.ceil(total / limit);
+            res.json({
+                data: clientes,
+                meta: {
+                    currentPage: page,
+                    totalPages,
+                    totalItems: total,
+                    itemsPerPage: limit,
+                    hasNextPage: page < totalPages,
+                    hasPreviousPage: page > 1
+                }
+            });
+        }
+        catch (error) {
+            console.error('Error al obtener clientes:', error);
+            res.status(500).json({
+                error: 'INTERNAL_SERVER_ERROR',
+                message: 'Error al obtener los clientes',
+                timestamp: new Date().toISOString(),
+                path: req.path
+            });
+        }
+    }
+    async getClienteById(req, res) {
+        try {
+            const { id } = req.params;
+            const cliente = await prisma.cliente.findUnique({
+                where: { id },
+                include: {
+                    facturas: {
+                        select: {
+                            id: true,
+                            numero: true,
+                            fecha: true,
+                            estado: true,
+                            total: true
+                        },
+                        orderBy: { fecha: 'desc' },
+                        take: 10
+                    }
+                }
+            });
+            if (!cliente) {
+                return res.status(404).json({
+                    error: 'NOT_FOUND',
+                    message: 'Cliente no encontrado',
+                    timestamp: new Date().toISOString(),
+                    path: req.path
+                });
+            }
+            res.json({ data: cliente });
+        }
+        catch (error) {
+            console.error('Error al obtener cliente:', error);
+            res.status(500).json({
+                error: 'INTERNAL_SERVER_ERROR',
+                message: 'Error al obtener el cliente',
+                timestamp: new Date().toISOString(),
+                path: req.path
+            });
+        }
+    }
+    async createCliente(req, res) {
+        try {
+            const { nombre, nif, email, telefono, direccion, codigoPostal, ciudad, provincia, pais = 'España' } = req.body;
+            if (!(0, fiscal_1.validarNIF)(nif)) {
+                return res.status(422).json({
+                    error: 'VALIDATION_ERROR',
+                    message: 'Los datos enviados no son válidos',
+                    details: [{
+                            field: 'nif',
+                            message: 'El NIF/CIF no tiene un formato válido',
+                            code: 'INVALID_NIF'
+                        }],
+                    timestamp: new Date().toISOString(),
+                    path: req.path
+                });
+            }
+            const clienteExistente = await prisma.cliente.findFirst({
+                where: { nif }
+            });
+            if (clienteExistente) {
+                return res.status(409).json({
+                    error: 'CONFLICT',
+                    message: 'Ya existe un cliente con ese NIF',
+                    timestamp: new Date().toISOString(),
+                    path: req.path
+                });
+            }
+            const cliente = await prisma.cliente.create({
+                data: {
+                    id: (0, uuid_1.v4)(),
+                    nombre,
+                    nif,
+                    email,
+                    telefono,
+                    direccion,
+                    codigoPostal,
+                    ciudad,
+                    provincia,
+                    pais,
+                    activo: true
+                }
+            });
+            res.status(201).json({
+                data: cliente,
+                message: 'Cliente creado correctamente'
+            });
+        }
+        catch (error) {
+            console.error('Error al crear cliente:', error);
+            res.status(500).json({
+                error: 'INTERNAL_SERVER_ERROR',
+                message: 'Error al crear el cliente',
+                timestamp: new Date().toISOString(),
+                path: req.path
+            });
+        }
+    }
+    async updateCliente(req, res) {
+        try {
+            const { id } = req.params;
+            const updateData = req.body;
+            const clienteExistente = await prisma.cliente.findUnique({
+                where: { id }
+            });
+            if (!clienteExistente) {
+                return res.status(404).json({
+                    error: 'NOT_FOUND',
+                    message: 'Cliente no encontrado',
+                    timestamp: new Date().toISOString(),
+                    path: req.path
+                });
+            }
+            if (updateData.nif && updateData.nif !== clienteExistente.nif) {
+                if (!(0, fiscal_1.validarNIF)(updateData.nif)) {
+                    return res.status(422).json({
+                        error: 'VALIDATION_ERROR',
+                        message: 'Los datos enviados no son válidos',
+                        details: [{
+                                field: 'nif',
+                                message: 'El NIF/CIF no tiene un formato válido',
+                                code: 'INVALID_NIF'
+                            }],
+                        timestamp: new Date().toISOString(),
+                        path: req.path
+                    });
+                }
+                const clienteConNIF = await prisma.cliente.findFirst({
+                    where: {
+                        nif: updateData.nif,
+                        id: { not: id }
+                    }
+                });
+                if (clienteConNIF) {
+                    return res.status(409).json({
+                        error: 'CONFLICT',
+                        message: 'Ya existe un cliente con ese NIF',
+                        timestamp: new Date().toISOString(),
+                        path: req.path
+                    });
+                }
+            }
+            const cliente = await prisma.cliente.update({
+                where: { id },
+                data: {
+                    ...updateData,
+                    updatedAt: new Date()
+                }
+            });
+            res.json({
+                data: cliente,
+                message: 'Cliente actualizado correctamente'
+            });
+        }
+        catch (error) {
+            console.error('Error al actualizar cliente:', error);
+            res.status(500).json({
+                error: 'INTERNAL_SERVER_ERROR',
+                message: 'Error al actualizar el cliente',
+                timestamp: new Date().toISOString(),
+                path: req.path
+            });
+        }
+    }
+    async deleteCliente(req, res) {
+        try {
+            const { id } = req.params;
+            const cliente = await prisma.cliente.findUnique({
+                where: { id },
+                include: {
+                    facturas: true
+                }
+            });
+            if (!cliente) {
+                return res.status(404).json({
+                    error: 'NOT_FOUND',
+                    message: 'Cliente no encontrado',
+                    timestamp: new Date().toISOString(),
+                    path: req.path
+                });
+            }
+            if (cliente.facturas.length > 0) {
+                return res.status(409).json({
+                    error: 'CONFLICT',
+                    message: 'No se puede eliminar un cliente con facturas asociadas',
+                    timestamp: new Date().toISOString(),
+                    path: req.path
+                });
+            }
+            await prisma.cliente.delete({
+                where: { id }
+            });
+            res.status(204).send();
+        }
+        catch (error) {
+            console.error('Error al eliminar cliente:', error);
+            res.status(500).json({
+                error: 'INTERNAL_SERVER_ERROR',
+                message: 'Error al eliminar el cliente',
+                timestamp: new Date().toISOString(),
+                path: req.path
+            });
+        }
+    }
+}
+exports.ClienteController = ClienteController;
+//# sourceMappingURL=clientes.js.map

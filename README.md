@@ -1,13 +1,14 @@
-
 # 📊 Facturación Autónomos - Monorepo
 
 > Plataforma unificada para gestión y facturación de autónomos, organizada como monorepo modular con backend Node.js y frontend React. Arquitectura escalable, pruebas automáticas y CI/CD integrado.
 
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Node.js](https://img.shields.io/badge/Node.js-20%2B-green.svg)](https://nodejs.org/)
+[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
 [![TypeScript](https://img.shields.io/badge/TypeScript-5.7%2B-blue.svg)](https://www.typescriptlang.org/)
 [![Yarn](https://img.shields.io/badge/Yarn-4.9%2B-blue.svg)](https://yarnpkg.com/)
 [![Turbo](https://img.shields.io/badge/Turbo-2.3%2B-red.svg)](https://turbo.build/)
+[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5.svg)](https://kubernetes.io/)
+[![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED.svg)](https://docker.com/)
 
 ## 🎯 Visión del Proyecto
 
@@ -18,9 +19,29 @@ Esta plataforma está diseñada para simplificar la gestión administrativa y fi
 - **💼 Gestión de Facturas**: Creación, edición y seguimiento de facturas
 - **🧮 Cálculo Fiscal**: Automatización de cálculos de IVA, IRPF y retenciones
 - **📊 Reporting**: Informes detallados y exportación de datos
-- **🔐 Seguridad**: Autenticación robusta y protección de datos
-- **📱 Responsive**: Interfaz adaptada para escritorio y móvil
-- **🤖 Copilot Ready**: Optimizado para GitHub Copilot Agent
+- **🔄 CI/CD Pipeline**: Despliegue automático en Kubernetes
+- **📈 Monitoreo**: Métricas con Prometheus y Grafana
+- **🔒 Seguridad**: Autenticación JWT y validación de datos
+- **🌐 API RESTful**: Documentación completa con OpenAPI/Swagger
+
+## 🚀 Pipeline CI/CD
+
+### Automatización Completa
+- ✅ **Build automático** del monorepo con Turbo
+- ✅ **Tests unitarios** y de integración
+- ✅ **Linting** y validación de código
+- ✅ **Construcción de Docker images** optimizadas
+- ✅ **Despliegue automático** en staging
+- ✅ **Despliegue manual** en producción
+- ✅ **Monitoreo** y alertas integradas
+
+### Infraestructura Kubernetes
+- 🎯 **Multi-ambiente**: Staging y Producción
+- 🔄 **Auto-scaling**: HPA configurado
+- 📊 **Observabilidad**: Logs, métricas y trazas
+- 🛡️ **Seguridad**: Policies de red y RBAC
+- 💾 **Persistencia**: Volúmenes para bases de datos
+- 🌐 **Ingress**: SSL/TLS automático con Let's Encrypt
 
 ## 🏗️ Arquitectura del Monorepo
 
@@ -271,6 +292,66 @@ docker-compose up -d
 
 # Solo servicios de soporte (BD, Redis)
 docker-compose up -d postgres redis
+```
+
+## 🔄 Desarrollo y Despliegue
+
+### Entorno Local con Docker
+```bash
+# Iniciar servicios de desarrollo
+docker-compose -f docker-compose.dev.yml up -d
+
+# Verificar servicios
+docker-compose -f docker-compose.dev.yml ps
+
+# Ver logs
+docker-compose -f docker-compose.dev.yml logs -f
+```
+
+### Pipeline CI/CD
+
+#### Configuración de Variables (GitLab CI/CD)
+```bash
+# Registry
+CI_REGISTRY_IMAGE=registry.gitlab.com/tu-grupo/facturacion-autonomos
+CI_REGISTRY_USER=gitlab-ci-token
+CI_REGISTRY_PASSWORD=<token>
+
+# Kubernetes
+KUBE_URL=https://tu-cluster.k8s.com
+KUBE_TOKEN=<service-account-token>
+KUBE_DOMAIN=tu-dominio.com
+
+# Secrets (Base64)
+POSTGRES_PASSWORD_B64=<base64-encoded>
+JWT_SECRET_B64=<base64-encoded>
+DATABASE_URL_B64=<base64-encoded>
+```
+
+#### Despliegue Manual
+```bash
+# Staging
+./deploy.sh staging
+
+# Production
+./deploy.sh production
+```
+
+### Monitoreo y Observabilidad
+
+#### URLs de Acceso
+- **Aplicación**: `https://facturacion.tu-dominio.com`
+- **API Docs**: `https://api-facturacion.tu-dominio.com/api/docs`
+- **Grafana**: `https://grafana.tu-dominio.com`
+- **Prometheus**: `https://prometheus.tu-dominio.com`
+
+#### Health Checks
+```bash
+# API Facturas
+curl https://api-facturacion.tu-dominio.com/health
+
+# API Tax Calculator
+curl https://api-facturacion.tu-dominio.com/api/tax-calculator/health
 ```
 
 ## 🤝 Contribución

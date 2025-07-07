@@ -1,0 +1,388 @@
+# GitLab CI/CD Pipeline para Facturación Autónomos Monorepo
+# Versión: 1.0
+# Última actualización: 2024
+
+stages:
+  - build
+  - test
+  - docker-build
+  - deploy-staging
+  - deploy-production
+  - cleanup
+
+variables:
+  # Configuración de Docker
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_BUILDKIT: 1
+  
+  # Configuración de registry
+  REGISTRY: registry.gitlab.com
+  REGISTRY_USER: $CI_REGISTRY_USER
+  REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
+  
+  # Configuración de Kubernetes
+  KUBE_NAMESPACE_STAGING: facturacion-staging
+  KUBE_NAMESPACE_PRODUCTION: facturacion-production
+  
+  # Configuración de aplicaciones
+  API_FACTURAS_IMAGE: $CI_REGISTRY_IMAGE/api-facturas
+  API_TAX_CALCULATOR_IMAGE: $CI_REGISTRY_IMAGE/api-tax-calculator
+  WEB_IMAGE: $CI_REGISTRY_IMAGE/web
+  
+  # Configuración de base de datos
+  POSTGRES_VERSION: "15"
+  REDIS_VERSION: "7-alpine"
+
+# Plantilla para caché de Node.js
+.node_cache_template: &node_cache
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-node"
+    paths:
+      - .yarn/cache/
+      - node_modules/
+    policy: pull-push
+
+# Plantilla para caché de Docker
+.docker_cache_template: &docker_cache
+  cache:
+    key: "$CI_COMMIT_REF_SLUG-docker"
+    paths:
+      - .docker/
+    policy: pull-push
+
+# Plantilla base para trabajos con Node.js
+.node_template: &node_template
+  image: node:18-alpine
+  before_script:
+    - apk add --no-cache git
+    - corepack enable
+    - yarn --version
+    - yarn install --frozen-lockfile
+  <<: *node_cache
+
+# ============================================
+# STAGE: BUILD
+# ============================================
+
+build:monorepo:
+  stage: build
+  <<: *node_template
+  script:
+    - echo "🏗️ Building monorepo..."
+    - yarn build
+    - echo "✅ Build completed successfully"
+  artifacts:
+    expire_in: 1 hour
+    paths:
+      - apps/*/dist/
+      - packages/*/dist/
+      - packages/*/lib/
+  only:
+    - merge_requests
+    - main
+    - develop
+
+# ============================================
+# STAGE: TEST
+# ============================================
+
+test:lint:
+  stage: test
+  <<: *node_template
+  script:
+    - echo "🔍 Running ESLint..."
+    - yarn lint
+    - echo "✅ Linting completed successfully"
+  only:
+    - merge_requests
+    - main
+    - develop
+
+test:unit:
+  stage: test
+  <<: *node_template
+  script:
+    - echo "🧪 Running unit tests..."
+    - yarn test --coverage
+    - echo "✅ Unit tests completed successfully"
+  coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
+  artifacts:
+    expire_in: 1 week
+    reports:
+      coverage_report:
+        coverage_format: cobertura
+        path: coverage/cobertura-coverage.xml
+    paths:
+      - coverage/
+  only:
+    - merge_requests
+    - main
+    - develop
+
+test:api-integration:
+  stage: test
+  <<: *node_template
+  services:
+    - postgres:15
+    - redis:7-alpine
+  variables:
+    POSTGRES_DB: facturacion_test
+    POSTGRES_USER: postgres
+    POSTGRES_PASSWORD: postgres
+    POSTGRES_HOST: postgres
+    REDIS_HOST: redis
+    DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/facturacion_test"
+  script:
+    - echo "🧪 Running API integration tests..."
+    - cd apps/api-facturas
+    - yarn prisma migrate dev --name init
+    - yarn test:integration
+    - echo "✅ API integration tests completed successfully"
+  only:
+    - merge_requests
+    - main
+    - develop
+
+# ============================================
+# STAGE: DOCKER BUILD
+# ============================================
+
+.docker_build_template: &docker_build_template
+  stage: docker-build
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  before_script:
+    - docker login -u $CI_REGISTRY_USER -p $CI_REGISTRY_PASSWORD $CI_REGISTRY
+    - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin $CI_REGISTRY
+  <<: *docker_cache
+
+docker:api-facturas:
+  <<: *docker_build_template
+  script:
+    - echo "🐳 Building API Facturas Docker image..."
+    - docker build -f apps/api-facturas/Dockerfile -t $API_FACTURAS_IMAGE:$CI_COMMIT_SHA -t $API_FACTURAS_IMAGE:latest .
+    - docker push $API_FACTURAS_IMAGE:$CI_COMMIT_SHA
+    - docker push $API_FACTURAS_IMAGE:latest
+    - echo "✅ API Facturas Docker image built and pushed successfully"
+  only:
+    - main
+    - develop
+
+docker:api-tax-calculator:
+  <<: *docker_build_template
+  script:
+    - echo "🐳 Building API Tax Calculator Docker image..."
+    - docker build -f apps/api-tax-calculator/Dockerfile -t $API_TAX_CALCULATOR_IMAGE:$CI_COMMIT_SHA -t $API_TAX_CALCULATOR_IMAGE:latest .
+    - docker push $API_TAX_CALCULATOR_IMAGE:$CI_COMMIT_SHA
+    - docker push $API_TAX_CALCULATOR_IMAGE:latest
+    - echo "✅ API Tax Calculator Docker image built and pushed successfully"
+  only:
+    - main
+    - develop
+
+docker:web:
+  <<: *docker_build_template
+  script:
+    - echo "🐳 Building Web Docker image..."
+    - docker build -f apps/web/Dockerfile -t $WEB_IMAGE:$CI_COMMIT_SHA -t $WEB_IMAGE:latest .
+    - docker push $WEB_IMAGE:$CI_COMMIT_SHA
+    - docker push $WEB_IMAGE:latest
+    - echo "✅ Web Docker image built and pushed successfully"
+  only:
+    - main
+    - develop
+
+# ============================================
+# STAGE: DEPLOY STAGING
+# ============================================
+
+deploy:staging:
+  stage: deploy-staging
+  image: bitnami/kubectl:latest
+  environment:
+    name: staging
+    url: https://facturacion-staging.${KUBE_DOMAIN}
+  variables:
+    KUBE_NAMESPACE: $KUBE_NAMESPACE_STAGING
+    ENVIRONMENT: staging
+  before_script:
+    - kubectl config set-cluster k8s --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM_FILE"
+    - kubectl config set-credentials gitlab --token="$KUBE_TOKEN"
+    - kubectl config set-context default --cluster=k8s --user=gitlab --namespace="$KUBE_NAMESPACE"
+    - kubectl config use-context default
+  script:
+    - echo "🚀 Deploying to staging environment..."
+    - kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+    
+    # Aplicar ConfigMaps y Secrets
+    - envsubst < k8s/configmap.yaml | kubectl apply -f -
+    - envsubst < k8s/secret.yaml | kubectl apply -f -
+    
+    # Aplicar servicios y deployments
+    - envsubst < k8s/postgres.yaml | kubectl apply -f -
+    - envsubst < k8s/redis.yaml | kubectl apply -f -
+    - envsubst < k8s/api-facturas.yaml | kubectl apply -f -
+    - envsubst < k8s/api-tax-calculator.yaml | kubectl apply -f -
+    - envsubst < k8s/web.yaml | kubectl apply -f -
+    
+    # Aplicar Ingress
+    - envsubst < k8s/ingress.yaml | kubectl apply -f -
+    
+    # Verificar deployments
+    - kubectl rollout status deployment/api-facturas -n $KUBE_NAMESPACE
+    - kubectl rollout status deployment/api-tax-calculator -n $KUBE_NAMESPACE
+    - kubectl rollout status deployment/web -n $KUBE_NAMESPACE
+    
+    - echo "✅ Staging deployment completed successfully"
+  only:
+    - develop
+
+# ============================================
+# STAGE: DEPLOY PRODUCTION
+# ============================================
+
+deploy:production:
+  stage: deploy-production
+  image: bitnami/kubectl:latest
+  environment:
+    name: production
+    url: https://facturacion.${KUBE_DOMAIN}
+  variables:
+    KUBE_NAMESPACE: $KUBE_NAMESPACE_PRODUCTION
+    ENVIRONMENT: production
+  before_script:
+    - kubectl config set-cluster k8s --server="$KUBE_URL" --certificate-authority="$KUBE_CA_PEM_FILE"
+    - kubectl config set-credentials gitlab --token="$KUBE_TOKEN"
+    - kubectl config set-context default --cluster=k8s --user=gitlab --namespace="$KUBE_NAMESPACE"
+    - kubectl config use-context default
+  script:
+    - echo "🚀 Deploying to production environment..."
+    - kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+    
+    # Aplicar ConfigMaps y Secrets
+    - envsubst < k8s/configmap.yaml | kubectl apply -f -
+    - envsubst < k8s/secret.yaml | kubectl apply -f -
+    
+    # Aplicar servicios y deployments
+    - envsubst < k8s/postgres.yaml | kubectl apply -f -
+    - envsubst < k8s/redis.yaml | kubectl apply -f -
+    - envsubst < k8s/api-facturas.yaml | kubectl apply -f -
+    - envsubst < k8s/api-tax-calculator.yaml | kubectl apply -f -
+    - envsubst < k8s/web.yaml | kubectl apply -f -
+    
+    # Aplicar Ingress
+    - envsubst < k8s/ingress.yaml | kubectl apply -f -
+    
+    # Verificar deployments
+    - kubectl rollout status deployment/api-facturas -n $KUBE_NAMESPACE
+    - kubectl rollout status deployment/api-tax-calculator -n $KUBE_NAMESPACE
+    - kubectl rollout status deployment/web -n $KUBE_NAMESPACE
+    
+    - echo "✅ Production deployment completed successfully"
+  when: manual
+  only:
+    - main
+
+# ============================================
+# STAGE: CLEANUP
+# ============================================
+
+cleanup:docker:
+  stage: cleanup
+  image: docker:24.0.5
+  services:
+    - docker:24.0.5-dind
+  script:
+    - echo "🧹 Cleaning up Docker images..."
+    - docker system prune -af
+    - echo "✅ Docker cleanup completed successfully"
+  when: always
+  only:
+    - main
+    - develop
+
+# ============================================
+# CONFIGURACIÓN DE NOTIFICACIONES
+# ============================================
+
+# Notificación de éxito en producción
+notify:success:
+  stage: .post
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "📧 Sending success notification..."
+    - |
+      curl -X POST "$SLACK_WEBHOOK_URL" \
+        -H 'Content-type: application/json' \
+        --data '{
+          "text": "✅ Deployment successful!",
+          "attachments": [
+            {
+              "color": "good",
+              "fields": [
+                {
+                  "title": "Environment",
+                  "value": "Production",
+                  "short": true
+                },
+                {
+                  "title": "Version",
+                  "value": "'$CI_COMMIT_SHA'",
+                  "short": true
+                },
+                {
+                  "title": "Branch",
+                  "value": "'$CI_COMMIT_REF_NAME'",
+                  "short": true
+                }
+              ]
+            }
+          ]
+        }'
+  only:
+    - main
+  when: on_success
+
+# Notificación de error
+notify:failure:
+  stage: .post
+  image: alpine:latest
+  before_script:
+    - apk add --no-cache curl
+  script:
+    - echo "📧 Sending failure notification..."
+    - |
+      curl -X POST "$SLACK_WEBHOOK_URL" \
+        -H 'Content-type: application/json' \
+        --data '{
+          "text": "❌ Deployment failed!",
+          "attachments": [
+            {
+              "color": "danger",
+              "fields": [
+                {
+                  "title": "Environment",
+                  "value": "Production",
+                  "short": true
+                },
+                {
+                  "title": "Version",
+                  "value": "'$CI_COMMIT_SHA'",
+                  "short": true
+                },
+                {
+                  "title": "Branch",
+                  "value": "'$CI_COMMIT_REF_NAME'",
+                  "short": true
+                }
+              ]
+            }
+          ]
+        }'
+  only:
+    - main
+  when: on_failure
