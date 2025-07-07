@@ -1,0 +1,162 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  invoices  Invoice[]
+  clients   Client[]
+  settings  UserSettings?
+
+  @@map("users")
+}
+
+model UserSettings {
+  id     String @id @default(cuid())
+  userId String @unique
+
+  // Configuración fiscal
+  irpfRate         Float   @default(0.15)
+  ivaRate          Float   @default(0.21)
+  retentionRate    Float   @default(0.0)
+  isAutonomoRegimen Boolean @default(true)
+
+  // Configuración de facturación
+  invoicePrefix    String  @default("F")
+  nextInvoiceNumber Int     @default(1)
+  
+  // Configuración de empresa
+  companyName      String?
+  taxId            String?
+  address          String?
+  city             String?
+  postalCode       String?
+  country          String  @default("España")
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("user_settings")
+}
+
+model Client {
+  id     String @id @default(cuid())
+  userId String
+
+  name     String
+  email    String?
+  taxId    String?
+  address  String?
+  city     String?
+  postalCode String?
+  country  String @default("España")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  user     User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  invoices Invoice[]
+
+  @@map("clients")
+}
+
+model Invoice {
+  id       String        @id @default(cuid())
+  userId   String
+  clientId String?
+
+  // Datos básicos
+  number      String
+  date        DateTime      @default(now())
+  dueDate     DateTime?
+  status      InvoiceStatus @default(DRAFT)
+  
+  // Importes
+  subtotal    Float
+  taxAmount   Float
+  totalAmount Float
+  
+  // Retenciones
+  retentionRate   Float @default(0.0)
+  retentionAmount Float @default(0.0)
+  
+  // Metadatos
+  notes       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relaciones
+  user   User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  client Client? @relation(fields: [clientId], references: [id])
+  items  InvoiceItem[]
+
+  @@unique([userId, number])
+  @@map("invoices")
+}
+
+model InvoiceItem {
+  id        String @id @default(cuid())
+  invoiceId String
+
+  description String
+  quantity    Float
+  unitPrice   Float
+  total       Float
+  taxRate     Float @default(0.21)
+
+  invoice Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_items")
+}
+
+model TaxCalculation {
+  id     String @id @default(cuid())
+  userId String
+
+  // Período fiscal
+  year    Int
+  quarter Int
+
+  // Ingresos
+  totalIncome      Float
+  deductibleExpenses Float
+  netIncome        Float
+
+  // Impuestos
+  irpfAmount       Float
+  ivaAmount        Float
+  socialSecurityAmount Float
+  totalTaxes       Float
+
+  // Metadatos
+  calculatedAt DateTime @default(now())
+  notes        String?
+
+  @@unique([userId, year, quarter])
+  @@map("tax_calculations")
+}
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}

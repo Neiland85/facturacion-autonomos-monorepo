@@ -1,5 +1,5 @@
 {
-  "name": "@facturacion/core",
+  "name": "@facturacion/types",
   "version": "1.0.0",
   "private": true,
   "main": "./src/index.ts",
@@ -9,12 +9,9 @@
     "dev": "tsc --watch",
     "lint": "eslint src --ext .ts",
     "type-check": "tsc --noEmit",
-    "test": "jest",
-    "test:watch": "jest --watch",
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "date-fns": "^4.1.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
