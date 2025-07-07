@@ -1,26 +1,82 @@
 {
   "name": "facturacion-autonomos-monorepo",
+  "version": "1.0.0",
   "private": true,
+  "description": "Plataforma unificada para gestión y facturación de autónomos - Monorepo modular con Next.js frontend y backend desacoplado Node.js",
+  "keywords": [
+    "monorepo",
+    "facturas",
+    "autonomos",
+    "typescript",
+    "nextjs",
+    "express",
+    "prisma"
+  ],
+  "homepage": "https://github.com/Neiland85/facturacion-autonomos-monorepo",
+  "bugs": {
+    "url": "https://github.com/Neiland85/facturacion-autonomos-monorepo/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Neiland85/facturacion-autonomos-monorepo.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Neil Muñoz Lago <neiland85@gmail.com>",
+  "engines": {
+    "node": ">=20.0.0",
+    "yarn": ">=4.0.0"
+  },
+  "packageManager": "yarn@4.9.2+sha512.1fc009bc09d13cfd0e19efa44cbfc2b9cf6ca61482725eb35bbc5e257e093ebf4130db6dfe15d604ff4b79efd8e1e8e99b25fa7d0a6197c9f9826358d4d65c3c",
   "workspaces": [
     "backend",
-    "frontend"
+    "frontend",
+    "packages/*"
   ],
-  "license": "Apache-2.0",
-  "description": "Monorepo modular para facturación de autónomos: Next.js frontend y backend desacoplado Node.js. Escalable, con CI/CD.",
   "scripts": {
+    "dev": "concurrently \"yarn workspace backend dev\" \"yarn workspace frontend dev\"",
     "dev:backend": "yarn workspace backend dev",
     "dev:frontend": "yarn workspace frontend dev",
-    "dev": "concurrently \"yarn workspace backend dev\" \"yarn workspace frontend dev\"",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "build": "turbo build",
+    "build:backend": "yarn workspace backend build",
+    "build:frontend": "yarn workspace frontend build",
+    "start": "turbo start",
+    "start:backend": "yarn workspace backend start",
+    "start:frontend": "yarn workspace frontend start",
+    "test": "turbo test",
+    "test:backend": "yarn workspace backend test",
+    "test:frontend": "yarn workspace frontend test",
+    "lint": "turbo lint",
+    "lint:fix": "turbo lint -- --fix",
+    "type-check": "turbo type-check",
+    "clean": "turbo clean && rm -rf node_modules",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "setup": "yarn install && yarn db:generate && yarn db:push",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:migrate": "prisma migrate dev",
+    "db:reset": "prisma migrate reset",
+    "copilot:test-all": "yarn test && yarn test:e2e",
+    "precommit": "lint-staged",
+    "prepare": "husky"
   },
   "devDependencies": {
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/node": "^24.0.3",
     "@types/supertest": "^6.0.3",
-    "@types/winston": "^2.4.4",
-    "concurrently": "^8.2.2"
+    "@typescript-eslint/eslint-plugin": "^8.18.2",
+    "@typescript-eslint/parser": "^8.18.2",
+    "concurrently": "^8.2.2",
+    "eslint": "^9.16.0",
+    "eslint-config-prettier": "^9.1.0",
+    "eslint-plugin-prettier": "^5.2.1",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.2.11",
+    "prettier": "^3.4.2",
+    "turbo": "^2.3.3",
+    "typescript": "^5.7.2"
   },
   "dependencies": {
     "@prisma/client": "^6.9.0",
@@ -36,5 +92,13 @@
     "xml-crypto": "^6.1.2",
     "xmlbuilder2": "^3.1.1"
   },
-  "packageManager": "yarn@4.9.2+sha512.1fc009bc09d13cfd0e19efa44cbfc2b9cf6ca61482725eb35bbc5e257e093ebf4130db6dfe15d604ff4b79efd8e1e8e99b25fa7d0a6197c9f9826358d4d65c3c"
+  "lint-staged": {
+    "*.{js,ts,tsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md}": [
+      "prettier --write"
+    ]
+  }
 }
