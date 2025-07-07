@@ -1,0 +1,49 @@
+// Esquema de Prisma para la base de datos
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                Int      @id @default(autoincrement())
+  email             String   @unique
+  name              String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  invoices          Invoice[]
+  processedInvoices ProcessedInvoice[]
+}
+
+model Invoice {
+  id          Int      @id @default(autoincrement())
+  clientId    Int
+  amount      Float
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  User User @relation(fields: [clientId], references: [id])
+}
+
+model ProcessedInvoice {
+  id                Int      @id @default(autoincrement())
+  userId            Int
+  invoiceData       Json
+  processedAt       DateTime @default(now())
+  confidence        Float
+  processingStatus  String
+  originalFileName  String
+  fileSize          Int
+  fileType          String
+  blobUrl           String
+  suggestions       String[]
+  quarter           String?
+  year              Int?
+  User              User     @relation(fields: [userId], references: [id])
+}

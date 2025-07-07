@@ -1,0 +1,178 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 240 5.9% 10%;
+    --card: 0 0% 100%;
+    --card-foreground: 240 5.9% 10%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 240 5.9% 10%;
+    --primary: 195 80% 45%; /* petrol */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 4.8% 95.9%;
+    --secondary-foreground: 240 5.9% 10%;
+    --muted: 240 4.8% 95.9%;
+    --muted-foreground: 240 3.8% 46.1%;
+    --accent: 240 4.8% 95.9%;
+    --accent-foreground: 240 5.9% 10%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 220 13% 91%;
+    --input: 220 13% 91%;
+    --ring: 217.2 91.2% 59.8%;
+    --radius: 0.5rem;
+
+    /* Sidebar specific colors (can be overridden by themes if desired) */
+    --sidebar-background: 0 0% 98%;
+    --sidebar-foreground: 240 5.3% 26.1%;
+    --sidebar-primary: 240 5.9% 10%;
+    --sidebar-primary-foreground: 0 0% 98%;
+    --sidebar-accent: 240 4.8% 95.9%;
+    --sidebar-accent-foreground: 240 5.9% 10%;
+    --sidebar-border: 220 13% 91%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+
+    /* Chart colors */
+    --chart-1: 195 80% 45%; /* petrol */
+    --chart-2: 24 80% 60%; /* terracotta */
+    --chart-3: 60 10% 45%; /* sage */
+    --chart-4: 40 80% 70%; /* cream */
+    --chart-5: 216 10% 45%; /* slate */
+  }
+
+  .dark {
+    --background: 240 5.9% 10%;
+    --foreground: 240 4.8% 95.9%;
+    --card: 240 5.9% 10%;
+    --card-foreground: 240 4.8% 95.9%;
+    --popover: 240 5.9% 10%;
+    --popover-foreground: 240 4.8% 95.9%;
+    --primary: 195 80% 45%; /* petrol */
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 3.7% 15.9%;
+    --secondary-foreground: 240 4.8% 95.9%;
+    --muted: 240 3.7% 15.9%;
+    --muted-foreground: 240 5% 64.9%;
+    --accent: 240 3.7% 15.9%;
+    --accent-foreground: 240 4.8% 95.9%;
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 240 3.7% 15.9%;
+    --input: 240 3.7% 15.9%;
+    --ring: 217.2 91.2% 59.8%;
+
+    /* Sidebar specific colors */
+    --sidebar-background: 240 5.9% 10%;
+    --sidebar-foreground: 240 4.8% 95.9%;
+    --sidebar-primary: 0 0% 98%;
+    --sidebar-primary-foreground: 240 5.9% 10%;
+    --sidebar-accent: 240 3.7% 15.9%;
+    --sidebar-accent-foreground: 240 4.8% 95.9%;
+    --sidebar-border: 240 3.7% 15.9%;
+    --sidebar-ring: 217.2 91.2% 59.8%;
+  }
+}
+
+/* --- Custom Themes --- */
+.theme-sage {
+  --background: 60 9.1% 97.8%; /* sage-50 */
+  --foreground: 216 10% 15%; /* slate-900 */
+  --primary: 60 10% 45%; /* sage-500 */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 24 80% 60%; /* terracotta-500 */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 40 80% 70%; /* cream-400 */
+  --accent-foreground: 216 10% 15%;
+  --muted: 60 9.1% 97.8%;
+  --muted-foreground: 216 10% 45%;
+  --border: 60 9.1% 90%; /* sage-200 */
+  --input: 60 9.1% 95%; /* sage-100 */
+  --ring: 60 10% 45%;
+  --card: 0 0% 100%;
+  --card-foreground: 216 10% 15%;
+
+  /* Chart colors for sage theme */
+  --chart-1: 60 10% 45%; /* sage-500 */
+  --chart-2: 24 80% 60%; /* terracotta-500 */
+  --chart-3: 40 80% 70%; /* cream-400 */
+  --chart-4: 216 10% 45%; /* slate-500 */
+  --chart-5: 195 80% 45%; /* petrol (fallback) */
+}
+
+.dark .theme-sage {
+  --background: 216 10% 15%; /* slate-900 */
+  --foreground: 60 9.1% 97.8%; /* sage-50 */
+  --primary: 60 10% 45%; /* sage-500 */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 24 80% 60%; /* terracotta-500 */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 40 80% 70%; /* cream-400 */
+  --accent-foreground: 216 10% 15%;
+  --muted: 216 10% 20%;
+  --muted-foreground: 216 10% 60%;
+  --border: 216 10% 25%; /* slate-700 */
+  --input: 216 10% 20%; /* slate-800 */
+  --ring: 60 10% 45%;
+  --card: 216 10% 20%;
+  --card-foreground: 60 9.1% 97.8%;
+
+  /* Chart colors for dark sage theme */
+  --chart-1: 60 10% 45%; /* sage-500 */
+  --chart-2: 24 80% 60%; /* terracotta-500 */
+  --chart-3: 40 80% 70%; /* cream-400 */
+  --chart-4: 216 10% 45%; /* slate-500 */
+  --chart-5: 195 80% 45%; /* petrol (fallback) */
+}
+
+.theme-terracotta {
+  --background: 24 80% 97%; /* terracotta-50 */
+  --foreground: 216 10% 15%; /* slate-900 */
+  --primary: 24 80% 60%; /* terracotta-500 */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 60 10% 45%; /* sage-500 */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 40 80% 70%; /* cream-400 */
+  --accent-foreground: 216 10% 15%;
+  --muted: 24 80% 97%;
+  --muted-foreground: 216 10% 45%;
+  --border: 24 80% 90%; /* terracotta-200 */
+  --input: 24 80% 95%; /* terracotta-100 */
+  --ring: 24 80% 60%;
+  --card: 0 0% 100%;
+  --card-foreground: 216 10% 15%;
+
+  /* Chart colors for terracotta theme */
+  --chart-1: 24 80% 60%; /* terracotta-500 */
+  --chart-2: 60 10% 45%; /* sage-500 */
+  --chart-3: 40 80% 70%; /* cream-400 */
+  --chart-4: 216 10% 45%; /* slate-500 */
+  --chart-5: 195 80% 45%; /* petrol (fallback) */
+}
+
+.dark .theme-terracotta {
+  --background: 216 10% 15%; /* slate-900 */
+  --foreground: 24 80% 97%; /* terracotta-50 */
+  --primary: 24 80% 60%; /* terracotta-500 */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 60 10% 45%; /* sage-500 */
+  --secondary-foreground: 0 0% 100%;
+  --accent: 40 80% 70%; /* cream-400 */
+  --accent-foreground: 216 10% 15%;
+  --muted: 216 10% 20%;
+  --muted-foreground: 216 10% 60%;
+  --border: 216 10% 25%; /* slate-700 */
+  --input: 216 10% 20%; /* slate-800 */
+  --ring: 24 80% 60%;
+  --card: 216 10% 20%;
+  --card-foreground: 24 80% 97%;
+
+  /* Chart colors for dark terracotta theme */
+  --chart-1: 24 80% 60%; /* terracotta-500 */
+  --chart-2: 60 10% 45%; /* sage-500 */
+  --chart-3: 40 80% 70%; /* cream-400 */
+  --chart-4: 216 10% 45%; /* slate-500 */
+  --chart-5: 195 80% 45%; /* petrol (fallback) */
+}

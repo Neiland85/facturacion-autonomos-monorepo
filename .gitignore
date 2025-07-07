@@ -7,6 +7,7 @@
 # ===========================================
 # 📦 DEPENDENCIES
 # ===========================================
+node_modules/
 /node_modules
 /.pnp
 .pnp.js
@@ -46,6 +47,121 @@ next-env.d.ts
 # ===========================================
 # 🏗️ BUILD OUTPUT
 # ===========================================
+/dist
+/build
+/.vscode
+/.idea
+
+# ===========================================
+# 🌍 ENVIRONMENT VARIABLES
+# ===========================================
+.env
+.env.*
+!.env.example
+.env.test
+.env.production
+.env.local
+
+# ===========================================
+# 🗄️ DATABASES
+# ===========================================
+*.db
+*.sqlite
+*.sqlite3
+
+# ===========================================
+# 📋 LOGS
+# ===========================================
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+# ===========================================
+# 🔧 SYSTEM & CACHE
+# ===========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# ===========================================
+# 🖥️ EDITOR
+# ===========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ===========================================
+# 📊 COVERAGE & REPORTS
+# ===========================================
+coverage/
+.nyc_output/
+
+# ===========================================
+# 🐳 DOCKER
+# ===========================================
+.dockerignore
+Dockerfile.dev
+docker-compose.override.yml
+
+# ===========================================
+# ☁️ CLOUD & DEPLOY
+# ===========================================
+.vercel
+.turbo
+
+# ===========================================
+# 🔐 CERTIFICATES & KEYS
+# ===========================================
+*.pem
+*.key
+*.crt
+
+# ===========================================
+# 💾 BACKUP & TEMPORARY
+# ===========================================
+*.backup
+*.bak
+tmp/
+temp/
+
+# ===========================================
+# 📎 UPLOADS & DOCUMENTS
+# ===========================================
+uploads/
+public/uploads/
+*.pdf
+*.docx
+*.xlsx
+
+# ===========================================
+# 🏢 BUSINESS LOGIC
+# ===========================================
+# Prisma
+prisma/migrations/
+!prisma/migrations/migration_lock.toml
+
+# Package managers
+package-lock.json
+pnpm-lock.yaml
+bun.lockb
+
+# Terraform
+*.tfstate
+*.tfstate.*
+.terraform/
+
+# Other
+.ignore
 /build
 /dist
 *.tsbuildinfo

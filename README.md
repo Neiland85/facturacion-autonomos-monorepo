@@ -1,3 +1,4 @@
+
 # 📊 Facturación Autónomos - Monorepo
 
 > Plataforma unificada para gestión y facturación de autónomos, organizada como monorepo modular con backend Node.js y frontend React. Arquitectura escalable, pruebas automáticas y CI/CD integrado.
@@ -322,3 +323,22 @@ Este proyecto está licenciado bajo Apache License 2.0 - ver [LICENSE](LICENSE) 
 Hecho con ❤️ y ☕ por el equipo de desarrollo
 
 </div>
+
+---
+
+## � Características Adicionales
+
+- Generación de facturas en PDF.
+- Validación robusta de datos.
+- Integración con PostgreSQL.
+- Despliegue con Docker Compose.
+
+## 📜 Licencia
+
+Este proyecto está bajo la licencia Apache 2.0. **Este repositorio no es de código abierto.**
+
+---
+
+© 2025 Neil Muñoz Lago ([Neiland85](https://github.com/Neiland85)). Todos los derechos reservados.
+
+> **Nota:** Para más detalles, consulta los README específicos en los directorios `backend` y `frontend`.
