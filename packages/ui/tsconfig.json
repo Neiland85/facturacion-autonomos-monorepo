@@ -13,8 +13,7 @@
     "allowSyntheticDefaultImports": true,
     "resolveJsonModule": true,
     "types": [
-      "node",
-      "jest"
+      "node"
     ]
   },
   "include": [

@@ -1,0 +1,1172 @@
+openapi: 3.0.3
+info:
+  title: Registro de Facturas - API
+  description: |
+    API para el registro y gestión de facturas de autónomos
+    
+    ## Características principales:
+    - Registro completo de facturas
+    - Validación fiscal automática
+    - Integración con AEAT/SII
+    - Cálculos fiscales automatizados
+    - Gestión de clientes y proveedores
+    
+    ## Flujo de trabajo:
+    1. Registrar factura
+    2. Validar datos fiscales
+    3. Calcular impuestos
+    4. Enviar a AEAT (si aplica)
+    5. Generar reportes
+    
+  version: 1.0.0
+  contact:
+    name: Equipo de Desarrollo
+    email: dev@facturacion-autonomos.com
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+
+servers:
+  - url: https://api.facturacion-autonomos.com/v1
+    description: Servidor de producción
+  - url: https://staging-api.facturacion-autonomos.com/v1
+    description: Servidor de staging
+  - url: http://localhost:3001/v1
+    description: Servidor de desarrollo
+
+security:
+  - bearerAuth: []
+  - apiKey: []
+
+paths:
+  /facturas:
+    get:
+      summary: Obtener lista de facturas
+      description: Obtiene una lista paginada de facturas con filtros opcionales
+      tags:
+        - Facturas
+      parameters:
+        - name: page
+          in: query
+          description: Número de página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          description: Número de resultados por página
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: tipo
+          in: query
+          description: Tipo de factura
+          required: false
+          schema:
+            type: string
+            enum: [emitida, recibida]
+        - name: estado
+          in: query
+          description: Estado de la factura
+          required: false
+          schema:
+            type: string
+            enum: [borrador, enviada, pagada, anulada]
+        - name: fechaDesde
+          in: query
+          description: Fecha de inicio del filtro
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: fechaHasta
+          in: query
+          description: Fecha de fin del filtro
+          required: false
+          schema:
+            type: string
+            format: date
+        - name: clienteId
+          in: query
+          description: ID del cliente
+          required: false
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Lista de facturas obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Factura'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+                  links:
+                    $ref: '#/components/schemas/PaginationLinks'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    post:
+      summary: Crear nueva factura
+      description: Crea una nueva factura con validación fiscal automática
+      tags:
+        - Facturas
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacturaCreate'
+      responses:
+        '201':
+          description: Factura creada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Factura'
+                  message:
+                    type: string
+                    example: "Factura creada correctamente"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /facturas/{id}:
+    get:
+      summary: Obtener factura por ID
+      description: Obtiene los detalles de una factura específica
+      tags:
+        - Facturas
+      parameters:
+        - name: id
+          in: path
+          description: ID de la factura
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Factura encontrada
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Factura'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    put:
+      summary: Actualizar factura
+      description: Actualiza una factura existente
+      tags:
+        - Facturas
+      parameters:
+        - name: id
+          in: path
+          description: ID de la factura
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FacturaUpdate'
+      responses:
+        '200':
+          description: Factura actualizada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Factura'
+                  message:
+                    type: string
+                    example: "Factura actualizada correctamente"
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    delete:
+      summary: Eliminar factura
+      description: Elimina una factura (solo si está en estado borrador)
+      tags:
+        - Facturas
+      parameters:
+        - name: id
+          in: path
+          description: ID de la factura
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '204':
+          description: Factura eliminada correctamente
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '409':
+          description: Conflicto - No se puede eliminar la factura
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /facturas/{id}/pdf:
+    get:
+      summary: Generar PDF de factura
+      description: Genera y descarga el PDF de una factura
+      tags:
+        - Facturas
+      parameters:
+        - name: id
+          in: path
+          description: ID de la factura
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: PDF generado correctamente
+          content:
+            application/pdf:
+              schema:
+                type: string
+                format: binary
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /facturas/{id}/enviar:
+    post:
+      summary: Enviar factura
+      description: Envía la factura al cliente y/o AEAT
+      tags:
+        - Facturas
+      parameters:
+        - name: id
+          in: path
+          description: ID de la factura
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                enviarCliente:
+                  type: boolean
+                  description: Enviar por email al cliente
+                  default: true
+                enviarAEAT:
+                  type: boolean
+                  description: Enviar a AEAT/SII
+                  default: false
+                emailPersonalizado:
+                  type: string
+                  format: email
+                  description: Email alternativo para el envío
+      responses:
+        '200':
+          description: Factura enviada correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Factura enviada correctamente"
+                  envioCliente:
+                    type: object
+                    properties:
+                      estado:
+                        type: string
+                        enum: [enviado, error]
+                      email:
+                        type: string
+                        format: email
+                      fechaEnvio:
+                        type: string
+                        format: date-time
+                  envioAEAT:
+                    type: object
+                    properties:
+                      estado:
+                        type: string
+                        enum: [enviado, error, no_aplica]
+                      csv:
+                        type: string
+                        description: Código Seguro de Verificación
+                      fechaEnvio:
+                        type: string
+                        format: date-time
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /clientes:
+    get:
+      summary: Obtener lista de clientes
+      description: Obtiene una lista paginada de clientes
+      tags:
+        - Clientes
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            default: 1
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+        - name: buscar
+          in: query
+          description: Búsqueda por nombre o NIF
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Lista de clientes obtenida correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Cliente'
+                  meta:
+                    $ref: '#/components/schemas/PaginationMeta'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+    
+    post:
+      summary: Crear nuevo cliente
+      description: Crea un nuevo cliente con validación de datos fiscales
+      tags:
+        - Clientes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ClienteCreate'
+      responses:
+        '201':
+          description: Cliente creado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Cliente'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '422':
+          $ref: '#/components/responses/ValidationError'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /clientes/{id}:
+    get:
+      summary: Obtener cliente por ID
+      tags:
+        - Clientes
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        '200':
+          description: Cliente encontrado
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/Cliente'
+        '404':
+          $ref: '#/components/responses/NotFound'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /fiscal/calcular:
+    post:
+      summary: Calcular impuestos
+      description: Calcula los impuestos para una factura
+      tags:
+        - Fiscal
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CalculoFiscal'
+      responses:
+        '200':
+          description: Cálculo realizado correctamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/ResultadoCalculoFiscal'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+  /reportes/trimestral:
+    get:
+      summary: Reporte trimestral
+      description: Genera reporte trimestral de facturas e impuestos
+      tags:
+        - Reportes
+      parameters:
+        - name: trimestre
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 4
+        - name: año
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 2020
+            maximum: 2030
+      responses:
+        '200':
+          description: Reporte generado correctamente
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ReporteTrimestral'
+        '400':
+          $ref: '#/components/responses/BadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '500':
+          $ref: '#/components/responses/InternalServerError'
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+
+  schemas:
+    Factura:
+      type: object
+      required:
+        - id
+        - numero
+        - fecha
+        - clienteId
+        - tipo
+        - estado
+        - baseImponible
+        - tipoIVA
+        - importeIVA
+        - total
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID único de la factura
+        numero:
+          type: string
+          description: Número de factura
+          example: "F-2024-001"
+        fecha:
+          type: string
+          format: date
+          description: Fecha de emisión
+        fechaVencimiento:
+          type: string
+          format: date
+          description: Fecha de vencimiento
+        clienteId:
+          type: string
+          format: uuid
+          description: ID del cliente
+        cliente:
+          $ref: '#/components/schemas/Cliente'
+        tipo:
+          type: string
+          enum: [emitida, recibida]
+          description: Tipo de factura
+        estado:
+          type: string
+          enum: [borrador, enviada, pagada, anulada]
+          description: Estado actual de la factura
+        concepto:
+          type: string
+          description: Concepto de la factura
+          example: "Servicios de consultoría"
+        baseImponible:
+          type: number
+          format: decimal
+          description: Base imponible
+          example: 100.00
+        tipoIVA:
+          type: number
+          format: decimal
+          description: Tipo de IVA aplicado
+          example: 21.00
+        importeIVA:
+          type: number
+          format: decimal
+          description: Importe del IVA
+          example: 21.00
+        tipoIRPF:
+          type: number
+          format: decimal
+          description: Tipo de IRPF aplicado
+          example: 15.00
+        importeIRPF:
+          type: number
+          format: decimal
+          description: Importe del IRPF
+          example: 15.00
+        total:
+          type: number
+          format: decimal
+          description: Total de la factura
+          example: 106.00
+        observaciones:
+          type: string
+          description: Observaciones adicionales
+        lineas:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineaFactura'
+        createdAt:
+          type: string
+          format: date-time
+          description: Fecha de creación
+        updatedAt:
+          type: string
+          format: date-time
+          description: Fecha de última actualización
+
+    FacturaCreate:
+      type: object
+      required:
+        - fecha
+        - clienteId
+        - tipo
+        - concepto
+        - baseImponible
+        - tipoIVA
+      properties:
+        fecha:
+          type: string
+          format: date
+        fechaVencimiento:
+          type: string
+          format: date
+        clienteId:
+          type: string
+          format: uuid
+        tipo:
+          type: string
+          enum: [emitida, recibida]
+        concepto:
+          type: string
+          minLength: 1
+          maxLength: 500
+        baseImponible:
+          type: number
+          format: decimal
+          minimum: 0
+        tipoIVA:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+        tipoIRPF:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+        observaciones:
+          type: string
+          maxLength: 1000
+        lineas:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineaFacturaCreate'
+
+    FacturaUpdate:
+      type: object
+      properties:
+        fecha:
+          type: string
+          format: date
+        fechaVencimiento:
+          type: string
+          format: date
+        concepto:
+          type: string
+          minLength: 1
+          maxLength: 500
+        baseImponible:
+          type: number
+          format: decimal
+          minimum: 0
+        tipoIVA:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+        tipoIRPF:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+        observaciones:
+          type: string
+          maxLength: 1000
+        estado:
+          type: string
+          enum: [borrador, enviada, pagada, anulada]
+        lineas:
+          type: array
+          items:
+            $ref: '#/components/schemas/LineaFacturaUpdate'
+
+    LineaFactura:
+      type: object
+      required:
+        - id
+        - descripcion
+        - cantidad
+        - precioUnitario
+        - total
+      properties:
+        id:
+          type: string
+          format: uuid
+        descripcion:
+          type: string
+          description: Descripción del producto/servicio
+        cantidad:
+          type: number
+          format: decimal
+          minimum: 0
+        precioUnitario:
+          type: number
+          format: decimal
+          minimum: 0
+        descuento:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+        total:
+          type: number
+          format: decimal
+          minimum: 0
+
+    LineaFacturaCreate:
+      type: object
+      required:
+        - descripcion
+        - cantidad
+        - precioUnitario
+      properties:
+        descripcion:
+          type: string
+          minLength: 1
+          maxLength: 500
+        cantidad:
+          type: number
+          format: decimal
+          minimum: 0
+        precioUnitario:
+          type: number
+          format: decimal
+          minimum: 0
+        descuento:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+
+    LineaFacturaUpdate:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        descripcion:
+          type: string
+          minLength: 1
+          maxLength: 500
+        cantidad:
+          type: number
+          format: decimal
+          minimum: 0
+        precioUnitario:
+          type: number
+          format: decimal
+          minimum: 0
+        descuento:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+
+    Cliente:
+      type: object
+      required:
+        - id
+        - nombre
+        - nif
+        - email
+      properties:
+        id:
+          type: string
+          format: uuid
+        nombre:
+          type: string
+          description: Nombre o razón social
+        nif:
+          type: string
+          description: NIF/CIF
+          pattern: '^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$'
+        email:
+          type: string
+          format: email
+        telefono:
+          type: string
+        direccion:
+          type: string
+        codigoPostal:
+          type: string
+        ciudad:
+          type: string
+        provincia:
+          type: string
+        pais:
+          type: string
+          default: "España"
+        activo:
+          type: boolean
+          default: true
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ClienteCreate:
+      type: object
+      required:
+        - nombre
+        - nif
+        - email
+      properties:
+        nombre:
+          type: string
+          minLength: 1
+          maxLength: 200
+        nif:
+          type: string
+          pattern: '^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$'
+        email:
+          type: string
+          format: email
+        telefono:
+          type: string
+        direccion:
+          type: string
+        codigoPostal:
+          type: string
+        ciudad:
+          type: string
+        provincia:
+          type: string
+        pais:
+          type: string
+          default: "España"
+
+    CalculoFiscal:
+      type: object
+      required:
+        - baseImponible
+        - tipoIVA
+      properties:
+        baseImponible:
+          type: number
+          format: decimal
+          minimum: 0
+        tipoIVA:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+        tipoIRPF:
+          type: number
+          format: decimal
+          minimum: 0
+          maximum: 100
+        regimenEspecial:
+          type: string
+          enum: [general, recargo_equivalencia, exento]
+          default: general
+
+    ResultadoCalculoFiscal:
+      type: object
+      properties:
+        baseImponible:
+          type: number
+          format: decimal
+        tipoIVA:
+          type: number
+          format: decimal
+        importeIVA:
+          type: number
+          format: decimal
+        tipoIRPF:
+          type: number
+          format: decimal
+        importeIRPF:
+          type: number
+          format: decimal
+        subtotal:
+          type: number
+          format: decimal
+        total:
+          type: number
+          format: decimal
+        desglose:
+          type: object
+          properties:
+            iva:
+              type: object
+              properties:
+                base:
+                  type: number
+                  format: decimal
+                tipo:
+                  type: number
+                  format: decimal
+                cuota:
+                  type: number
+                  format: decimal
+            irpf:
+              type: object
+              properties:
+                base:
+                  type: number
+                  format: decimal
+                tipo:
+                  type: number
+                  format: decimal
+                cuota:
+                  type: number
+                  format: decimal
+
+    ReporteTrimestral:
+      type: object
+      properties:
+        trimestre:
+          type: integer
+          minimum: 1
+          maximum: 4
+        año:
+          type: integer
+        resumen:
+          type: object
+          properties:
+            facturasEmitidas:
+              type: object
+              properties:
+                cantidad:
+                  type: integer
+                baseImponible:
+                  type: number
+                  format: decimal
+                iva:
+                  type: number
+                  format: decimal
+                irpf:
+                  type: number
+                  format: decimal
+                total:
+                  type: number
+                  format: decimal
+            facturasRecibidas:
+              type: object
+              properties:
+                cantidad:
+                  type: integer
+                baseImponible:
+                  type: number
+                  format: decimal
+                iva:
+                  type: number
+                  format: decimal
+                irpf:
+                  type: number
+                  format: decimal
+                total:
+                  type: number
+                  format: decimal
+        detalles:
+          type: array
+          items:
+            type: object
+            properties:
+              mes:
+                type: integer
+                minimum: 1
+                maximum: 12
+              facturasEmitidas:
+                type: integer
+              facturasRecibidas:
+                type: integer
+              baseImponible:
+                type: number
+                format: decimal
+              iva:
+                type: number
+                format: decimal
+              irpf:
+                type: number
+                format: decimal
+
+    PaginationMeta:
+      type: object
+      properties:
+        currentPage:
+          type: integer
+          minimum: 1
+        totalPages:
+          type: integer
+          minimum: 1
+        totalItems:
+          type: integer
+          minimum: 0
+        itemsPerPage:
+          type: integer
+          minimum: 1
+        hasNextPage:
+          type: boolean
+        hasPreviousPage:
+          type: boolean
+
+    PaginationLinks:
+      type: object
+      properties:
+        first:
+          type: string
+          format: uri
+        previous:
+          type: string
+          format: uri
+        next:
+          type: string
+          format: uri
+        last:
+          type: string
+          format: uri
+
+    Error:
+      type: object
+      required:
+        - error
+        - message
+      properties:
+        error:
+          type: string
+          description: Código de error
+        message:
+          type: string
+          description: Mensaje de error
+        details:
+          type: array
+          items:
+            type: object
+            properties:
+              field:
+                type: string
+              message:
+                type: string
+              code:
+                type: string
+        timestamp:
+          type: string
+          format: date-time
+        path:
+          type: string
+          description: Ruta de la petición
+
+  responses:
+    BadRequest:
+      description: Petición incorrecta
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "BAD_REQUEST"
+            message: "Los datos enviados no son válidos"
+            timestamp: "2024-01-15T10:30:00Z"
+            path: "/api/v1/facturas"
+
+    Unauthorized:
+      description: No autorizado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "UNAUTHORIZED"
+            message: "Token de autenticación requerido"
+            timestamp: "2024-01-15T10:30:00Z"
+            path: "/api/v1/facturas"
+
+    NotFound:
+      description: Recurso no encontrado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "NOT_FOUND"
+            message: "El recurso solicitado no existe"
+            timestamp: "2024-01-15T10:30:00Z"
+            path: "/api/v1/facturas/123"
+
+    ValidationError:
+      description: Error de validación
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "VALIDATION_ERROR"
+            message: "Los datos enviados no son válidos"
+            details:
+              - field: "email"
+                message: "El email no tiene un formato válido"
+                code: "INVALID_EMAIL"
+              - field: "nif"
+                message: "El NIF no tiene un formato válido"
+                code: "INVALID_NIF"
+            timestamp: "2024-01-15T10:30:00Z"
+            path: "/api/v1/clientes"
+
+    InternalServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error: "INTERNAL_SERVER_ERROR"
+            message: "Ha ocurrido un error interno del servidor"
+            timestamp: "2024-01-15T10:30:00Z"
+            path: "/api/v1/facturas"
+
+tags:
+  - name: Facturas
+    description: Operaciones relacionadas con facturas
+  - name: Clientes
+    description: Gestión de clientes
+  - name: Fiscal
+    description: Cálculos fiscales y tributarios
+  - name: Reportes
+    description: Generación de reportes e informes

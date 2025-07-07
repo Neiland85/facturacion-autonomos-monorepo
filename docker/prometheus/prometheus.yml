@@ -1,0 +1,42 @@
+# Configuración de Prometheus para desarrollo local
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+# Configuración de alertas
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets: []
+
+# Configuración de reglas (vacía para desarrollo)
+rule_files: []
+
+# Configuración de scraping
+scrape_configs:
+  # Métricas de Prometheus
+  - job_name: 'prometheus'
+    static_configs:
+      - targets: ['localhost:9090']
+
+  # API de Facturas
+  - job_name: 'api-facturas'
+    static_configs:
+      - targets: ['host.docker.internal:3000']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # API Tax Calculator
+  - job_name: 'api-tax-calculator'
+    static_configs:
+      - targets: ['host.docker.internal:3001']
+    metrics_path: '/metrics'
+    scrape_interval: 30s
+    scrape_timeout: 10s
+
+  # Métricas del sistema (opcional)
+  - job_name: 'node-exporter'
+    static_configs:
+      - targets: ['host.docker.internal:9100']
+    scrape_interval: 30s
