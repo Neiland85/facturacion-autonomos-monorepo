@@ -1,0 +1,366 @@
+{
+  "folders": [
+    {
+      "name": "🏠 Raíz del Proyecto",
+      "path": "."
+    },
+    {
+      "name": "📱 Apps",
+      "path": "./apps"
+    },
+    {
+      "name": "🌐 Frontend (Next.js)",
+      "path": "./apps/web"
+    },
+    {
+      "name": "🔌 API Facturas",
+      "path": "./apps/api-facturas"
+    },
+    {
+      "name": "🧮 API Tax Calculator",
+      "path": "./apps/api-tax-calculator"
+    },
+    {
+      "name": "📦 Packages",
+      "path": "./packages"
+    },
+    {
+      "name": "🎯 Core",
+      "path": "./packages/core"
+    },
+    {
+      "name": "🔗 Services",
+      "path": "./packages/services"
+    },
+    {
+      "name": "🏷️ Types",
+      "path": "./packages/types"
+    },
+    {
+      "name": "🎨 UI Components",
+      "path": "./packages/ui"
+    },
+    {
+      "name": "📝 Documentation",
+      "path": "./docs"
+    }
+  ],
+  "settings": {
+    "typescript.preferences.includePackageJsonAutoImports": "on",
+    "typescript.preferences.includeAutoImport": "on",
+    "typescript.suggest.autoImports": true,
+    "typescript.suggest.paths": true,
+    "editor.formatOnSave": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode",
+    "editor.codeActionsOnSave": {
+      "source.fixAll.eslint": true,
+      "source.organizeImports": true
+    },
+    "files.associations": {
+      "*.css": "tailwindcss",
+      "*.tsx": "typescriptreact",
+      "*.ts": "typescript"
+    },
+    "emmet.includeLanguages": {
+      "javascript": "javascriptreact",
+      "typescript": "typescriptreact"
+    },
+    "tailwindCSS.includeLanguages": {
+      "typescript": "typescript",
+      "typescriptreact": "typescriptreact"
+    },
+    "tailwindCSS.experimental.classRegex": [
+      [
+        "clsx\\(([^)]*)\\)",
+        "(?:'|\"|`)([^']*)(?:'|\"|`)"
+      ],
+      [
+        "classnames\\(([^)]*)\\)",
+        "(?:'|\"|`)([^']*)(?:'|\"|`)"
+      ],
+      [
+        "cn\\(([^)]*)\\)",
+        "(?:'|\"|`)([^']*)(?:'|\"|`)"
+      ]
+    ],
+    "github.copilot.enable": {
+      "*": true,
+      "yaml": true,
+      "plaintext": true,
+      "markdown": true,
+      "typescript": true,
+      "typescriptreact": true,
+      "javascript": true,
+      "javascriptreact": true,
+      "json": true,
+      "jsonc": true
+    },
+    "github.copilot.editor.enableAutoCompletions": true,
+    "github.copilot.advanced": {
+      "listCount": 10,
+      "inlineSuggestCount": 3
+    },
+    "prisma.showPrismaDataPlatformNotification": false,
+    "prisma.schemaPath": "./prisma/schema.prisma",
+    "eslint.workingDirectories": [
+      ".",
+      "./apps/web",
+      "./apps/api-facturas",
+      "./apps/api-tax-calculator",
+      "./packages/core",
+      "./packages/services",
+      "./packages/types",
+      "./packages/ui"
+    ],
+    "eslint.validate": [
+      "javascript",
+      "javascriptreact",
+      "typescript",
+      "typescriptreact"
+    ],
+    "search.exclude": {
+      "**/node_modules": true,
+      "**/dist": true,
+      "**/build": true,
+      "**/.next": true,
+      "**/coverage": true,
+      "**/.turbo": true,
+      "**/yarn.lock": true,
+      "**/package-lock.json": true,
+      "**/pnpm-lock.yaml": true
+    },
+    "files.exclude": {
+      "**/.DS_Store": true,
+      "**/node_modules": true,
+      "**/.git": false,
+      "**/.turbo": true
+    },
+    "terminal.integrated.env.osx": {
+      "PROJECT_ROOT": "${workspaceFolder}"
+    },
+    "terminal.integrated.env.linux": {
+      "PROJECT_ROOT": "${workspaceFolder}"
+    },
+    "terminal.integrated.env.windows": {
+      "PROJECT_ROOT": "${workspaceFolder}"
+    },
+    "debug.javascript.autoAttachFilter": "smart",
+    "debug.javascript.codelens.npmScripts": "all",
+    "jest.autoRun": "watch",
+    "jest.showCoverageOnLoad": true,
+    "jest.runMode": "deferred",
+    "playwright.showTrace": true,
+    "playwright.reuseBrowser": true,
+    "turbo.useGlobalTurbo": false,
+    "turbo.experimentalSpaceIgnore": true
+  },
+  "extensions": {
+    "recommendations": [
+      "github.copilot",
+      "github.copilot-chat",
+      "ms-vscode.vscode-typescript-next",
+      "bradlc.vscode-tailwindcss",
+      "prisma.prisma",
+      "esbenp.prettier-vscode",
+      "dbaeumer.vscode-eslint",
+      "ms-playwright.playwright",
+      "orta.vscode-jest",
+      "ms-vscode.vscode-json",
+      "yzhang.markdown-all-in-one",
+      "redhat.vscode-yaml",
+      "graphql.vscode-graphql",
+      "formulahendry.auto-rename-tag",
+      "christian-kohler.path-intellisense",
+      "bradlc.vscode-tailwindcss",
+      "lokalise.i18n-ally"
+    ]
+  },
+  "tasks": {
+    "version": "2.0.0",
+    "tasks": [
+      {
+        "label": "🚀 Desarrollo - Todos los servicios",
+        "type": "shell",
+        "command": "yarn dev",
+        "group": "build",
+        "isBackground": true,
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "🏗️ Build - Todo el monorepo",
+        "type": "shell",
+        "command": "yarn build",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": [
+          "$tsc"
+        ]
+      },
+      {
+        "label": "🧪 Tests - Todo el monorepo",
+        "type": "shell",
+        "command": "yarn test",
+        "group": "test",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "🔍 Lint - Todo el monorepo",
+        "type": "shell",
+        "command": "yarn lint",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": [
+          "$eslint-stylish"
+        ]
+      },
+      {
+        "label": "📊 Prisma Studio",
+        "type": "shell",
+        "command": "yarn db:studio",
+        "group": "build",
+        "isBackground": true,
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "🌐 Solo Frontend",
+        "type": "shell",
+        "command": "yarn workspace @facturacion/web dev",
+        "group": "build",
+        "isBackground": true,
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "🔌 Solo API Facturas",
+        "type": "shell",
+        "command": "yarn workspace @facturacion/api-facturas dev",
+        "group": "build",
+        "isBackground": true,
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      },
+      {
+        "label": "🧮 Solo API Tax Calculator",
+        "type": "shell",
+        "command": "yarn workspace @facturacion/api-tax-calculator dev",
+        "group": "build",
+        "isBackground": true,
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "new"
+        },
+        "problemMatcher": []
+      }
+    ]
+  },
+  "launch": {
+    "version": "0.2.0",
+    "configurations": [
+      {
+        "name": "🌐 Debug Frontend",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/apps/web",
+        "runtimeExecutable": "yarn",
+        "runtimeArgs": [
+          "dev"
+        ],
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "env": {
+          "NODE_ENV": "development"
+        }
+      },
+      {
+        "name": "🔌 Debug API Facturas",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/apps/api-facturas",
+        "runtimeExecutable": "yarn",
+        "runtimeArgs": [
+          "dev"
+        ],
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "env": {
+          "NODE_ENV": "development"
+        }
+      },
+      {
+        "name": "🧮 Debug API Tax Calculator",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}/apps/api-tax-calculator",
+        "runtimeExecutable": "yarn",
+        "runtimeArgs": [
+          "dev"
+        ],
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "env": {
+          "NODE_ENV": "development"
+        }
+      },
+      {
+        "name": "🧪 Debug Tests",
+        "type": "node",
+        "request": "launch",
+        "cwd": "${workspaceFolder}",
+        "runtimeExecutable": "yarn",
+        "runtimeArgs": [
+          "test",
+          "--watch"
+        ],
+        "skipFiles": [
+          "<node_internals>/**"
+        ],
+        "env": {
+          "NODE_ENV": "test"
+        }
+      }
+    ]
+  }
+}
