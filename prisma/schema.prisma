@@ -1,0 +1,303 @@
+// ===========================================
+// 🗄️ PRISMA SCHEMA - FACTURACIÓN AUTÓNOMOS
+// ===========================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ===========================================
+// 👤 USERS & AUTHENTICATION
+// ===========================================
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  role      Role     @default(USER)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  profile         UserProfile?
+  facturas        Factura[]
+  configuraciones ConfiguracionFiscal[]
+  gastos          Gasto[]
+
+  @@map("users")
+}
+
+model UserProfile {
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Datos personales
+  nif        String?
+  direccion  String?
+  telefono   String?
+  web        String?
+  
+  // Configuración fiscal
+  regimenIVA          RegimenIVA @default(GENERAL)
+  actividadEconomica  String?
+  
+  // Configuración de facturación
+  numeracionFacturas  String     @default("F{YYYY}{MM}-{####}")
+  logoUrl            String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("user_profiles")
+}
+
+// ===========================================
+// 📄 FACTURAS
+// ===========================================
+
+model Factura {
+  id       String @id @default(cuid())
+  numero   String @unique
+  fecha    DateTime @default(now())
+  
+  // Cliente
+  clienteNombre    String
+  clienteEmail     String?
+  clienteNIF       String?
+  clienteDireccion String?
+  
+  // Importes
+  baseImponible    Decimal @db.Decimal(10, 2)
+  tipoIVA          Decimal @db.Decimal(5, 2)
+  importeIVA       Decimal @db.Decimal(10, 2)
+  tipoRetencion    Decimal @db.Decimal(5, 2) @default(0)
+  importeRetencion Decimal @db.Decimal(10, 2) @default(0)
+  total            Decimal @db.Decimal(10, 2)
+  
+  // Estado
+  estado           EstadoFactura @default(BORRADOR)
+  fechaVencimiento DateTime?
+  fechaPago        DateTime?
+  
+  // Metadatos
+  notas      String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+  
+  // Relaciones
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  lineas    LineaFactura[]
+  pagos     PagoFactura[]
+  
+  @@map("facturas")
+}
+
+model LineaFactura {
+  id          String @id @default(cuid())
+  facturaId   String
+  factura     Factura @relation(fields: [facturaId], references: [id], onDelete: Cascade)
+  
+  concepto    String
+  cantidad    Decimal @db.Decimal(10, 2)
+  precio      Decimal @db.Decimal(10, 2)
+  descuento   Decimal @db.Decimal(5, 2) @default(0)
+  total       Decimal @db.Decimal(10, 2)
+  
+  orden       Int     @default(0)
+  
+  @@map("lineas_factura")
+}
+
+model PagoFactura {
+  id        String @id @default(cuid())
+  facturaId String
+  factura   Factura @relation(fields: [facturaId], references: [id], onDelete: Cascade)
+  
+  fecha     DateTime
+  importe   Decimal @db.Decimal(10, 2)
+  metodo    MetodoPago
+  referencia String?
+  
+  createdAt DateTime @default(now())
+  
+  @@map("pagos_factura")
+}
+
+// ===========================================
+// 💰 GASTOS
+// ===========================================
+
+model Gasto {
+  id          String @id @default(cuid())
+  
+  // Datos básicos
+  concepto    String
+  fecha       DateTime @default(now())
+  importe     Decimal @db.Decimal(10, 2)
+  tipoIVA     Decimal @db.Decimal(5, 2)
+  importeIVA  Decimal @db.Decimal(10, 2)
+  
+  // Proveedor
+  proveedorNombre String?
+  proveedorNIF    String?
+  
+  // Categorización
+  categoria   CategoriaGasto
+  deducible   Boolean @default(true)
+  
+  // Documentos
+  facturaNumero String?
+  archivoUrl    String?
+  
+  // Metadatos
+  notas     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relaciones
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@map("gastos")
+}
+
+// ===========================================
+// ⚙️ CONFIGURACIÓN FISCAL
+// ===========================================
+
+model ConfiguracionFiscal {
+  id     String @id @default(cuid())
+  userId String
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Períodos fiscales
+  trimestre       Int
+  ejercicio       Int
+  fechaVencimiento DateTime
+  
+  // Configuración IVA
+  tipoIVAGeneral     Decimal @db.Decimal(5, 2) @default(21)
+  tipoIVAReducido    Decimal @db.Decimal(5, 2) @default(10)
+  tipoIVASuperreducido Decimal @db.Decimal(5, 2) @default(4)
+  
+  // Configuración IRPF
+  tipoRetencionGeneral Decimal @db.Decimal(5, 2) @default(15)
+  tipoRetencionProfesional Decimal @db.Decimal(5, 2) @default(7)
+  
+  // Estados
+  presentado Boolean @default(false)
+  fechaPresentacion DateTime?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@unique([userId, trimestre, ejercicio])
+  @@map("configuracion_fiscal")
+}
+
+// ===========================================
+// 🔄 WEBHOOKS & INTEGRACIONES
+// ===========================================
+
+model Webhook {
+  id        String @id @default(cuid())
+  
+  // Configuración
+  url       String
+  eventos   String[] // JSON array de eventos
+  activo    Boolean @default(true)
+  secreto   String?
+  
+  // Metadatos
+  nombre    String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  // Relaciones
+  entregas  EntregaWebhook[]
+  
+  @@map("webhooks")
+}
+
+model EntregaWebhook {
+  id        String @id @default(cuid())
+  webhookId String
+  webhook   Webhook @relation(fields: [webhookId], references: [id], onDelete: Cascade)
+  
+  // Datos de la entrega
+  evento        String
+  payload       Json
+  estado        EstadoEntrega @default(PENDIENTE)
+  intentos      Int @default(0)
+  ultimoIntento DateTime?
+  respuesta     String?
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@map("entregas_webhook")
+}
+
+// ===========================================
+// 📊 ENUMS
+// ===========================================
+
+enum Role {
+  USER
+  ADMIN
+  SUPERUSER
+}
+
+enum RegimenIVA {
+  GENERAL
+  SIMPLIFICADO
+  RECARGO_EQUIVALENCIA
+  EXENTO
+}
+
+enum EstadoFactura {
+  BORRADOR
+  ENVIADA
+  PAGADA
+  VENCIDA
+  CANCELADA
+}
+
+enum MetodoPago {
+  EFECTIVO
+  TRANSFERENCIA
+  TARJETA
+  CHEQUE
+  OTROS
+}
+
+enum CategoriaGasto {
+  MATERIAL_OFICINA
+  TELEFONO_INTERNET
+  COMBUSTIBLE
+  COMIDAS
+  ALOJAMIENTO
+  TRANSPORTE
+  FORMACION
+  SEGUROS
+  SUMINISTROS
+  SERVICIOS_PROFESIONALES
+  MARKETING
+  OTROS
+}
+
+enum EstadoEntrega {
+  PENDIENTE
+  ENVIADO
+  ENTREGADO
+  FALLIDO
+  CANCELADO
+}
