@@ -1,0 +1,223 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: prometheus-config
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    app: prometheus
+    environment: ${ENVIRONMENT}
+data:
+  prometheus.yml: |
+    global:
+      scrape_interval: 15s
+      evaluation_interval: 15s
+    
+    rule_files:
+      - "alert_rules.yml"
+    
+    scrape_configs:
+      - job_name: 'prometheus'
+        static_configs:
+          - targets: ['localhost:9090']
+      
+      - job_name: 'api-facturas'
+        static_configs:
+          - targets: ['api-facturas-service:9090']
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+        scrape_timeout: 10s
+      
+      - job_name: 'api-tax-calculator'
+        static_configs:
+          - targets: ['api-tax-calculator-service:9090']
+        metrics_path: '/metrics'
+        scrape_interval: 30s
+        scrape_timeout: 10s
+      
+      - job_name: 'postgres'
+        static_configs:
+          - targets: ['postgres-exporter:9187']
+        scrape_interval: 30s
+      
+      - job_name: 'redis'
+        static_configs:
+          - targets: ['redis-exporter:9121']
+        scrape_interval: 30s
+      
+      - job_name: 'nginx-ingress'
+        kubernetes_sd_configs:
+          - role: pod
+            namespaces:
+              names:
+                - ingress-nginx
+        relabel_configs:
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_scrape]
+            action: keep
+            regex: true
+          - source_labels: [__meta_kubernetes_pod_annotation_prometheus_io_path]
+            action: replace
+            target_label: __metrics_path__
+            regex: (.+)
+          - source_labels: [__address__, __meta_kubernetes_pod_annotation_prometheus_io_port]
+            action: replace
+            regex: ([^:]+)(?::\d+)?;(\d+)
+            replacement: $1:$2
+            target_label: __address__
+    
+    alerting:
+      alertmanagers:
+        - static_configs:
+            - targets:
+              - alertmanager:9093
+  
+  alert_rules.yml: |
+    groups:
+      - name: facturacion.rules
+        rules:
+          - alert: HighResponseTime
+            expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket[5m])) by (le, service)) > 0.5
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "High response time detected"
+              description: "95th percentile response time is above 500ms for service {{ $labels.service }}"
+          
+          - alert: HighErrorRate
+            expr: sum(rate(http_requests_total{status=~"5.."}[5m])) by (service) / sum(rate(http_requests_total[5m])) by (service) > 0.05
+            for: 5m
+            labels:
+              severity: critical
+            annotations:
+              summary: "High error rate detected"
+              description: "Error rate is above 5% for service {{ $labels.service }}"
+          
+          - alert: DatabaseConnectionFailure
+            expr: up{job="postgres"} == 0
+            for: 1m
+            labels:
+              severity: critical
+            annotations:
+              summary: "Database connection failure"
+              description: "PostgreSQL database is not responding"
+          
+          - alert: RedisConnectionFailure
+            expr: up{job="redis"} == 0
+            for: 1m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Redis connection failure"
+              description: "Redis cache is not responding"
+          
+          - alert: PodCrashLooping
+            expr: increase(kube_pod_container_status_restarts_total[15m]) > 3
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Pod is crash looping"
+              description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is crash looping"
+          
+          - alert: PodNotReady
+            expr: kube_pod_status_ready{condition="false"} == 1
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Pod not ready"
+              description: "Pod {{ $labels.pod }} in namespace {{ $labels.namespace }} is not ready"
+          
+          - alert: DeploymentReplicasMismatch
+            expr: kube_deployment_spec_replicas != kube_deployment_status_available_replicas
+            for: 5m
+            labels:
+              severity: warning
+            annotations:
+              summary: "Deployment replicas mismatch"
+              description: "Deployment {{ $labels.deployment }} has {{ $labels.kube_deployment_spec_replicas }} desired replicas but only {{ $labels.kube_deployment_status_available_replicas }} are available"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: prometheus-service
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    app: prometheus
+    environment: ${ENVIRONMENT}
+spec:
+  selector:
+    app: prometheus
+  ports:
+    - port: 9090
+      targetPort: 9090
+      name: prometheus
+  type: ClusterIP
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: prometheus
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    app: prometheus
+    environment: ${ENVIRONMENT}
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: prometheus
+  template:
+    metadata:
+      labels:
+        app: prometheus
+        environment: ${ENVIRONMENT}
+    spec:
+      containers:
+        - name: prometheus
+          image: prom/prometheus:latest
+          ports:
+            - containerPort: 9090
+          args:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--storage.tsdb.path=/prometheus/"
+            - "--web.console.libraries=/etc/prometheus/console_libraries"
+            - "--web.console.templates=/etc/prometheus/consoles"
+            - "--web.enable-lifecycle"
+            - "--web.external-url=https://prometheus.${KUBE_DOMAIN}"
+            - "--storage.tsdb.retention.time=30d"
+          volumeMounts:
+            - name: prometheus-config
+              mountPath: /etc/prometheus
+            - name: prometheus-storage
+              mountPath: /prometheus
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "1Gi"
+              cpu: "1000m"
+      volumes:
+        - name: prometheus-config
+          configMap:
+            name: prometheus-config
+        - name: prometheus-storage
+          persistentVolumeClaim:
+            claimName: prometheus-pvc
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: prometheus-pvc
+  namespace: ${KUBE_NAMESPACE}
+  labels:
+    app: prometheus
+    environment: ${ENVIRONMENT}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: standard

@@ -1,0 +1,367 @@
+// Prisma schema file
+// Learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Usuario {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  nombre        String
+  apellidos     String?
+  password      String
+  nif           String   @unique
+  telefono      String?
+  activo        Boolean  @default(true)
+  emailVerified Boolean  @default(false)
+  role          Role     @default(USER)
+  
+  // Configuración de negocio
+  empresa       Empresa?
+  
+  // Auditoría
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  @@map("usuarios")
+}
+
+model Empresa {
+  id              String   @id @default(uuid())
+  usuarioId       String   @unique
+  usuario         Usuario  @relation(fields: [usuarioId], references: [id], onDelete: Cascade)
+  
+  razonSocial     String
+  nombreComercial String?
+  nif             String   @unique
+  email           String
+  telefono        String?
+  web             String?
+  
+  // Dirección fiscal
+  direccion       String
+  codigoPostal    String
+  ciudad          String
+  provincia       String
+  pais            String   @default("España")
+  
+  // Configuración fiscal
+  regimenIVA      RegimenIVA @default(GENERAL)
+  regimenIRPF     RegimenIRPF @default(ESTIMACION_DIRECTA)
+  
+  // Logo y configuración
+  logo            String?
+  colorPrimario   String?
+  
+  // Relaciones
+  clientes        Cliente[]
+  facturas        Factura[]
+  configuracion   ConfiguracionEmpresa?
+  
+  // Auditoría
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("empresas")
+}
+
+model ConfiguracionEmpresa {
+  id                    String  @id @default(uuid())
+  empresaId             String  @unique
+  empresa               Empresa @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  
+  // Numeración de facturas
+  prefijoFacturasEmitidas   String @default("F")
+  prefijoFacturasRecibidas  String @default("R")
+  siguienteNumeroEmitida    Int    @default(1)
+  siguienteNumeroRecibida   Int    @default(1)
+  
+  // Configuración de email
+  emailRemitente        String?
+  smtpHost              String?
+  smtpPort              Int?
+  smtpUser              String?
+  smtpPassword          String?
+  smtpSecure            Boolean @default(true)
+  
+  // Configuración de PDF
+  incluirLogo           Boolean @default(true)
+  incluirFirma          Boolean @default(false)
+  textoFooter           String?
+  
+  // Configuración AEAT
+  certificadoAEAT       String?
+  passwordCertificado   String?
+  entornoAEAT           EntornoAEAT @default(PRUEBAS)
+  
+  // Auditoría
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+  
+  @@map("configuracion_empresas")
+}
+
+model Cliente {
+  id              String   @id @default(uuid())
+  empresaId       String
+  empresa         Empresa  @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  
+  // Datos básicos
+  nombre          String
+  nif             String
+  email           String
+  telefono        String?
+  web             String?
+  
+  // Dirección
+  direccion       String?
+  codigoPostal    String?
+  ciudad          String?
+  provincia       String?
+  pais            String   @default("España")
+  
+  // Configuración
+  activo          Boolean  @default(true)
+  notas           String?
+  
+  // Relaciones
+  facturas        Factura[]
+  
+  // Auditoría
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([empresaId, nif])
+  @@map("clientes")
+}
+
+model Factura {
+  id                String    @id @default(uuid())
+  numero            String
+  empresaId         String
+  empresa           Empresa   @relation(fields: [empresaId], references: [id], onDelete: Cascade)
+  clienteId         String
+  cliente           Cliente   @relation(fields: [clienteId], references: [id], onDelete: Restrict)
+  
+  // Datos de la factura
+  fecha             DateTime
+  fechaVencimiento  DateTime?
+  tipo              TipoFactura
+  estado            EstadoFactura @default(BORRADOR)
+  
+  // Conceptos
+  concepto          String
+  observaciones     String?
+  
+  // Importes
+  baseImponible     Decimal   @db.Decimal(10, 2)
+  tipoIVA           Decimal   @db.Decimal(5, 2)
+  importeIVA        Decimal   @db.Decimal(10, 2)
+  tipoIRPF          Decimal   @db.Decimal(5, 2) @default(0)
+  importeIRPF       Decimal   @db.Decimal(10, 2) @default(0)
+  total             Decimal   @db.Decimal(10, 2)
+  
+  // Líneas de detalle
+  lineas            LineaFactura[]
+  
+  // Datos de envío
+  fechaEnvio        DateTime?
+  fechaPago         DateTime?
+  
+  // Datos AEAT
+  csvAEAT           String?
+  fechaEnvioAEAT    DateTime?
+  estadoAEAT        EstadoAEAT?
+  
+  // Auditoría
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([empresaId, numero])
+  @@map("facturas")
+}
+
+model LineaFactura {
+  id              String  @id @default(uuid())
+  facturaId       String
+  factura         Factura @relation(fields: [facturaId], references: [id], onDelete: Cascade)
+  
+  orden           Int
+  descripcion     String
+  cantidad        Decimal @db.Decimal(10, 3)
+  precioUnitario  Decimal @db.Decimal(10, 2)
+  descuento       Decimal @db.Decimal(5, 2) @default(0)
+  total           Decimal @db.Decimal(10, 2)
+  
+  // Auditoría
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("lineas_facturas")
+}
+
+model Producto {
+  id              String  @id @default(uuid())
+  empresaId       String
+  
+  codigo          String?
+  nombre          String
+  descripcion     String?
+  precio          Decimal @db.Decimal(10, 2)
+  tipoIVA         Decimal @db.Decimal(5, 2) @default(21)
+  unidad          String  @default("ud")
+  activo          Boolean @default(true)
+  
+  // Auditoría
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@unique([empresaId, codigo])
+  @@map("productos")
+}
+
+model Gasto {
+  id              String    @id @default(uuid())
+  empresaId       String
+  
+  fecha           DateTime
+  concepto        String
+  proveedor       String?
+  numeroFactura   String?
+  
+  baseImponible   Decimal   @db.Decimal(10, 2)
+  tipoIVA         Decimal   @db.Decimal(5, 2)
+  importeIVA      Decimal   @db.Decimal(10, 2)
+  tipoIRPF        Decimal   @db.Decimal(5, 2) @default(0)
+  importeIRPF     Decimal   @db.Decimal(10, 2) @default(0)
+  total           Decimal   @db.Decimal(10, 2)
+  
+  categoria       CategoriaGasto @default(OTROS)
+  deducible       Boolean   @default(true)
+  
+  // Archivos adjuntos
+  archivoUrl      String?
+  archivoNombre   String?
+  
+  // Auditoría
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("gastos")
+}
+
+model RegistroAEAT {
+  id              String    @id @default(uuid())
+  empresaId       String
+  facturaId       String?
+  
+  tipo            TipoRegistroAEAT
+  operacion       String
+  fechaOperacion  DateTime
+  csv             String    @unique
+  estado          EstadoAEAT
+  
+  request         Json?
+  response        Json?
+  errores         Json?
+  
+  // Auditoría
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("registros_aeat")
+}
+
+model ConfiguracionSistema {
+  id              String @id @default(uuid())
+  clave           String @unique
+  valor           String
+  descripcion     String?
+  tipo            TipoConfiguracion @default(STRING)
+  
+  // Auditoría
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  
+  @@map("configuracion_sistema")
+}
+
+// Enumeraciones
+enum Role {
+  USER
+  ADMIN
+  SUPERADMIN
+}
+
+enum RegimenIVA {
+  GENERAL
+  RECARGO_EQUIVALENCIA
+  EXENTO
+  SIMPLIFICADO
+}
+
+enum RegimenIRPF {
+  ESTIMACION_DIRECTA
+  ESTIMACION_OBJETIVA
+  MODULOS
+}
+
+enum EntornoAEAT {
+  PRODUCCION
+  PRUEBAS
+}
+
+enum TipoFactura {
+  EMITIDA
+  RECIBIDA
+}
+
+enum EstadoFactura {
+  BORRADOR
+  ENVIADA
+  PAGADA
+  ANULADA
+  VENCIDA
+}
+
+enum EstadoAEAT {
+  PENDIENTE
+  ENVIADO
+  ACEPTADO
+  RECHAZADO
+  ERROR
+}
+
+enum TipoRegistroAEAT {
+  ALTA_FACTURA
+  MODIFICACION_FACTURA
+  ANULACION_FACTURA
+  CONSULTA_FACTURA
+}
+
+enum CategoriaGasto {
+  MATERIAL_OFICINA
+  SERVICIOS_PROFESIONALES
+  PUBLICIDAD
+  VIAJES
+  FORMACION
+  SOFTWARE
+  IMPUESTOS
+  SEGUROS
+  ALQUILER
+  SUMINISTROS
+  OTROS
+}
+
+enum TipoConfiguracion {
+  STRING
+  NUMBER
+  BOOLEAN
+  JSON
+}

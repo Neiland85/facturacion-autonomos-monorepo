@@ -115,6 +115,9 @@ export const logger = {
   }
 };
 
+// Exportar calculador fiscal
+export { CalculadorFiscal } from './fiscal/calculador';
+
 export default {
   validateEmail,
   validateTaxId,
