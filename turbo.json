@@ -12,10 +12,16 @@
       "dependsOn": ["^build"]
     },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["^lint"],
+      "outputs": ["eslint-report.json"]
     },
     "lint:fix": {
-      "dependsOn": ["^lint:fix"]
+      "dependsOn": ["^lint:fix"],
+      "cache": false
+    },
+    "lint:check": {
+      "dependsOn": ["^lint:check"],
+      "outputs": ["eslint-report.json"]
     },
     "type-check": {
       "dependsOn": ["^type-check"]

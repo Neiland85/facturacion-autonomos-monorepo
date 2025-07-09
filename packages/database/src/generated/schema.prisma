@@ -1,0 +1,148 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relaciones
+  company  Company?
+  invoices Invoice[]
+  clients  Client[]
+
+  @@map("users")
+}
+
+model Company {
+  id         String  @id @default(cuid())
+  name       String
+  cif        String  @unique
+  address    String
+  city       String
+  postalCode String
+  province   String
+  phone      String?
+  email      String?
+  website    String?
+
+  // Datos fiscales
+  taxRegime TaxRegime @default(GENERAL)
+  vatNumber String?
+
+  // Relaciones
+  userId   String    @unique
+  user     User      @relation(fields: [userId], references: [id])
+  invoices Invoice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("companies")
+}
+
+model Client {
+  id         String  @id @default(cuid())
+  name       String
+  nifCif     String
+  address    String?
+  city       String?
+  postalCode String?
+  province   String?
+  phone      String?
+  email      String?
+
+  // Relaciones
+  userId   String
+  user     User      @relation(fields: [userId], references: [id])
+  invoices Invoice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("clients")
+}
+
+model Invoice {
+  id        String    @id @default(cuid())
+  number    String    @unique
+  series    String    @default("A")
+  issueDate DateTime
+  dueDate   DateTime?
+
+  // Importes
+  subtotal  Decimal @db.Decimal(10, 2)
+  vatAmount Decimal @db.Decimal(10, 2)
+  total     Decimal @db.Decimal(10, 2)
+
+  // Estado
+  status InvoiceStatus @default(DRAFT)
+  paidAt DateTime?
+
+  // SII Integration
+  siiSent      Boolean   @default(false)
+  siiReference String?
+  siiSentAt    DateTime?
+
+  // Relaciones
+  companyId String
+  company   Company       @relation(fields: [companyId], references: [id])
+  clientId  String
+  client    Client        @relation(fields: [clientId], references: [id])
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  lines     InvoiceLine[]
+
+  // Metadatos
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("invoices")
+}
+
+model InvoiceLine {
+  id          String  @id @default(cuid())
+  description String
+  quantity    Decimal @db.Decimal(10, 2)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  vatRate     Decimal @default(21.00) @db.Decimal(5, 2)
+  amount      Decimal @db.Decimal(10, 2)
+
+  // Relaciones
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_lines")
+}
+
+// Enums
+enum TaxRegime {
+  GENERAL
+  SIMPLIFIED
+  AGRICULTURE
+
+  @@map("tax_regimes")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+
+  @@map("invoice_statuses")
+}
