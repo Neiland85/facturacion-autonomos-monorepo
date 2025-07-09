@@ -52,21 +52,23 @@ export const Button: React.FC<ButtonProps> = ({
   loading = false,
   onClick,
   type = 'button',
-  className = ''
+  className = '',
 }) => {
-  const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
-  
+  const baseClasses =
+    'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
+
   const variantClasses = {
     primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-    secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
+    secondary:
+      'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
     danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-    success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500'
+    success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
   };
 
   const sizeClasses = {
     sm: 'px-3 py-1.5 text-sm',
     md: 'px-4 py-2 text-base',
-    lg: 'px-6 py-3 text-lg'
+    lg: 'px-6 py-3 text-lg',
   };
 
   const disabledClasses = 'opacity-50 cursor-not-allowed';
@@ -76,7 +78,7 @@ export const Button: React.FC<ButtonProps> = ({
     variantClasses[variant],
     sizeClasses[size],
     disabled || loading ? disabledClasses : '',
-    className
+    className,
   ].join(' ');
 
   return (
@@ -87,9 +89,25 @@ export const Button: React.FC<ButtonProps> = ({
       disabled={disabled || loading}
     >
       {loading && (
-        <svg className="animate-spin -ml-1 mr-2 h-4 w-4 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        <svg
+          className="animate-spin -ml-1 mr-2 h-4 w-4 text-white"
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+        >
+          <circle
+            className="opacity-25"
+            cx="12"
+            cy="12"
+            r="10"
+            stroke="currentColor"
+            strokeWidth="4"
+          ></circle>
+          <path
+            className="opacity-75"
+            fill="currentColor"
+            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+          ></path>
         </svg>
       )}
       {children}
@@ -107,9 +125,10 @@ export const Input: React.FC<InputProps> = ({
   disabled = false,
   required = false,
   type = 'text',
-  className = ''
+  className = '',
 }) => {
-  const baseClasses = 'block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm';
+  const baseClasses =
+    'block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm';
   const errorClasses = 'border-red-300 focus:border-red-500 focus:ring-red-500';
   const disabledClasses = 'bg-gray-50 text-gray-500 cursor-not-allowed';
 
@@ -117,7 +136,7 @@ export const Input: React.FC<InputProps> = ({
     baseClasses,
     error ? errorClasses : '',
     disabled ? disabledClasses : '',
-    className
+    className,
   ].join(' ');
 
   return (
@@ -133,13 +152,11 @@ export const Input: React.FC<InputProps> = ({
         className={inputClasses}
         placeholder={placeholder}
         value={value}
-        onChange={(e) => onChange?.(e.target.value)}
+        onChange={e => onChange?.(e.target.value)}
         disabled={disabled}
         required={required}
       />
-      {error && (
-        <p className="text-sm text-red-600">{error}</p>
-      )}
+      {error && <p className="text-sm text-red-600">{error}</p>}
     </div>
   );
 };
@@ -148,7 +165,7 @@ export const Input: React.FC<InputProps> = ({
 export const Card: React.FC<CardProps> = ({
   children,
   title,
-  className = ''
+  className = '',
 }) => {
   const baseClasses = 'bg-white rounded-lg shadow-md border border-gray-200';
   const classes = [baseClasses, className].join(' ');
@@ -160,9 +177,7 @@ export const Card: React.FC<CardProps> = ({
           <h3 className="text-lg font-medium text-gray-900">{title}</h3>
         </div>
       )}
-      <div className="px-6 py-4">
-        {children}
-      </div>
+      <div className="px-6 py-4">{children}</div>
     </div>
   );
 };
@@ -173,7 +188,7 @@ export const Modal: React.FC<ModalProps> = ({
   onClose,
   title,
   children,
-  size = 'md'
+  size = 'md',
 }) => {
   if (!isOpen) return null;
 
@@ -181,7 +196,7 @@ export const Modal: React.FC<ModalProps> = ({
     sm: 'max-w-sm',
     md: 'max-w-md',
     lg: 'max-w-lg',
-    xl: 'max-w-xl'
+    xl: 'max-w-xl',
   };
 
   return (
@@ -191,16 +206,16 @@ export const Modal: React.FC<ModalProps> = ({
           className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
           onClick={onClose}
         ></div>
-        
-        <div className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full ${sizeClasses[size]}`}>
+
+        <div
+          className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full ${sizeClasses[size]}`}
+        >
           {title && (
             <div className="px-6 py-4 border-b border-gray-200">
               <h3 className="text-lg font-medium text-gray-900">{title}</h3>
             </div>
           )}
-          <div className="px-6 py-4">
-            {children}
-          </div>
+          <div className="px-6 py-4">{children}</div>
         </div>
       </div>
     </div>
@@ -208,18 +223,36 @@ export const Modal: React.FC<ModalProps> = ({
 };
 
 // Componente Loading Spinner
-export const LoadingSpinner: React.FC<{ size?: 'sm' | 'md' | 'lg' }> = ({ size = 'md' }) => {
+export const LoadingSpinner: React.FC<{ size?: 'sm' | 'md' | 'lg' }> = ({
+  size = 'md',
+}) => {
   const sizeClasses = {
     sm: 'h-4 w-4',
     md: 'h-8 w-8',
-    lg: 'h-12 w-12'
+    lg: 'h-12 w-12',
   };
 
   return (
     <div className="flex justify-center items-center">
-      <svg className={`animate-spin ${sizeClasses[size]} text-blue-600`} xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+      <svg
+        className={`animate-spin ${sizeClasses[size]} text-blue-600`}
+        xmlns="http://www.w3.org/2000/svg"
+        fill="none"
+        viewBox="0 0 24 24"
+      >
+        <circle
+          className="opacity-25"
+          cx="12"
+          cy="12"
+          r="10"
+          stroke="currentColor"
+          strokeWidth="4"
+        ></circle>
+        <path
+          className="opacity-75"
+          fill="currentColor"
+          d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+        ></path>
       </svg>
     </div>
   );
@@ -233,21 +266,24 @@ export interface AlertProps {
   onClose?: () => void;
 }
 
-export const Alert: React.FC<AlertProps> = ({ type, title, message, onClose }) => {
+export const Alert: React.FC<AlertProps> = ({
+  type,
+  title,
+  message,
+  onClose,
+}) => {
   const typeClasses = {
     info: 'bg-blue-50 border-blue-200 text-blue-800',
     success: 'bg-green-50 border-green-200 text-green-800',
     warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-    error: 'bg-red-50 border-red-200 text-red-800'
+    error: 'bg-red-50 border-red-200 text-red-800',
   };
 
   return (
     <div className={`rounded-md border p-4 ${typeClasses[type]}`}>
       <div className="flex">
         <div className="flex-1">
-          {title && (
-            <h3 className="text-sm font-medium mb-1">{title}</h3>
-          )}
+          {title && <h3 className="text-sm font-medium mb-1">{title}</h3>}
           <p className="text-sm">{message}</p>
         </div>
         {onClose && (
@@ -270,5 +306,5 @@ export default {
   Card,
   Modal,
   LoadingSpinner,
-  Alert
+  Alert,
 };
