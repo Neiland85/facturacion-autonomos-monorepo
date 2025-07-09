@@ -25,6 +25,7 @@
     "editor.formatOnSave": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode",
     "editor.codeActionsOnSave": {
+
       "source.fixAll.eslint": "explicit",
       "source.organizeImports": "explicit"
     },
@@ -76,20 +77,23 @@
     "prisma.schemaPath": "./prisma/schema.prisma",
     "eslint.workingDirectories": [
       ".",
-      "./frontend",
-      "./apps/api-facturas",
+      "./apps/web",
+      "./apps/api-facturas", 
       "./apps/api-tax-calculator",
+      "./packages/database",
       "./packages/core",
-      "./packages/services",
+      "./packages/services", 
       "./packages/types",
-      "./packages/ui"
+      "./packages/ui",
+      "./frontend"
     ],
     "eslint.validate": [
       "javascript",
-      "javascriptreact",
+      "javascriptreact", 
       "typescript",
       "typescriptreact"
     ],
+    "eslint.experimental.useFlatConfig": true,
     "search.exclude": {
       "**/node_modules": true,
       "**/dist": true,
@@ -194,6 +198,36 @@
         "label": "🔍 Lint - Todo el monorepo",
         "type": "shell",
         "command": "yarn lint",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": [
+          "$eslint-stylish"
+        ]
+      },
+      {
+        "label": "🔧 Lint Fix - Todo el monorepo",
+        "type": "shell", 
+        "command": "yarn lint:fix",
+        "group": "build",
+        "presentation": {
+          "echo": true,
+          "reveal": "always",
+          "focus": false,
+          "panel": "shared"
+        },
+        "problemMatcher": [
+          "$eslint-stylish"
+        ]
+      },
+      {
+        "label": "✅ Lint Check - Validación estricta",
+        "type": "shell",
+        "command": "yarn lint:check", 
         "group": "build",
         "presentation": {
           "echo": true,

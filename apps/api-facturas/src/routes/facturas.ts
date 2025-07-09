@@ -1,9 +1,7 @@
 import express from 'express';
-import { FacturaController } from '../controllers/facturas';
-import { validateFactura, validateFacturaUpdate } from '../middleware/validation';
+import { FacturasController } from '../controllers/facturas';
 
 const router = express.Router();
-const facturaController = new FacturaController();
 
 /**
  * @swagger
