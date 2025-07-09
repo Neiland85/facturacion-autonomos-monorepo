@@ -9,36 +9,8 @@
       "path": "./apps"
     },
     {
-      "name": "🌐 Frontend (Next.js)",
-      "path": "./apps/web"
-    },
-    {
-      "name": "🔌 API Facturas",
-      "path": "./apps/api-facturas"
-    },
-    {
-      "name": "🧮 API Tax Calculator",
-      "path": "./apps/api-tax-calculator"
-    },
-    {
       "name": "📦 Packages",
       "path": "./packages"
-    },
-    {
-      "name": "🎯 Core",
-      "path": "./packages/core"
-    },
-    {
-      "name": "🔗 Services",
-      "path": "./packages/services"
-    },
-    {
-      "name": "🏷️ Types",
-      "path": "./packages/types"
-    },
-    {
-      "name": "🎨 UI Components",
-      "path": "./packages/ui"
     },
     {
       "name": "📝 Documentation",
@@ -104,7 +76,7 @@
     "prisma.schemaPath": "./prisma/schema.prisma",
     "eslint.workingDirectories": [
       ".",
-      "./apps/web",
+      "./frontend",
       "./apps/api-facturas",
       "./apps/api-tax-calculator",
       "./packages/core",
@@ -146,9 +118,7 @@
     },
     "debug.javascript.autoAttachFilter": "smart",
     "debug.javascript.codelens.npmScripts": "all",
-    "jest.autoRun": "watch",
-    "jest.showCoverageOnLoad": true,
-    "jest.runMode": "deferred",
+    "jest.runMode": "watch",
     "playwright.showTrace": true,
     "playwright.reuseBrowser": true,
     "turbo.useGlobalTurbo": false,
@@ -252,7 +222,7 @@
       {
         "label": "🌐 Solo Frontend",
         "type": "shell",
-        "command": "yarn workspace @facturacion/web dev",
+        "command": "yarn workspace facturacion-autonomos-frontend dev",
         "group": "build",
         "isBackground": true,
         "presentation": {
@@ -300,7 +270,7 @@
         "name": "🌐 Debug Frontend",
         "type": "node",
         "request": "launch",
-        "cwd": "${workspaceFolder}/apps/web",
+        "cwd": "${workspaceFolder}/frontend",
         "runtimeExecutable": "yarn",
         "runtimeArgs": [
           "dev"
