@@ -2,11 +2,16 @@
   "name": "@facturacion/ui",
   "version": "1.0.0",
   "private": true,
+<<<<<<< HEAD
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
     "dist"
   ],
+=======
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+>>>>>>> dev
   "scripts": {
     "build": "tsc",
     "dev": "tsc --watch",
@@ -26,7 +31,10 @@
   },
   "devDependencies": {
     "@types/react": "^18.3.12",
+<<<<<<< HEAD
     "@types/react-dom": "^18.3.1",
+=======
+>>>>>>> dev
     "typescript": "^5.7.2"
   },
   "peerDependencies": {

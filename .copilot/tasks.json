@@ -1,0 +1,75 @@
+{
+  "tasks": [
+    {
+      "name": "generate:adr",
+      "description": "Genera un nuevo ADR (Architecture Decision Record)",
+      "command": "yarn adr:new",
+      "args": [
+        "${input:adrTitle}"
+      ],
+      "inputs": [
+        {
+          "id": "adrTitle",
+          "description": "Título del ADR",
+          "type": "promptString"
+        }
+      ]
+    },
+    {
+      "name": "scaffold:service",
+      "description": "Genera un nuevo microservicio con Express + Prisma",
+      "command": "turbo gen",
+      "args": [
+        "service",
+        "${input:serviceName}"
+      ],
+      "inputs": [
+        {
+          "id": "serviceName",
+          "description": "Nombre del servicio",
+          "type": "promptString"
+        }
+      ]
+    },
+    {
+      "name": "scaffold:hook",
+      "description": "Genera un hook React con SWR y Zod",
+      "command": "turbo gen",
+      "args": [
+        "hook",
+        "${input:hookName}"
+      ],
+      "inputs": [
+        {
+          "id": "hookName",
+          "description": "Nombre del hook (sin 'use')",
+          "type": "promptString"
+        }
+      ]
+    },
+    {
+      "name": "test:all",
+      "description": "Ejecuta todos los tests: Jest + Cypress + Playwright",
+      "command": "yarn",
+      "args": [
+        "test"
+      ]
+    },
+    {
+      "name": "dev:full",
+      "description": "Inicia desarrollo completo (todos los servicios)",
+      "command": "yarn",
+      "args": [
+        "dev"
+      ]
+    },
+    {
+      "name": "build:production",
+      "description": "Build de producción completo",
+      "command": "yarn",
+      "args": [
+        "build"
+      ]
+    }
+  ]
+}

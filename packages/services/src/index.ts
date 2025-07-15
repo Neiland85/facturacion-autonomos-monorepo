@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @fileoverview Shared services and API clients for the facturacion-autonomos project
  * @version 1.0.0
@@ -267,3 +268,7 @@ export default {
   DEFAULT_API_CONFIG,
   TAX_CALCULATOR_CONFIG
 };
+=======
+// Placeholder for services
+export const servicesVersion = "1.0.0";
+>>>>>>> dev

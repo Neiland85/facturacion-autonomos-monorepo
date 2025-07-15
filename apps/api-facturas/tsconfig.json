@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+<<<<<<< HEAD
     "outDir": "dist",
     "rootDir": "src",
     "target": "ES2020",
@@ -15,14 +16,25 @@
       "node",
       "jest"
     ]
+=======
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "target": "ES2022",
+    "module": "CommonJS",
+    "moduleResolution": "node"
+>>>>>>> dev
   },
   "include": [
     "src/**/*"
   ],
   "exclude": [
     "node_modules",
+<<<<<<< HEAD
     "dist",
     "**/*.test.ts",
     "**/*.spec.ts"
+=======
+    "dist"
+>>>>>>> dev
   ]
 }

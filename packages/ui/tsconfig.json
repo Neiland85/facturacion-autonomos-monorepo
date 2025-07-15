@@ -1,6 +1,7 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+<<<<<<< HEAD
     "outDir": "dist",
     "rootDir": "src",
     "target": "ES2020",
@@ -15,6 +16,13 @@
     "types": [
       "node"
     ]
+=======
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "declaration": true,
+    "declarationMap": true,
+    "jsx": "react-jsx"
+>>>>>>> dev
   },
   "include": [
     "src/**/*"
@@ -23,8 +31,12 @@
     "node_modules",
     "dist",
     "**/*.test.ts",
+<<<<<<< HEAD
     "**/*.test.tsx",
     "**/*.spec.ts",
     "**/*.spec.tsx"
+=======
+    "**/*.test.tsx"
+>>>>>>> dev
   ]
 }

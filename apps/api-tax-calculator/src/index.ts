@@ -1,4 +1,5 @@
 import cors from 'cors';
+<<<<<<< HEAD
 import 'dotenv/config';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
@@ -10,10 +11,15 @@ import { configuracionFiscalRoutes } from './routes/configuracion-fiscal.routes'
 import { quarterClosureRoutes } from './routes/quarter-closure.routes';
 import { taxRoutes } from './routes/tax.routes';
 import { webhookRoutes } from './routes/webhook.routes';
+=======
+import express from 'express';
+import helmet from 'helmet';
+>>>>>>> dev
 
 const app = express();
 const PORT = process.env.PORT || 3002;
 
+<<<<<<< HEAD
 // Inicializar cron jobs
 const cronManager = new CronJobManager();
 
@@ -103,4 +109,16 @@ process.on('SIGINT', async () => {
     console.log('Servidor cerrado correctamente');
     process.exit(0);
   });
+=======
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', service: 'tax-calculator-api' });
+});
+
+app.listen(PORT, () => {
+  console.log(`🧮 API Tax Calculator corriendo en puerto ${PORT}`);
+>>>>>>> dev
 });

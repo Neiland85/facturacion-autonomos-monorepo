@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @fileoverview Shared TypeScript type definitions for the facturacion-autonomos project
  * @version 1.0.0
@@ -319,3 +320,9 @@ export default {
   TAXPAYER_TYPES,
   VAT_RATES
 };
+=======
+// Placeholder for types
+export interface AppVersion {
+  version: string;
+}
+>>>>>>> dev

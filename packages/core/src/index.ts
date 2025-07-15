@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * @fileoverview Core business logic and utilities for the facturacion-autonomos project
  * @version 1.0.0
@@ -131,3 +132,7 @@ export default {
   BusinessError,
   logger
 };
+=======
+// Placeholder for core functionality
+export const version = "1.0.0";
+>>>>>>> dev

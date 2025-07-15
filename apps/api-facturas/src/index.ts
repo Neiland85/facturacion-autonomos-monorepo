@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import express from 'express';
 import cors from 'cors';
 import helmet from 'helmet';
@@ -6,10 +7,16 @@ import compression from 'compression';
 import { prisma } from '@facturacion/database';
 import { rateLimit } from 'express-rate-limit';
 import facturasRoutes from './routes/facturas-simple';
+=======
+import cors from 'cors';
+import express from 'express';
+import helmet from 'helmet';
+>>>>>>> dev
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
+<<<<<<< HEAD
 // Middleware de seguridad
 app.use(helmet());
 app.use(cors());
@@ -72,3 +79,16 @@ process.on('SIGTERM', async () => {
 });
 
 export default app;
+=======
+app.use(helmet());
+app.use(cors());
+app.use(express.json());
+
+app.get('/health', (req, res) => {
+  res.json({ status: 'OK', service: 'facturas-api' });
+});
+
+app.listen(PORT, () => {
+  console.log(`🚀 API Facturas corriendo en puerto ${PORT}`);
+});
+>>>>>>> dev
