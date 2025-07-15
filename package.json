@@ -78,7 +78,6 @@
     "@types/yamljs": "^0",
     "@typescript-eslint/eslint-plugin": "^8.18.2",
     "@typescript-eslint/parser": "^8.18.2",
-    "@typescript-eslint/types": "^8.36.0",
     "concurrently": "^8.2.2",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
