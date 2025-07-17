@@ -1,6 +1,12 @@
 {
   "$schema": "https://turbo.build/schema.json",
-<<<<<<< HEAD
+  "globalDependencies": [
+    "**/.env",
+    "**/.env.local",
+    "**/.env.development.local",
+    "**/.env.test.local",
+    "**/.env.production.local"
+  ],
   "tasks": {
     "build": {
       "dependsOn": ["^build"],
@@ -45,63 +51,6 @@
     },
     "clean": {
       "cache": false
-    }
-  },
-  "globalDependencies": [
-    "**/.env",
-    "**/.env.local",
-    "**/.env.development.local",
-    "**/.env.test.local",
-    "**/.env.production.local"
-  ]
-}
-=======
-  "globalDependencies": [
-    "**/.env.*local"
-  ],
-  "tasks": {
-    "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "dist/**"
-      ]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true
-    },
-    "lint": {
-      "dependsOn": [
-        "^lint"
-      ],
-      "outputs": []
-    },
-    "type-check": {
-      "dependsOn": [
-        "^type-check"
-      ],
-      "outputs": []
-    },
-    "test": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "coverage/**"
-      ]
-    },
-    "test:e2e": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": []
-    },
-    "clean": {
-      "cache": false
     },
     "db:generate": {
       "cache": false
@@ -115,4 +64,3 @@
     }
   }
 }
->>>>>>> dev
