@@ -1,0 +1,31 @@
+{
+  "projects": {
+    "facturacion-autonomos": {
+      "schema": [
+        "apps/*/src/**/*.graphql",
+        "packages/*/src/**/*.graphql",
+        "apps/*/prisma/schema.prisma"
+      ],
+      "documents": [
+        "apps/*/src/**/*.{graphql,gql,js,ts,jsx,tsx,vue}",
+        "packages/*/src/**/*.{graphql,gql,js,ts,jsx,tsx,vue}"
+      ],
+      "exclude": [
+        "**/node_modules/**",
+        "**/dist/**",
+        "**/.next/**",
+        "**/coverage/**"
+      ],
+      "extensions": {
+        "endpoints": {
+          "development": {
+            "url": "http://localhost:4000/graphql"
+          },
+          "production": {
+            "url": "${GRAPHQL_ENDPOINT}"
+          }
+        }
+      }
+    }
+  }
+}

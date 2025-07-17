@@ -126,7 +126,10 @@
     "playwright.showTrace": true,
     "playwright.reuseBrowser": true,
     "turbo.useGlobalTurbo": false,
-    "turbo.experimentalSpaceIgnore": true
+    "turbo.experimentalSpaceIgnore": true,
+    "[typescript]": {
+      "editor.defaultFormatter": "esbenp.prettier-vscode"
+    }
   },
   "extensions": {
     "recommendations": [

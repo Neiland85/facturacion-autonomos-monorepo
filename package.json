@@ -26,7 +26,7 @@
     "node": ">=20.0.0",
     "yarn": ">=4.0.0"
   },
-  "packageManager": "yarn@4.9.2+sha512.1fc009bc09d13cfd0e19efa44cbfc2b9cf6ca61482725eb35bbc5e257e093ebf4130db6dfe15d604ff4b79efd8e1e8e99b25fa7d0a6197c9f9826358d4d65c3c",
+  "packageManager": "yarn@4.0.0",
   "workspaces": [
     "frontend",
     "apps/*",
@@ -41,7 +41,8 @@
     "build:web": "yarn workspace facturacion-autonomos-frontend build",
     "start": "turbo start",
     "start:api": "yarn workspace @facturacion/api-facturas start",
-    "start:web": "yarn workspace facturacion-autonomos-frontend start",
+    "start:web": "yarn workspace facturacion-autonomos-frontend dev",
+    "start:web:node-modules": "yarn install && yarn workspace facturacion-autonomos-frontend dev",
     "test": "turbo test",
     "test:api": "yarn workspace @facturacion/api-facturas test",
     "test:web": "yarn workspace facturacion-autonomos-frontend test",
@@ -103,6 +104,7 @@
     "prisma": "^6.11.1",
     "qrcode": "^1.5.4",
     "speakeasy": "^2.0.0",
+    "styled-jsx": "^5.1.7",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
     "tesseract.js": "^6.0.1",

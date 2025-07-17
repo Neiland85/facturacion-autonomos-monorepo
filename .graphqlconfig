@@ -1,0 +1,16 @@
+{
+  "name": "Facturación Autónomos GraphQL Config",
+  "schemaPath": "./schema.graphql",
+  "extensions": {
+    "endpoints": {
+      "dev": "http://localhost:4000/graphql"
+    }
+  },
+  "includes": [
+    "apps/*/src/**/*.{js,ts,jsx,tsx,vue,graphql,gql}"
+  ],
+  "excludes": [
+    "**/node_modules/**",
+    "**/dist/**"
+  ]
+}

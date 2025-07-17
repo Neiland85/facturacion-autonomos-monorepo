@@ -1,0 +1,97 @@
+# Facturación Autónomos GraphQL Schema
+# This is a placeholder schema file for GraphQL tooling
+
+type Query {
+  # Health check
+  health: String
+
+  # Invoices
+  invoices: [Invoice]
+  invoice(id: ID!): Invoice
+}
+
+type Mutation {
+  # Invoice operations
+  createInvoice(input: InvoiceInput!): Invoice
+  updateInvoice(id: ID!, input: InvoiceUpdateInput!): Invoice
+  deleteInvoice(id: ID!): Boolean
+}
+
+type Invoice {
+  id: ID!
+  number: String!
+  status: InvoiceStatus!
+  issueDate: String!
+  dueDate: String
+  total: Float!
+  issuer: Company!
+  client: Company!
+  items: [InvoiceItem!]!
+}
+
+type Company {
+  name: String!
+  taxId: String!
+  address: String!
+  city: String!
+  postalCode: String!
+  country: String!
+  email: String
+  phone: String
+}
+
+type InvoiceItem {
+  description: String!
+  quantity: Float!
+  unitPrice: Float!
+  discount: Float
+  taxType: TaxType!
+  total: Float!
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+}
+
+enum TaxType {
+  IVA_21
+  IVA_10
+  IVA_4
+  IVA_0
+  EXENTO
+}
+
+input InvoiceInput {
+  issuer: CompanyInput!
+  client: CompanyInput!
+  items: [InvoiceItemInput!]!
+  notes: String
+}
+
+input InvoiceUpdateInput {
+  status: InvoiceStatus
+  notes: String
+}
+
+input CompanyInput {
+  name: String!
+  taxId: String!
+  address: String!
+  city: String!
+  postalCode: String!
+  country: String!
+  email: String
+  phone: String
+}
+
+input InvoiceItemInput {
+  description: String!
+  quantity: Float!
+  unitPrice: Float!
+  discount: Float
+  taxType: TaxType!
+}
