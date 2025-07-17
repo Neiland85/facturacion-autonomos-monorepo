@@ -1,40 +1,20 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-<<<<<<< HEAD
-    "outDir": "dist",
-    "rootDir": "src",
-    "target": "ES2020",
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-    "types": [
-      "node",
-      "jest"
-    ]
-=======
     "outDir": "./dist",
     "rootDir": "./src",
-    "target": "ES2022",
-    "module": "CommonJS",
-    "moduleResolution": "node"
->>>>>>> dev
+    "target": "es2020",
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "types": [
+      "node"
+    ]
   },
   "include": [
     "src/**/*"
   ],
   "exclude": [
     "node_modules",
-<<<<<<< HEAD
-    "dist",
-    "**/*.test.ts",
-    "**/*.spec.ts"
-=======
     "dist"
->>>>>>> dev
   ]
 }
