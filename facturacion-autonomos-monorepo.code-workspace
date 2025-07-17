@@ -126,7 +126,11 @@
     "playwright.showTrace": true,
     "playwright.reuseBrowser": true,
     "turbo.useGlobalTurbo": false,
-    "turbo.experimentalSpaceIgnore": true
+    "turbo.experimentalSpaceIgnore": true,
+    "chat.tools.autoApprove": true,
+    "chat.editing.autoAcceptDelay": 10,
+    "chat.editRequests": "inline",
+    "chat.agent.maxRequests": 15
   },
   "extensions": {
     "recommendations": [

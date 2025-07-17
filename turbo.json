@@ -1,61 +1,5 @@
 {
   "$schema": "https://turbo.build/schema.json",
-<<<<<<< HEAD
-  "tasks": {
-    "build": {
-      "dependsOn": ["^build"],
-      "outputs": [".next/**", "!.next/cache/**", "dist/**"],
-      "env": ["NODE_ENV"]
-    },
-    "dev": {
-      "cache": false,
-      "persistent": true,
-      "dependsOn": ["^build"]
-    },
-    "lint": {
-      "dependsOn": ["^lint"],
-      "outputs": ["eslint-report.json"]
-    },
-    "lint:fix": {
-      "dependsOn": ["^lint:fix"],
-      "cache": false
-    },
-    "lint:check": {
-      "dependsOn": ["^lint:check"],
-      "outputs": ["eslint-report.json"]
-    },
-    "type-check": {
-      "dependsOn": ["^type-check"]
-    },
-    "test": {
-      "dependsOn": ["^build"],
-      "outputs": ["coverage/**"]
-    },
-    "test:watch": {
-      "cache": false,
-      "persistent": true
-    },
-    "test:e2e": {
-      "dependsOn": ["^build"],
-      "outputs": ["test-results/**", "playwright-report/**"]
-    },
-    "test:e2e:ui": {
-      "cache": false,
-      "persistent": true
-    },
-    "clean": {
-      "cache": false
-    }
-  },
-  "globalDependencies": [
-    "**/.env",
-    "**/.env.local",
-    "**/.env.development.local",
-    "**/.env.test.local",
-    "**/.env.production.local"
-  ]
-}
-=======
   "globalDependencies": [
     "**/.env.*local"
   ],
@@ -113,6 +57,21 @@
       "cache": false,
       "persistent": true
     }
+  },
+  "pipeline": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "outputs": []
+    }
   }
 }
->>>>>>> dev
