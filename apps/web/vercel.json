@@ -1,8 +1,8 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "installCommand": "corepack enable && yarn install --immutable",
-  "buildCommand": "yarn workspace @facturacion/web build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm run build",
   "outputDirectory": ".next",
   "rootDirectory": ".",
   "ignoreCommand": "git diff --quiet HEAD^ HEAD ."

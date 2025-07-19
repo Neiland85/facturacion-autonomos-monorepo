@@ -1,0 +1,16 @@
+{
+  "version": 2,
+  "builds": [
+    {
+      "src": "apps/web/package.json",
+      "use": "@vercel/next",
+      "config": {
+        "outputDirectory": "apps/web/.next"
+      }
+    }
+  ],
+  "installCommand": "corepack enable && corepack prepare && yarn install --immutable",
+  "buildCommand": "cd apps/web && yarn build",
+  "outputDirectory": "apps/web/.next",
+  "framework": null
+}
