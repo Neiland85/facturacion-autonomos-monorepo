@@ -9,8 +9,8 @@
       }
     }
   ],
-  "installCommand": "corepack enable && corepack prepare && yarn install --immutable",
-  "buildCommand": "cd apps/web && yarn build",
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "cd apps/web && npm run build",
   "outputDirectory": "apps/web/.next",
   "framework": null
 }

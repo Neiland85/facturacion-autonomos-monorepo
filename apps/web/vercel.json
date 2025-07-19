@@ -1,9 +1,9 @@
 {
   "version": 2,
   "framework": "nextjs",
-  "installCommand": "npm install --legacy-peer-deps",
-  "buildCommand": "npm run build",
-  "outputDirectory": ".next",
+  "installCommand": "cd apps/web && npm install --legacy-peer-deps",
+  "buildCommand": "cd apps/web && npm run build",
+  "outputDirectory": "apps/web/.next",
   "rootDirectory": ".",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ."
+  "ignoreCommand": "git diff --quiet HEAD^ HEAD apps/web"
 }
