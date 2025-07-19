@@ -1,0 +1,40 @@
+name: 🚀 Netlify Deployment
+
+on:
+  push:
+    branches: [main, develop, fix/*]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  test-and-build:
+    name: 🧪 Test & Build for Netlify
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: 📦 Install dependencies
+        run: cd apps/web && npm install --legacy-peer-deps
+
+      - name: 🔍 Lint
+        run: cd apps/web && npm run lint
+
+      - name: 🧪 Test
+        run: cd apps/web && npm run test
+
+      - name: 🏗️ Build
+        run: cd apps/web && npm run build
+        env:
+          NODE_ENV: production
+          SWC_BINARY_TARGET: "x86_64-unknown-linux-gnu"
