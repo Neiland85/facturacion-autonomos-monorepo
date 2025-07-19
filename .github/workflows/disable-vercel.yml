@@ -1,0 +1,15 @@
+# 🚫 DISABLE VERCEL COMPLETELY
+# This repository uses Netlify exclusively
+# Vercel should not deploy this project
+
+name: Disable Vercel
+on: [push, pull_request]
+jobs:
+  disable-vercel:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚫 Block Vercel
+        run: |
+          echo "🚫 Vercel deployment blocked"
+          echo "✅ This project uses Netlify instead"
+          exit 0
