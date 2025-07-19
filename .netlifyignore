@@ -1,0 +1,18 @@
+# Netlify specific
+.netlify/
+.env.local
+.env.build
+.env.netlify
+
+# Build outputs
+apps/web/.next/
+apps/web/out/
+apps/web/node_modules/
+
+# Development files
+*.log
+.DS_Store
+.vscode/
+
+# Dependencies
+node_modules/

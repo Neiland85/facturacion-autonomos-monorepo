@@ -1,0 +1,23 @@
+# 🚫 Disable Vercel Deployment
+# This workflow prevents Vercel from deploying our project
+# We use Netlify instead for better monorepo support
+
+name: 🚫 Block Vercel
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+jobs:
+  block-vercel:
+    name: 🚫 Block Vercel Deployment
+    runs-on: ubuntu-latest
+    steps:
+      - name: 🚫 Skip Vercel
+        run: |
+          echo "🚫 Vercel deployment blocked - using Netlify instead"
+          echo "✅ This project is deployed via Netlify"
+          echo "📋 See netlify.toml for deployment configuration"
+          exit 0

@@ -1,0 +1,50 @@
+[build]
+  # Build command
+  command = "cd apps/web && npm install --legacy-peer-deps && npm run build"
+  
+  # Directory with the deployable files  
+  publish = "apps/web/.next"
+  
+  # Base directory for relative paths
+  base = ""
+
+# Netlify Next.js plugin
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+# Environment variables for build
+[build.environment]
+  NODE_ENV = "production"
+  NODE_VERSION = "20"
+  NPM_VERSION = "10"
+
+# Production environment variables
+[context.production.environment]
+  NEXT_PUBLIC_APP_URL = "https://facturacion-autonomos.netlify.app"
+  NEXT_PUBLIC_API_BASE_URL = "https://facturacion-autonomos.netlify.app/api"
+
+# Branch deploys environment
+[context.branch-deploy.environment]  
+  NEXT_PUBLIC_APP_URL = "https://deploy-preview-{REVIEW_ID}--facturacion-autonomos.netlify.app"
+  NEXT_PUBLIC_API_BASE_URL = "https://deploy-preview-{REVIEW_ID}--facturacion-autonomos.netlify.app/api"
+
+# Headers for security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+# Cache static assets
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Redirects for SPA routing
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
