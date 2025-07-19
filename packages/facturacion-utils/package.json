@@ -1,0 +1,16 @@
+{
+  "name": "@neiland85/facturacion-utils",
+  "version": "1.0.0",
+  "description": "Utility functions for invoicing and formatting",
+  "main": "index.ts",
+  "types": "index.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Neil Muñoz Lago",
+  "license": "MIT",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://npm.pkg.github.com/"
+  }
+}
