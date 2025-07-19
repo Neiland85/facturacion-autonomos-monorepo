@@ -1,30 +1,39 @@
-# 🚀 NETLIFY DEPLOYMENT SETUP
+# 🚀 NETLIFY DEPLOYMENT - CONFIGURACIÓN COMPLETA
 
-## 📋 Configuración para Netlify:
+## ✅ **CONFIGURACIÓN YA APLICADA:**
 
-### 🎯 **Build Settings:**
+### � **Archivos configurados:**
+- ✅ `netlify.toml` - Configuración principal
+- ✅ `apps/web/next.config.mjs` - Optimizado para Netlify
+- ✅ `apps/web/package.json` - Scripts de deployment
+- ❌ Eliminados todos los archivos Vercel
+
+### 🎯 **Build Settings (Automáticos desde netlify.toml):**
 ```
 Build command: cd apps/web && npm install --legacy-peer-deps && npm run build
 Publish directory: apps/web/.next
-Base directory: (dejar vacío)
+Base directory: (vacío)
+Node version: 20
 ```
 
-### 🌐 **Environment Variables:**
+### 🌐 **Environment Variables (Pre-configuradas):**
 ```
 NODE_ENV=production
-NEXT_PUBLIC_APP_URL=https://tu-app.netlify.app
-NEXT_PUBLIC_API_BASE_URL=https://tu-app.netlify.app/api
+NEXT_PUBLIC_APP_URL=https://facturacion-autonomos.netlify.app
+NEXT_PUBLIC_API_BASE_URL=https://facturacion-autonomos.netlify.app/api
 ```
 
-### ✅ **Ventajas de Netlify:**
-- ✅ Mejor soporte para monorepos
-- ✅ Build commands más flexibles  
-- ✅ Deployment más rápido
-- ✅ Gratis para proyectos pequeños
-- ✅ Mejor debugging de builds
+### 🔗 **DEPLOY EN NETLIFY:**
 
-### 🔗 **Pasos:**
-1. Ve a https://netlify.com
-2. Connect with GitHub
-3. Selecciona tu repo
-4. Usa la configuración de arriba
+1. **Ve a https://netlify.com**
+2. **New site from Git → GitHub**
+3. **Selecciona: `facturacion-autonomos-monorepo`**
+4. **Deploy site** (configuración automática desde netlify.toml)
+
+### 🎉 **VENTAJAS APLICADAS:**
+- ✅ Static export optimizado
+- ✅ Headers de seguridad configurados
+- ✅ Cache de assets estáticos
+- ✅ Variables de entorno por environment
+- ✅ Preview deployments automáticos
+- ✅ Mejor soporte para monorepos

@@ -1,0 +1,11 @@
+# Netlify specific
+.netlify/
+.env.local
+.env.build
+.env.netlify
+
+# Next.js export
+apps/web/out/
+
+# Deployment files
+apps/web/.next/
