@@ -7,11 +7,12 @@ const nextConfig = {
   },
   transpilePackages: [
     '@facturacion/core',
-    '@facturacion/services',
+    '@facturacion/services', 
     '@facturacion/ui',
   ],
   env: {
-    CUSTOM_KEY: process.env.CUSTOM_KEY,
+    NEXT_PUBLIC_API_BASE_URL: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002',
+    NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
   },
   async headers() {
     return [
