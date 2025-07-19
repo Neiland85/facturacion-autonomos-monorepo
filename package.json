@@ -1,5 +1,5 @@
 {
-  "name": "facturacion-autonomos-monorepo",
+  "name": "facturacion-autonomos-root",
   "version": "1.0.0",
   "private": true,
   "description": "Plataforma unificada para gestión y facturación de autónomos - Monorepo modular con Next.js frontend y backend desacoplado Node.js",
@@ -26,9 +26,8 @@
     "node": ">=20.0.0",
     "yarn": ">=4.0.0"
   },
-  "packageManager": "yarn@4.0.0",
+  "packageManager": "yarn@3.6.4",
   "workspaces": [
-    "frontend",
     "apps/*",
     "packages/*"
   ],
@@ -77,8 +76,8 @@
     "@types/swagger-ui-express": "^4.1.8",
     "@types/uuid": "^10.0.0",
     "@types/yamljs": "^0",
-    "@typescript-eslint/eslint-plugin": "^8.18.2",
-    "@typescript-eslint/parser": "^8.18.2",
+    "@typescript-eslint/eslint-plugin": "^8.59.0",
+    "@typescript-eslint/parser": "^8.59.0",
     "concurrently": "^8.2.2",
     "eslint": "^9.16.0",
     "eslint-config-prettier": "^9.1.0",
