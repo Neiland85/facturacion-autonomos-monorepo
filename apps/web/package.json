@@ -45,6 +45,7 @@
     "jest": "^30.0.0",
     "jest-environment-jsdom": "^30.0.0",
     "postcss": "^8.4.49",
+    "ts-jest": "^29.1.1",
     "typescript": "^5.7.2"
   }
 }

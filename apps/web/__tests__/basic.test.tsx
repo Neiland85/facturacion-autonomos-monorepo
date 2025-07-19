@@ -1,10 +1,5 @@
-/**
- * @jest-environment jsdom
- */
-import '@testing-library/jest-dom';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { expect } from '@jest/globals'; // Importación añadida
 
 // Componente de prueba simple
 const TestComponent = () => {
@@ -13,21 +8,25 @@ const TestComponent = () => {
       <h1 data-testid="test-title">Hello Test</h1>
       <button data-testid="test-button">Click me</button>
     </div>
-  )
-}
+  );
+};
 
 describe('Basic Tests', () => {
   it('should pass basic test', () => {
-    expect(true).toBe(true)
+    expect(true).toBe(true);
     expect(2 + 2).toBe(4);
-  })
+  });
 
   it('should render test component', () => {
     render(<TestComponent />);
 
-    expect(screen.getByTestId('test-container')).toBeInTheDocument();
-    expect(screen.getByTestId('test-title')).toHaveTextContent('Hello Test');
-    expect(screen.getByTestId('test-button')).toBeInTheDocument();
+    const container = screen.getByTestId('test-container');
+    const title = screen.getByTestId('test-title');
+    const button = screen.getByTestId('test-button');
+
+    expect(container).toBeInTheDocument();
+    expect(title).toHaveTextContent('Hello Test');
+    expect(button).toBeInTheDocument();
   });
 
   it('should handle user interaction', async () => {
@@ -37,8 +36,7 @@ describe('Basic Tests', () => {
     const button = screen.getByTestId('test-button');
     expect(button).toBeInTheDocument();
 
-    // Test button is clickable
     await user.click(button);
-    expect(button).toBeInTheDocument(); // Still there after click
+    expect(button).toBeInTheDocument();
   });
-})
+});

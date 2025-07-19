@@ -122,12 +122,13 @@ export class InvoiceService {
       const url = window.URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = filename || `invoice-${id}.pdf`;
+      link.download = filename ?? `invoice-${id}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
       window.URL.revokeObjectURL(url);
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('Failed to download PDF:', error);
       throw error;
     }
