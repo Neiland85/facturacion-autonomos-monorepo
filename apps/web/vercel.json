@@ -1,11 +1,7 @@
 {
-  "version": 2,
   "framework": "nextjs",
-  "installCommand": "cd apps/web && npm install --legacy-peer-deps",
-  "buildCommand": "cd apps/web && npm run build",
-  "outputDirectory": "apps/web/.next",
-  "rootDirectory": ".",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD apps/web",
+  "installCommand": "npm install --legacy-peer-deps",
+  "buildCommand": "npm run build",
   "env": {
     "NODE_ENV": "production",
     "NEXT_PUBLIC_APP_URL": "https://facturacion-autonomos-monorepo.vercel.app",
