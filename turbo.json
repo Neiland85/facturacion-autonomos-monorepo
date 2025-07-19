@@ -19,7 +19,8 @@
       ],
       "env": [
         "NODE_ENV",
-        "NETLIFY_URL",
+        "NEXT_PUBLIC_APP_URL",
+        "NEXTAUTH_URL",
         "DATABASE_URL"
       ]
     },
