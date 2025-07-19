@@ -1,0 +1,67 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "version": 2,
+  "regions": [
+    "iad1"
+  ],
+  "buildCommand": "cd ../.. && pnpm install && pnpm run build --filter=web",
+  "outputDirectory": ".next",
+  "installCommand": "pnpm install",
+  "framework": "nextjs",
+  "functions": {
+    "apps/web/pages/api/**/*.js": {
+      "runtime": "nodejs20.x"
+    },
+    "apps/web/app/api/**/*.js": {
+      "runtime": "nodejs20.x"
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Access-Control-Allow-Credentials",
+          "value": "true"
+        },
+        {
+          "key": "Access-Control-Allow-Origin",
+          "value": "*"
+        },
+        {
+          "key": "Access-Control-Allow-Methods",
+          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
+        },
+        {
+          "key": "Access-Control-Allow-Headers",
+          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version, Authorization"
+        }
+      ]
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/api/invoices/(.*)",
+      "destination": "https://your-invoice-api-domain.com/api/invoices/$1"
+    },
+    {
+      "source": "/api/auth/(.*)",
+      "destination": "https://your-auth-api-domain.com/api/auth/$1"
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/home",
+      "destination": "/",
+      "permanent": true
+    }
+  ],
+  "trailingSlash": false,
+  "cleanUrls": true,
+  "crons": [
+    {
+      "path": "/api/cron/health-check",
+      "schedule": "0 */5 * * * *"
+    }
+  ]
+}
