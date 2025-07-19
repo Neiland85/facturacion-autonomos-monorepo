@@ -1,0 +1,103 @@
+{
+  "name": "Facturación Autónomos Monorepo",
+  "image": "mcr.microsoft.com/devcontainers/typescript-node:20",
+  // Configuración de Node.js
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "nodeGypDependencies": true,
+      "version": "20"
+    },
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {
+      "version": "latest",
+      "dockerDashComposeVersion": "v2"
+    }
+  },
+  // Configuración del contenedor
+  "containerEnv": {
+    "NODE_ENV": "development",
+    "PNPM_HOME": "/pnpm",
+    "PATH": "$PNPM_HOME:$PATH"
+  },
+  // Puertos expuestos para desarrollo
+  "forwardPorts": [
+    3000, // Frontend Web
+    3001, // API Gateway
+    3002, // Invoice Service
+    3003, // Auth Service
+    3004, // Tax Calculator API
+    5432 // PostgreSQL
+  ],
+  // Configuración de puertos
+  "portsAttributes": {
+    "3000": {
+      "label": "Frontend Web",
+      "onAutoForward": "notify"
+    },
+    "3001": {
+      "label": "API Gateway",
+      "onAutoForward": "notify"
+    },
+    "3002": {
+      "label": "Invoice Service",
+      "onAutoForward": "notify"
+    },
+    "3003": {
+      "label": "Auth Service",
+      "onAutoForward": "notify"
+    },
+    "3004": {
+      "label": "Tax Calculator API",
+      "onAutoForward": "notify"
+    },
+    "5432": {
+      "label": "PostgreSQL Database",
+      "onAutoForward": "silent"
+    }
+  },
+  // Extensiones de VS Code recomendadas
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "ms-vscode.vscode-typescript-next",
+        "bradlc.vscode-tailwindcss",
+        "Prisma.prisma",
+        "ms-azuretools.vscode-docker",
+        "ms-vscode.vscode-json",
+        "formulahendry.auto-rename-tag",
+        "christian-kohler.path-intellisense",
+        "ms-vscode.vscode-github-issue-notebooks",
+        "GitHub.vscode-pull-request-github"
+      ],
+      "settings": {
+        "typescript.preferences.preferTypeOnlyAutoImports": true,
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "esbenp.prettier-vscode",
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": "explicit"
+        },
+        "eslint.workingDirectories": [
+          "apps",
+          "packages"
+        ],
+        "files.watcherExclude": {
+          "**/node_modules/**": true,
+          "**/.git/**": true,
+          "**/dist/**": true,
+          "**/.next/**": true
+        }
+      }
+    }
+  },
+  // Script de configuración inicial
+  "postCreateCommand": "bash .devcontainer/setup.sh",
+  // Usuario para el desarrollo
+  "remoteUser": "node",
+  // Montajes adicionales para optimizar rendimiento
+  "mounts": [
+    "source=facturacion-node_modules,target=${containerWorkspaceFolder}/node_modules,type=volume"
+  ]
+}
