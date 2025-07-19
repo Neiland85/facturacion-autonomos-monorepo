@@ -22,19 +22,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'npm'
+          cache: 'yarn'
 
       - name: 📦 Install dependencies
-        run: cd apps/web && npm install --legacy-peer-deps
+        run: yarn install --frozen-lockfile
 
       - name: 🔍 Lint
-        run: cd apps/web && npm run lint
+        run: yarn workspace @facturacion/web lint
 
       - name: 🧪 Test
-        run: cd apps/web && npm run test
+        run: yarn workspace @facturacion/web test
 
       - name: 🏗️ Build
-        run: cd apps/web && npm run build
+        run: yarn workspace @facturacion/web build
         env:
           NODE_ENV: production
           SWC_BINARY_TARGET: "x86_64-unknown-linux-gnu"
