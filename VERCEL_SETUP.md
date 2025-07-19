@@ -1,128 +1,65 @@
-# 🚀 Configuración de Vercel para Monorepo
+# 🚀 Guía de Configuración Vercel - Monorepo
 
-## 📋 Configuración Requerida en el Dashboard de Vercel
+## 📋 **CONFIGURACIÓN ACTUALIZADA**
 
-Para desplegar correctamente este monorepo en Vercel, **DEBES** configurar manualmente los siguientes valores en el dashboard de Vercel:
+### ✅ **Archivos de Configuración**
+- ❌ **Root `vercel.json`**: Eliminado (no necesario para monorepo)
+- ✅ **`apps/web/vercel.json`**: Configuración específica para la app web
 
-### 🎯 Configuración Básica
+### 🎯 **Configuración en Dashboard de Vercel**
 
-| Campo | Valor | Descripción |
-|-------|-------|-------------|
-| **Root Directory** | `apps/web` | 🚨 **MUY IMPORTANTE**: Especifica el subdirectorio donde está el frontend |
-| **Framework** | `Next.js` | Framework detectado automáticamente |
-| **Node.js Version** | `20.x` | Versión de Node.js a utilizar |
+1. **Import Project**: Conecta tu repositorio GitHub
+2. **Configure Project**:
+   ```
+   Project Name: facturacion-autonomos-web
+   Framework Preset: Next.js
+   Root Directory: apps/web
+   Build Command: pnpm run build
+   Install Command: pnpm install
+   Output Directory: .next (default)
+   Node.js Version: 20.x
+   ```
 
-### 🛠️ Comandos de Build
+3. **Environment Variables** (si es necesario):
+   ```
+   NODE_ENV=production
+   NEXT_PUBLIC_API_URL=https://your-api-domain.com
+   ```
 
-| Campo | Valor | Descripción |
-|-------|-------|-------------|
-| **Build Command** | `cd ../.. && pnpm install && pnpm run build --filter=web` | Comando personalizado para monorepo |
-| **Output Directory** | `.next` | Directorio de salida de Next.js |
-| **Install Command** | `pnpm install` | Comando de instalación de dependencias |
-
-### 🔧 Variables de Entorno
-
-Configura estas variables en `Settings > Environment Variables`:
-
-```bash
-NODE_VERSION=20
-PNPM_VERSION=8
-NODE_ENV=production
-
-# Variables específicas de tu aplicación
-DATABASE_URL=your_database_url_here
-NEXTAUTH_SECRET=your_nextauth_secret_here
-NEXTAUTH_URL=https://your-domain.vercel.app
-```
-
-## 🏗️ Estructura del Proyecto
-
-```
-monorepo/
-├── apps/
-│   └── web/                 👈 Root Directory en Vercel
-│       ├── package.json
-│       ├── next.config.js
-│       └── ...
-├── packages/
-│   └── ...
-├── vercel.json             👈 Configuración de Vercel
-└── package.json            👈 Root package.json
-```
-
-## 🚨 Pasos de Configuración Manual
-
-### 1. Importar Proyecto
-- Ve a [vercel.com](https://vercel.com)
-- Importa tu repositorio de GitHub
-
-### 2. Configurar Root Directory
-- En la pantalla de importación, busca **"Root Directory"**
-- Selecciona `apps/web` en el dropdown
-- ⚠️ **Si no configuras esto, el despliegue fallará**
-
-### 3. Configurar Build Settings
-- **Build Command**: `cd ../.. && pnpm install && pnpm run build --filter=web`
-- **Output Directory**: `.next`
-- **Install Command**: `pnpm install`
-
-### 4. Configurar Variables de Entorno
-- Ve a `Settings > Environment Variables`
-- Agrega todas las variables necesarias para tu aplicación
-
-## 📚 Comandos de Desarrollo Local
+### 🔧 **Configuración Manual via CLI**
 
 ```bash
-# Desarrollo local del frontend
-pnpm dev --filter=web
+# Instalar Vercel CLI
+npm i -g vercel
 
-# Build del frontend
-pnpm build --filter=web
+# Login
+vercel login
 
-# Preview local
-pnpm preview --filter=web
+# Configurar proyecto desde apps/web
+cd apps/web
+vercel
+
+# Seguir prompts:
+# Set up and deploy "~/path/apps/web"? [Y/n] y
+# Which scope do you want to deploy to? [tu-usuario]
+# Link to existing project? [y/N] n
+# What's your project's name? facturacion-autonomos-web
+# In which directory is your code located? ./
 ```
 
-## 🔄 Despliegue Automático
+### 🏗️ **Build Commands Correctos**
 
-Una vez configurado correctamente, cada push a las ramas configuradas desencadenará un despliegue automático.
+**Para Monorepo desde root:**
+```bash
+# Opción 1: Build específico
+cd apps/web && pnpm install && pnpm run build
 
-### Ramas de Despliegue
-- `main` → Producción
-- `develop` → Preview
-- `feature/*` → Preview
+# Opción 2: Con turbo (recomendado)
+pnpm install && pnpm turbo run build --filter=web
+```
 
-## ⚡ Optimizaciones
-
-El archivo `vercel.json` incluye:
-- ✅ Configuración de headers CORS
-- ✅ Rewrites para APIs externas
-- ✅ Redirects automáticos
-- ✅ Clean URLs
-- ✅ Cron jobs para health checks
-
-## 🆘 Troubleshooting
-
-### ❌ Error: "No Build Output"
-**Causa**: Root Directory no configurado correctamente
-**Solución**: Configurar `Root Directory` como `apps/web`
-
-### ❌ Error: "pnpm not found"
-**Causa**: Vercel usa npm por defecto
-**Solución**: Configurar `Install Command` como `pnpm install`
-
-### ❌ Error: "Module not found"
-**Causa**: Dependencias del monorepo no instaladas
-**Solución**: Usar build command completo que incluye `cd ../.. && pnpm install`
-
-## 📞 Soporte
-
-Si encuentras problemas, verifica:
-1. ✅ Root Directory configurado como `apps/web`
-2. ✅ Build Command incluye navegación al root (`cd ../..`)
-3. ✅ Variables de entorno configuradas
-4. ✅ Archivo `vercel.json` en el root del proyecto
-
----
-
-**💡 Tip**: Guarda este archivo como referencia para futuros despliegues.
+**Para App específica desde apps/web:**
+```bash
+# Más simple y directo
+pnpm install && pnpm run build
+```
