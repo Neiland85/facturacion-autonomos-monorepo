@@ -37,6 +37,9 @@ jobs:
       - name: 🔍 Lint
         run: yarn workspace @facturacion/web lint
 
+      - name: 🧪 Test
+        run: yarn workspace @facturacion/web test:ci
+
       - name: 🏗️ Build (Critical for Netlify)
         run: yarn workspace @facturacion/web build
         env:

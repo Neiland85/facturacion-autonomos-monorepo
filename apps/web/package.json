@@ -8,8 +8,9 @@
     "start": "next start",
     "lint": "next lint",
     "type-check": "tsc --noEmit",
-    "test": "jest",
-    "test:watch": "jest --watch",
+    "test": "NODE_OPTIONS='--no-deprecation' jest",
+    "test:watch": "NODE_OPTIONS='--no-deprecation' jest --watch",
+    "test:ci": "NODE_OPTIONS='--no-deprecation' jest --passWithNoTests --silent --coverage=false",
     "clean": "rm -rf .next dist"
   },
   "dependencies": {
@@ -31,8 +32,10 @@
   "devDependencies": {
     "@netlify/plugin-nextjs": "^5.7.2",
     "@swc/core": "^1.3.107",
+    "@testing-library/dom": "^9.3.4",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^14.1.2",
+    "@testing-library/user-event": "^14.5.1",
     "@types/jest": "^30.0.0",
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
