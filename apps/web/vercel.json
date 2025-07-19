@@ -1,4 +1,6 @@
 {
   "version": 2,
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "installCommand": "yarn install",
+  "buildCommand": "yarn build"
 }
