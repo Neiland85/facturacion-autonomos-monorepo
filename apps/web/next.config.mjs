@@ -1,10 +1,9 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   experimental: {
-    appDir: true,
-    serverComponentsExternalPackages: ['@prisma/client'],
     typedRoutes: true,
   },
+  serverExternalPackages: ['@prisma/client'],
   transpilePackages: [
     '@facturacion/core',
     '@facturacion/services', 
