@@ -1,5 +1,5 @@
 [build]
-  command = "cd apps/web && npm install --legacy-peer-deps && npm run build"
+  command = "corepack enable && corepack prepare yarn@4.9.2 --activate && yarn workspace @facturacion/web build"
   publish = "apps/web/.next"
   base = "."
 
@@ -9,9 +9,7 @@
 [build.environment]
   NODE_ENV = "production"
   NODE_VERSION = "20"
-  NPM_VERSION = "10"
-  SWC_BINARY_TARGET = "x86_64-unknown-linux-gnu"
-  NPM_FLAGS = "--legacy-peer-deps"
+  COREPACK_ENABLE_STRICT = "0"
 
 [context.production.environment]
   NEXT_PUBLIC_APP_URL = "https://facturacion-autonomos.netlify.app"
