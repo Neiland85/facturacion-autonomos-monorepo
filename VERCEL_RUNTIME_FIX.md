@@ -1,42 +1,62 @@
-# 🔧 Vercel Function Runtime Error Fix
+# 🔧 Vercel Deployment Issues - Complete Fix Guide
 
-## ❌ **Error Específico**
+## ❌ **Error Evolutivo - Yarn Version Incompatible**
+
+### **Error Actual:**
 ```
-Error: Function Runtimes must have a valid version, for example `now-php@1.0.0`.
+error facturacion-autonomos-monorepo@1.0.0: The engine "yarn" is incompatible with this module. Expected version ">=4.0.0". Got "1.22.19"
 ```
 
-## 🔍 **Análisis del Problema**
+### **Análisis:**
+- Vercel usa Yarn 1.22.19 por defecto
+- El proyecto requiere Yarn >=4.0.0 
+- Incompatibilidad de versiones de package manager
 
-### **Causa Raíz:**
-- Vercel no reconoce `nodejs20.x` como runtime válido en funciones
-- El formato de versión debe seguir el patrón `runtime@version`
-- Para Next.js, no es necesario especificar runtimes de funciones
+## ✅ **Solución Final Aplicada**
 
-### **Síntomas:**
-- Build falla en "Running vercel build"
-- Error: "Function Runtimes must have a valid version"
-- Deployment stops before compilation
-
-## ✅ **Solución Aplicada**
-
-### **1. Configuración Minimalista**
+### **1. Cambio a NPM**
 ```json
 {
   "version": 2,
-  "framework": "nextjs"
+  "framework": "nextjs",
+  "installCommand": "npm install", 
+  "buildCommand": "npm run build"
 }
 ```
 
-### **2. Por qué Funciona:**
-- **Autodetección**: Vercel detecta automáticamente Next.js
-- **Runtime por defecto**: Next.js usa Node.js 20 por defecto
-- **Sin configuración manual**: Evita errores de versioning
+### **2. Archivos .nvmrc Añadidos**
+```
+/apps/web/.nvmrc: "20"
+/.nvmrc: "20"
+```
 
-### **3. Configuraciones Eliminadas:**
-- ❌ `functions` con runtimes específicos
-- ❌ `buildCommand` personalizado
-- ❌ `installCommand` personalizado
-- ❌ `outputDirectory` manual
+### **3. Configuración Vercel Dashboard**
+```
+Framework: Next.js
+Root Directory: apps/web
+Build Command: npm run build
+Install Command: npm install
+Output Directory: .next (auto)
+Node.js Version: 20.x
+```
+
+## 🔄 **Historia de Errores Resueltos**
+
+### **Error 1**: Function Runtimes ✅ RESUELTO
+- **Problema**: `nodejs20.x` runtime inválido
+- **Solución**: Configuración minimalista sin functions
+
+### **Error 2**: Conflictos de Merge ✅ RESUELTO  
+- **Problema**: Multiple `<<<<<<< HEAD` en package.json files
+- **Solución**: Resolución manual de todos los conflictos
+
+### **Error 3**: Package.json Vacíos ✅ RESUELTO
+- **Problema**: `{}` en api-gateway, invoice-service, auth-service
+- **Solución**: Configuración completa para cada microservicio
+
+### **Error 4**: Yarn Version ✅ RESUELTO
+- **Problema**: Yarn >=4.0.0 required, got 1.22.19
+- **Solución**: Switch a NPM en lugar de Yarn
 
 ## 🎯 **Configuración Vercel Dashboard**
 
