@@ -1,0 +1,54 @@
+{
+  "name": "Facturacion Autonomos Monorepo",
+  "dockerFile": "./Dockerfile",
+  "context": "..",
+  "features": {
+    "docker-in-docker": "latest"
+  },
+  "settings": {
+    "terminal.integrated.defaultProfile.linux": "bash",
+    "editor.formatOnSave": true
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        "editor.codeActionsOnSave": {
+          "source.fixAll.eslint": true
+        },
+        "eslint.experimental.useFlatConfig": true,
+        "eslint.workingDirectories": [
+          "./apps/web",
+          "./apps/api-facturas",
+          "./apps/api-tax-calculator",
+          "./packages/core",
+          "./packages/services",
+          "./packages/ui",
+          "./packages/types"
+        ]
+      },
+      "extensions": [
+        "github.copilot",
+        "github.copilot-chat",
+        "dbaeumer.vscode-eslint",
+        "esbenp.prettier-vscode",
+        "prisma.prisma",
+        "ms-azuretools.vscode-docker"
+      ]
+    }
+  },
+  "forwardPorts": [
+    3000,
+    3001,
+    5432
+  ],
+  "postCreateCommand": "export NVM_DIR=/usr/local/share/nvm && . $NVM_DIR/nvm.sh && nvm install 20 && nvm use 20 && yarn install && yarn build",
+  "remoteEnv": {
+    "NODE_ENV": "development",
+    "DATABASE_URL": "postgresql://postgres:postgres_dev_password@localhost:5432/facturacion_dev",
+    "PORT": "3000",
+    "GITHUB_TOKEN": "your-personal-access-token"
+  },
+  "mounts": [
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ]
+}

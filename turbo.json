@@ -1,6 +1,49 @@
 {
   "$schema": "https://turbo.build/schema.json",
   "globalDependencies": [
+      feature/update-devcontainer
+    "**/.env.*local"
+  ],
+  "tasks": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        ".next/**",
+        "!.next/cache/**",
+        "dist/**"
+      ]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": [
+        "^lint"
+      ],
+      "outputs": []
+    },
+    "type-check": {
+      "dependsOn": [
+        "^type-check"
+      ],
+      "outputs": []
+    },
+    "test": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "coverage/**"
+      ]
+    },
+    "test:e2e": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": []
     "**/.env",
     "**/.env.local",
     "**/.env.development.local",
@@ -94,6 +137,7 @@
     "test:e2e:ui": {
       "cache": false,
       "persistent": true
+       main
     },
     "clean": {
       "cache": false
@@ -135,5 +179,25 @@
         ".prettierCache"
       ]
     }
+  },
+  "pipeline": {
+    "build": {
+      "dependsOn": [
+        "^build"
+      ],
+      "outputs": [
+        "dist/**"
+      ]
+    },
+    "lint": {
+      "outputs": []
+    },
+    "test": {
+      "outputs": []
+    }
   }
+    feature/update-devcontainer
 }
+
+}
+  main
