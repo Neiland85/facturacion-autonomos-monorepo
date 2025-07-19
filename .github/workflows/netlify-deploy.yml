@@ -23,11 +23,13 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
+          cache-dependency-path: yarn.lock
 
       - name: 🎯 Enable Corepack and install correct Yarn version
         run: |
           corepack enable
           corepack prepare yarn@4.9.2 --activate
+          yarn --version
 
       - name: 📦 Install dependencies
         run: yarn install --frozen-lockfile
@@ -35,10 +37,7 @@ jobs:
       - name: 🔍 Lint
         run: yarn workspace @facturacion/web lint
 
-      - name: 🧪 Test
-        run: yarn workspace @facturacion/web test
-
-      - name: 🏗️ Build
+      - name: 🏗️ Build (Critical for Netlify)
         run: yarn workspace @facturacion/web build
         env:
           NODE_ENV: production

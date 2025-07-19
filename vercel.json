@@ -1,0 +1,11 @@
+{
+  "$comment": "DEPLOYMENT DISABLED - Using Netlify instead",
+  "builds": [],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "status": 404,
+      "dest": "/404.html"
+    }
+  ]
+}
