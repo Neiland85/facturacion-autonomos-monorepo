@@ -1,22 +1,27 @@
 [build]
-  # Build command
-  command = "cd apps/web && npm install --legacy-peer-deps && npm run build"
+  # Build command optimizado para monorepo con SWC
+  command = "cd apps/web && npm install --legacy-peer-deps && npm run build:netlify"
   
-  # Directory with the deployable files  
+  # El plugin de Netlify maneja el directorio de publicación automáticamente
   publish = "apps/web/.next"
   
-  # Base directory for relative paths
-  base = ""
+  # Base directory para rutas relativas
+  base = "."
 
-# Netlify Next.js plugin
+# Netlify Next.js plugin - maneja la compilación automáticamente
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 
-# Environment variables for build
+# Variables de entorno para el build
 [build.environment]
   NODE_ENV = "production"
   NODE_VERSION = "20"
   NPM_VERSION = "10"
+  # Forzar uso de SWC precompilado en entorno Linux
+  SWC_BINARY_TARGET = "x86_64-unknown-linux-gnu"
+  # Evitar problemas de compilación nativa
+  NETLIFY_USE_YARN = "false"
+  NPM_FLAGS = "--legacy-peer-deps"
 
 # Production environment variables
 [context.production.environment]
