@@ -19,7 +19,7 @@
       ],
       "env": [
         "NODE_ENV",
-        "VERCEL_URL",
+        "NETLIFY_URL",
         "DATABASE_URL"
       ]
     },
