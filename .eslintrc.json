@@ -7,12 +7,18 @@
   "extends": [
     "eslint:recommended",
     "@typescript-eslint/recommended",
-    "prettier"
+    "prettier",
+    "next/core-web-vitals"
   ],
   "parser": "@typescript-eslint/parser",
   "parserOptions": {
     "ecmaVersion": 2022,
-    "sourceType": "module"
+    "sourceType": "module",
+    "project": [
+      "./tsconfig.json",
+      "./frontend/tsconfig.json",
+      "./tsconfig.api-tax-calculator.json"
+    ]
   },
   "plugins": [
     "@typescript-eslint",

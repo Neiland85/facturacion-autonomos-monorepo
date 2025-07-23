@@ -1,8 +1,8 @@
 const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002';
+  process.env.NEXT_PUBLIC_API_BASE_URL ?? 'http://localhost:3002';
 
 export class ApiClient {
-  private readonly baseURL: string;
+  private baseURL: string;
   private token: string | null = null;
 
   constructor(baseURL: string = API_BASE_URL) {
@@ -60,12 +60,13 @@ export class ApiClient {
       if (!response.ok) {
         const errorData = await response.json().catch(() => ({}));
         throw new Error(
-          errorData.error || `HTTP error! status: ${response.status}`
+          errorData.error ?? `HTTP error! status: ${response.status}`
         );
       }
 
       return await response.json();
     } catch (error) {
+      // eslint-disable-next-line no-console
       console.error('API request failed:', error);
       throw error;
     }
@@ -77,7 +78,7 @@ export class ApiClient {
   }
 
   // POST request
-  async post<T>(endpoint: string, data?: any): Promise<T> {
+  async post<T>(endpoint: string, data?: unknown): Promise<T> {
     const options: RequestInit = {
       method: 'POST',
     };
@@ -90,7 +91,7 @@ export class ApiClient {
   }
 
   // PUT request
-  async put<T>(endpoint: string, data?: any): Promise<T> {
+  async put<T>(endpoint: string, data?: unknown): Promise<T> {
     const options: RequestInit = {
       method: 'PUT',
     };
