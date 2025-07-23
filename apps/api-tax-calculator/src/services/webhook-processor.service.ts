@@ -1,5 +1,8 @@
 import { PrismaClient } from '@prisma/client';
-import { AEATWebhookPayload, WebhookSignatureService } from './webhook-signature.service';
+import {
+  AEATWebhookPayload,
+  WebhookSignatureService,
+} from './webhook-signature.service';
 
 const prisma = new PrismaClient();
 
@@ -49,10 +52,15 @@ export class WebhookProcessorService {
 
     try {
       // 1. Verificar firma digital
-      const verificationResult = this.signatureService.verifyWebhookIntegrity(payload, headers);
+      const verificationResult = this.signatureService.verifyWebhookIntegrity(
+        payload,
+        headers
+      );
 
       if (!verificationResult.isValid) {
-        result.errors.push(`Firma inválida: ${verificationResult.errors.join(', ')}`);
+        result.errors.push(
+          `Firma inválida: ${verificationResult.errors.join(', ')}`
+        );
         await this.saveFailedWebhook(payload, headers, ipOrigen, result.errors);
         return result;
       }
@@ -114,7 +122,10 @@ export class WebhookProcessorService {
       );
 
       if (result.webhookId) {
-        await this.markWebhookAsError(result.webhookId, result.errors.join('; '));
+        await this.markWebhookAsError(
+          result.webhookId,
+          result.errors.join('; ')
+        );
       }
     }
 
@@ -136,7 +147,10 @@ export class WebhookProcessorService {
     if (!payload.fechaEvento) errors.push('Campo "fechaEvento" requerido');
 
     // Validar formato de referencia AEAT
-    if (payload.referencia && !this.signatureService.validateAEATReference(payload.referencia)) {
+    if (
+      payload.referencia &&
+      !this.signatureService.validateAEATReference(payload.referencia)
+    ) {
       errors.push('Formato de referencia AEAT inválido');
     }
 
@@ -174,7 +188,9 @@ export class WebhookProcessorService {
         ipOrigen,
         referenciaAEAT: parsedPayload.referencia,
         csvNotificacion: parsedPayload.csv,
-        fechaEvento: parsedPayload.fechaEvento ? new Date(parsedPayload.fechaEvento) : null,
+        fechaEvento: parsedPayload.fechaEvento
+          ? new Date(parsedPayload.fechaEvento)
+          : null,
       },
     });
   }
@@ -213,25 +229,43 @@ export class WebhookProcessorService {
       // Actualizar estado según tipo de notificación
       switch (payload.tipo.toUpperCase()) {
         case 'PRESENTACION_ACEPTADA':
-          return await this.processPresentacionAceptada(presentacion.id, payload);
+          return await this.processPresentacionAceptada(
+            presentacion.id,
+            payload
+          );
 
         case 'PRESENTACION_RECHAZADA':
-          return await this.processPresentacionRechazada(presentacion.id, payload);
+          return await this.processPresentacionRechazada(
+            presentacion.id,
+            payload
+          );
 
         case 'SUBSANACION_REQUERIDA':
-          return await this.processSubsanacionRequerida(presentacion.id, payload);
+          return await this.processSubsanacionRequerida(
+            presentacion.id,
+            payload
+          );
 
         case 'LIQUIDACION_GENERADA':
-          return await this.processLiquidacionGenerada(presentacion.id, payload);
+          return await this.processLiquidacionGenerada(
+            presentacion.id,
+            payload
+          );
 
         case 'DEVOLUCION_AUTORIZADA':
-          return await this.processDevolucionAutorizada(presentacion.id, payload);
+          return await this.processDevolucionAutorizada(
+            presentacion.id,
+            payload
+          );
 
         case 'INGRESO_REALIZADO':
           return await this.processIngresoRealizado(presentacion.id, payload);
 
         case 'ACTUALIZACION_ESTADO':
-          return await this.processActualizacionEstado(presentacion.id, payload);
+          return await this.processActualizacionEstado(
+            presentacion.id,
+            payload
+          );
 
         default:
           console.warn(`Tipo de notificación no soportado: ${payload.tipo}`);
@@ -490,7 +524,10 @@ export class WebhookProcessorService {
 
           // Parsear payload y reintentarlo
           const parsedPayload = JSON.parse(webhook.payload);
-          const success = await this.processNotificationByType(parsedPayload, webhook.id);
+          const success = await this.processNotificationByType(
+            parsedPayload,
+            webhook.id
+          );
 
           if (success) {
             await prisma.webhookNotificacion.update({
@@ -527,7 +564,9 @@ export class WebhookProcessorService {
    * @param webhookId - ID del webhook
    * @returns WebhookStatus o null si no se encuentra
    */
-  public async getWebhookStatus(webhookId: string): Promise<WebhookStatus | null> {
+  public async getWebhookStatus(
+    webhookId: string
+  ): Promise<WebhookStatus | null> {
     try {
       const webhook = await prisma.webhookNotificacion.findUnique({
         where: { id: webhookId },
@@ -569,7 +608,9 @@ export class WebhookProcessorService {
    * @param webhookId - ID del webhook a reintentar
    * @returns Resultado del reintento
    */
-  public async retryWebhook(webhookId: string): Promise<WebhookProcessingResult> {
+  public async retryWebhook(
+    webhookId: string
+  ): Promise<WebhookProcessingResult> {
     const result: WebhookProcessingResult = {
       success: false,
       webhookId,
@@ -600,7 +641,10 @@ export class WebhookProcessorService {
 
       // Parsear payload y reintentarlo
       const parsedPayload = JSON.parse(webhook.payload);
-      const success = await this.processNotificationByType(parsedPayload, webhookId);
+      const success = await this.processNotificationByType(
+        parsedPayload,
+        webhookId
+      );
 
       if (success) {
         await prisma.webhookNotificacion.update({
@@ -643,7 +687,9 @@ export class WebhookProcessorService {
    * @param options - Opciones de paginación y filtros
    * @returns Lista de webhooks con total
    */
-  public async listWebhooks(options: ListWebhooksOptions): Promise<ListWebhooksResult> {
+  public async listWebhooks(
+    options: ListWebhooksOptions
+  ): Promise<ListWebhooksResult> {
     const { page = 1, limit = 10, estado, fechaDesde, fechaHasta } = options;
     const skip = (page - 1) * limit;
 

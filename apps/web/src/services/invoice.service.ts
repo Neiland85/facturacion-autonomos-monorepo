@@ -1,14 +1,14 @@
 import { apiClient } from '@/lib/api-client';
 import type {
-  ApiResponse,
-  Invoice,
-  InvoiceFilters,
-  InvoiceStats,
-  PaginatedResponse,
+    ApiResponse,
+    Invoice,
+    InvoiceFilters,
+    InvoiceStats,
+    PaginatedResponse,
 } from '@/types';
 
 export class InvoiceService {
-  private baseEndpoint = '/api/invoices';
+  private readonly baseEndpoint = '/api/invoices';
 
   /**
    * Get all invoices with optional filtering

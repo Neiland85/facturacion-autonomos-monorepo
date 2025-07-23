@@ -120,7 +120,7 @@
     "terminal.integrated.env.windows": {
       "PROJECT_ROOT": "${workspaceFolder}"
     },
-    "debug.javascript.autoAttachFilter": "smart",
+    "debug.javascript.autoAttachFilter": "always",
     "debug.javascript.codelens.npmScripts": "all",
     "jest.runMode": "watch",
     "playwright.showTrace": true,

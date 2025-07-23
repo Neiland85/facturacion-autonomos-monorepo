@@ -40,9 +40,14 @@
     "next-env.d.ts",
     "**/*.ts",
     "**/*.tsx",
+<<<<<<< HEAD
     "__tests__/**/*",
     "jest.setup.js",
     ".next/types/**/*.ts"
+=======
+    ".next/types/**/*.ts",
+    "src/lib/**/*.ts"
+>>>>>>> develop
   ],
   "exclude": [
     "node_modules"

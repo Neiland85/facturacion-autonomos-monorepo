@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 /**
  * @fileoverview Core business logic and utilities for the facturacion-autonomos project
  * @version 1.0.0
@@ -47,7 +46,7 @@ export const validateEmail = (email: string): boolean => {
 
 export const validateTaxId = (taxId: string): boolean => {
   // Validación básica de NIF/CIF español
-  const taxIdRegex = /^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$/;
+  const taxIdRegex = /^\d{8}[A-Z]$|^[A-Z]\d{7}[A-Z]$/;
   return taxIdRegex.test(taxId);
 };
 
@@ -132,7 +131,6 @@ export default {
   BusinessError,
   logger
 };
-=======
+
 // Placeholder for core functionality
 export const version = "1.0.0";
->>>>>>> dev
