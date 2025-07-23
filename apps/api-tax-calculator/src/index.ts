@@ -9,7 +9,6 @@ import { requestLogger } from './middleware/logger.middleware';
 import { configuracionFiscalRoutes } from './routes/configuracion-fiscal.routes';
 import { quarterClosureRoutes } from './routes/quarter-closure.routes';
 import { taxRoutes } from './routes/tax.routes';
-import { webhookRoutes } from './routes/webhook.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3002;
@@ -57,7 +56,6 @@ app.get('/health', (_req, res) => {
 app.use('/api/tax', taxRoutes);
 app.use('/api/quarter-closure', quarterClosureRoutes);
 app.use('/api/configuracion-fiscal', configuracionFiscalRoutes);
-app.use('/api/webhooks', webhookRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

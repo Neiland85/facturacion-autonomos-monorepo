@@ -130,20 +130,20 @@ export interface RegisterRequest {
 
 // Tipos de cálculos fiscales
 export interface TaxCalculationRequest {
-  income: number;
-  expenses: number;
-  taxYear: number;
-  taxpayerType: 'individual' | 'company';
+  amount: number;
+  vatRate: number;
+  retentionRate?: number;
+  taxYear?: number;
+  taxpayerType?: 'individual' | 'company';
 }
 
 export interface TaxCalculationResponse {
-  grossIncome: number;
-  netIncome: number;
-  irpf: number;
-  vat: number;
-  socialSecurity: number;
-  totalTax: number;
-  netAfterTax: number;
+  baseAmount: number;
+  vatRate: number;
+  vatAmount: number;
+  totalAmount: number;
+  retentionAmount: number;
+  netAmount: number;
 }
 
 export interface TaxType {
@@ -276,6 +276,16 @@ export interface ReportData {
   paidAmount: number;
   pendingAmount: number;
   taxAmount: number;
+}
+
+// Tipos de estadísticas de facturas
+export interface InvoiceStats {
+  totalInvoices: number;
+  totalAmount: number;
+  paidAmount: number;
+  pendingAmount: number;
+  overdueAmount: number;
+  statusBreakdown: Record<string, number>;
 }
 
 // Constantes de tipos

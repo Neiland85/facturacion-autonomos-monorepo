@@ -15,7 +15,6 @@ export default [
           './tsconfig.json',
           './apps/*/tsconfig.json',
           './packages/*/tsconfig.json',
-          './frontend/tsconfig.json',
         ],
       },
     },
@@ -38,14 +37,14 @@ export default [
       '@typescript-eslint/no-explicit-any': 'warn',
       '@typescript-eslint/prefer-nullish-coalescing': 'error',
       '@typescript-eslint/prefer-optional-chain': 'error',
-      
+
       // Reglas generales
       'prefer-const': 'error',
       'no-var': 'error',
       'no-console': 'warn',
       'no-debugger': 'error',
       'no-alert': 'error',
-      
+
       // Reglas de Prettier
       'prettier/prettier': 'error',
     },
@@ -53,7 +52,11 @@ export default [
 
   // Configuración específica para APIs
   {
-    files: ['apps/api-*/**/*.ts', 'backend/**/*.ts', 'packages/services/**/*.ts'],
+    files: [
+      'apps/api-*/**/*.ts',
+      'backend/**/*.ts',
+      'packages/services/**/*.ts',
+    ],
     rules: {
       'no-console': 'off', // Permitir console en APIs
       '@typescript-eslint/no-explicit-any': 'error', // Más estricto en APIs

@@ -3,16 +3,13 @@ import CryptoJS from 'crypto-js';
 import NodeRSA from 'node-rsa';
 
 /**
- * Servicio para verificación de firmas digitales de webhooks AEAT
- * Implementa verificación HMAC-SHA256 y RSA según especificaciones AEAT
+ * Servicio para verificación de firmas digitales de webhooks
+ * Implementa verificación HMAC-SHA256 básica
  */
 export class WebhookSignatureService {
-  private readonly aeatPublicKey: string;
   private readonly webhookSecret: string;
 
   constructor() {
-    // Clave pública de AEAT (sandbox/producción)
-    this.aeatPublicKey = process.env.AEAT_PUBLIC_KEY || this.getDefaultAEATPublicKey();
     // Secret compartido para HMAC
     this.webhookSecret = process.env.WEBHOOK_SECRET || 'default-webhook-secret';
   }
