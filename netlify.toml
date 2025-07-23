@@ -1,0 +1,8 @@
+[build]
+  base = "."
+  command = "yarn install --immutable && yarn workspaces foreach --topological run build"
+  publish = "apps/web/.next"
+
+[build.environment]
+  NODE_VERSION = "20.12.2"
+  YARN_VERSION = "4.9.2"

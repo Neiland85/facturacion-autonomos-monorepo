@@ -16,7 +16,10 @@ export class WebhookController {
    * Endpoint para recibir webhooks de AEAT
    * POST /api/webhooks/aeat
    */
-  public receiveAeatWebhook = async (req: Request, res: Response): Promise<void> => {
+  public receiveAeatWebhook = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       // Obtener payload crudo como string
       const rawPayload = JSON.stringify(req.body);
@@ -42,7 +45,11 @@ export class WebhookController {
       });
 
       // Procesar webhook
-      const result = await this.webhookProcessor.processWebhook(rawPayload, headers, ipOrigen);
+      const result = await this.webhookProcessor.processWebhook(
+        rawPayload,
+        headers,
+        ipOrigen
+      );
 
       if (result.success) {
         res.status(200).json({
@@ -72,7 +79,10 @@ export class WebhookController {
    * Endpoint para verificar el estado de un webhook
    * GET /api/webhooks/aeat/:webhookId/status
    */
-  public getWebhookStatus = async (req: Request, res: Response): Promise<void> => {
+  public getWebhookStatus = async (
+    req: Request,
+    res: Response
+  ): Promise<void> => {
     try {
       const webhookIdSchema = z.string().uuid();
       const webhookId = webhookIdSchema.parse(req.params.webhookId);
@@ -218,11 +228,17 @@ export class WebhookController {
   /**
    * Filtra headers sensibles para logging
    */
-  private filterSensitiveHeaders(headers: Record<string, string>): Record<string, string> {
+  private filterSensitiveHeaders(
+    headers: Record<string, string>
+  ): Record<string, string> {
     const filtered = { ...headers };
 
     // Ocultar headers sensibles
-    const sensitiveHeaders = ['authorization', 'x-aeat-signature', 'x-aeat-hmac'];
+    const sensitiveHeaders = [
+      'authorization',
+      'x-aeat-signature',
+      'x-aeat-hmac',
+    ];
     sensitiveHeaders.forEach(header => {
       if (filtered[header]) {
         filtered[header] = '***';

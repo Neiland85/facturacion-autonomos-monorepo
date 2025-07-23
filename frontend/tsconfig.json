@@ -1,12 +1,29 @@
 {
   "compilerOptions": {
-    // ...existing code...
+    "target": "ES2020",
+    "module": "CommonJS",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "baseUrl": "./",
+    "paths": {
+      "@core/*": [
+        "../packages/core/src/*"
+      ],
+      "@services/*": [
+        "../packages/services/src/*"
+      ]
+    }
   },
   "include": [
-    // ...existing code...
+    "src/**/*.ts",
+    "src/**/*.tsx",
     "src/lib/**/*.ts"
   ],
   "exclude": [
-    // ...existing code...
+    "node_modules",
+    "dist",
+    "build"
   ]
 }

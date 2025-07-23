@@ -12,7 +12,8 @@ export class WebhookSignatureService {
 
   constructor() {
     // Clave pública de AEAT (sandbox/producción)
-    this.aeatPublicKey = process.env.AEAT_PUBLIC_KEY || this.getDefaultAEATPublicKey();
+    this.aeatPublicKey =
+      process.env.AEAT_PUBLIC_KEY || this.getDefaultAEATPublicKey();
     // Secret compartido para HMAC
     this.webhookSecret = process.env.WEBHOOK_SECRET || 'default-webhook-secret';
   }
@@ -24,13 +25,20 @@ export class WebhookSignatureService {
    * @param timestamp - Timestamp del webhook
    * @returns boolean - true si la firma es válida
    */
-  public verifyHMACSignature(payload: string, signature: string, timestamp?: string): boolean {
+  public verifyHMACSignature(
+    payload: string,
+    signature: string,
+    timestamp?: string
+  ): boolean {
     try {
       // Construir string a firmar (payload + timestamp si existe)
       const stringToSign = timestamp ? `${payload}.${timestamp}` : payload;
 
       // Calcular HMAC-SHA256
-      const expectedSignature = CryptoJS.HmacSHA256(stringToSign, this.webhookSecret);
+      const expectedSignature = CryptoJS.HmacSHA256(
+        stringToSign,
+        this.webhookSecret
+      );
       const expectedSignatureHex = `sha256=${expectedSignature.toString(CryptoJS.enc.Hex)}`;
 
       // Comparación segura contra timing attacks
