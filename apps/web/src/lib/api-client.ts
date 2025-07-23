@@ -2,7 +2,7 @@ const API_BASE_URL =
   process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3002';
 
 export class ApiClient {
-  private baseURL: string;
+  private readonly baseURL: string;
   private token: string | null = null;
 
   constructor(baseURL: string = API_BASE_URL) {
