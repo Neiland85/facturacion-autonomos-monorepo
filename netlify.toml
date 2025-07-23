@@ -1,6 +1,6 @@
 [build]
   command = "corepack enable && corepack prepare yarn@4.9.2 --activate && yarn install --frozen-lockfile && yarn workspace @facturacion/web build"
-  publish = "apps/web/dist"
+  publish = "apps/web/.next"
 
 [functions]
   directory = "apps/web/functions"
