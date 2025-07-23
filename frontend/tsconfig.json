@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    // ...existing code...
+  },
+  "include": [
+    // ...existing code...
+    "src/lib/**/*.ts"
+  ],
+  "exclude": [
+    // ...existing code...
+  ]
+}
