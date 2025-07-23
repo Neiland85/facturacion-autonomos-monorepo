@@ -46,7 +46,7 @@ export const validateEmail = (email: string): boolean => {
 
 export const validateTaxId = (taxId: string): boolean => {
   // Validación básica de NIF/CIF español
-  const taxIdRegex = /^[0-9]{8}[A-Z]$|^[A-Z][0-9]{7}[A-Z]$/;
+  const taxIdRegex = /^\d{8}[A-Z]$|^[A-Z]\d{7}[A-Z]$/;
   return taxIdRegex.test(taxId);
 };
 

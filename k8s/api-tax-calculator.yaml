@@ -37,9 +37,23 @@ spec:
         app: api-tax-calculator
         environment: ${ENVIRONMENT}
     spec:
+      serviceAccountName: api-tax-calculator-sa
+      automountServiceAccountToken: false
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 2000
       containers:
         - name: api-tax-calculator
           image: ${API_TAX_CALCULATOR_IMAGE}:${CI_COMMIT_SHA}
+          securityContext:
+            allowPrivilegeEscalation: false
+            runAsNonRoot: true
+            runAsUser: 1000
+            capabilities:
+              drop:
+                - ALL
+            readOnlyRootFilesystem: true
           ports:
             - containerPort: 3001
             - containerPort: 9090
@@ -135,9 +149,16 @@ spec:
             requests:
               memory: "256Mi"
               cpu: "250m"
+              ephemeral-storage: "1Gi"
             limits:
               memory: "512Mi"
               cpu: "500m"
+              ephemeral-storage: "2Gi"
+          volumeMounts:
+            - name: tmp-volume
+              mountPath: /tmp
+            - name: logs-volume
+              mountPath: /app/logs
           livenessProbe:
             httpGet:
               path: /health
@@ -165,6 +186,11 @@ spec:
             timeoutSeconds: 5
             successThreshold: 1
             failureThreshold: 12
+      volumes:
+        - name: tmp-volume
+          emptyDir: {}
+        - name: logs-volume
+          emptyDir: {}
 ---
 apiVersion: v1
 kind: ServiceMonitor
