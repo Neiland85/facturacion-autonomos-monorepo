@@ -110,11 +110,6 @@ spec:
                 configMapKeyRef:
                   name: facturacion-config
                   key: RATE_LIMIT_MAX
-            - name: WEBHOOK_SECRET
-              valueFrom:
-                secretKeyRef:
-                  name: facturacion-secret
-                  key: WEBHOOK_SECRET
             - name: ENABLE_METRICS
               valueFrom:
                 configMapKeyRef:

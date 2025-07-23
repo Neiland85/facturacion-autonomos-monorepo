@@ -10,8 +10,8 @@ export class WebhookSignatureService {
   private readonly webhookSecret: string;
 
   constructor() {
-    // Secret compartido para HMAC
-    this.webhookSecret = process.env.WEBHOOK_SECRET || 'default-webhook-secret';
+    // Secret compartido para HMAC - simplificado para uso básico
+    this.webhookSecret = 'basic-webhook-secret';
   }
 
   /**
