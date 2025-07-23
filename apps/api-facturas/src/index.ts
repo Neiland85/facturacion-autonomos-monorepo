@@ -20,7 +20,7 @@ app.use(morgan('combined'));
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // máximo 100 requests por ventana
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
 });
 app.use('/api/', limiter);
 
@@ -34,7 +34,7 @@ app.get('/health', (req: express.Request, res: express.Response) => {
     status: 'OK',
     service: 'API Facturas',
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
+    version: '1.0.0',
   });
 });
 
@@ -45,18 +45,25 @@ app.use('/api/facturas', facturasRoutes);
 app.use('*', (req: express.Request, res: express.Response) => {
   res.status(404).json({
     error: 'Ruta no encontrada',
-    path: req.originalUrl
+    path: req.originalUrl,
   });
 });
 
 // Manejo global de errores
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
-  res.status(500).json({
-    error: 'Error interno del servidor',
-    details: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error('Error:', err);
+    res.status(500).json({
+      error: 'Error interno del servidor',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+    });
+  }
+);
 
 // Iniciar servidor
 app.listen(PORT, () => {

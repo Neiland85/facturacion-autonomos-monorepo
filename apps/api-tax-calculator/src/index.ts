@@ -1,33 +1,19 @@
 import cors from 'cors';
-<<<<<<< HEAD
 import 'dotenv/config';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
-import { CronJobManager } from './cron/cron-manager';
-import { errorHandler } from './middleware/error.middleware';
-import { requestLogger } from './middleware/logger.middleware';
-import { configuracionFiscalRoutes } from './routes/configuracion-fiscal.routes';
-import { quarterClosureRoutes } from './routes/quarter-closure.routes';
-import { taxRoutes } from './routes/tax.routes';
-import { webhookRoutes } from './routes/webhook.routes';
-=======
-import express from 'express';
-import helmet from 'helmet';
->>>>>>> dev
 
 const app = express();
 const PORT = process.env.PORT || 3002;
-
-<<<<<<< HEAD
-// Inicializar cron jobs
-const cronManager = new CronJobManager();
 
 // Middleware de seguridad
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || [
+      'http://localhost:3000',
+    ],
     credentials: true,
   })
 );
@@ -35,90 +21,58 @@ app.use(
 // Rate limiting
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // máximo 100 requests por ventana
-  message: {
-    error: 'Demasiadas solicitudes, inténtalo de nuevo más tarde.',
-  },
+  max: 100, // límite de 100 requests por IP
+  message: 'Demasiadas peticiones desde esta IP, intenta de nuevo más tarde.',
 });
 app.use(limiter);
 
-// Middleware general
+// Middleware de parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
-app.use(requestLogger);
 
 // Health check
-app.get('/health', (_req, res) => {
+app.get('/health', (req, res) => {
   res.json({
-    status: 'ok',
-    service: 'tax-calculator',
+    status: 'OK',
+    service: 'tax-calculator-api',
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0',
   });
 });
 
-// Rutas
-app.use('/api/tax', taxRoutes);
-app.use('/api/quarter-closure', quarterClosureRoutes);
-app.use('/api/configuracion-fiscal', configuracionFiscalRoutes);
-app.use('/api/webhooks', webhookRoutes);
+// Rutas básicas de tax calculation
+app.get('/api/calculate-tax', (req, res) => {
+  res.json({
+    message: 'Tax calculation endpoint',
+    status: 'available',
+  });
+});
 
-// 404 handler
+// Ruta 404
 app.use('*', (req, res) => {
   res.status(404).json({
-    error: 'Endpoint no encontrado',
+    error: 'Ruta no encontrada',
     path: req.originalUrl,
-    method: req.method,
   });
 });
-
-// Error handler
-app.use(errorHandler);
 
 // Iniciar servidor
 const server = app.listen(PORT, () => {
-  console.log(`Tax Calculator API corriendo en puerto ${PORT}`);
-  console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
-
-  // Iniciar cron jobs
-  cronManager.startCronJobs();
-});
-
-// Manejo de señales de cierre
-process.on('SIGTERM', async () => {
-  console.log('Señal SIGTERM recibida, cerrando servidor...');
-
-  // Detener cron jobs
-  await cronManager.shutdown();
-
-  // Cerrar servidor
-  server.close(() => {
-    console.log('Servidor cerrado correctamente');
-    process.exit(0);
-  });
-});
-
-process.on('SIGINT', async () => {
-  console.log('Señal SIGINT recibida, cerrando servidor...');
-
-  // Detener cron jobs
-  await cronManager.shutdown();
-
-  // Cerrar servidor
-  server.close(() => {
-    console.log('Servidor cerrado correctamente');
-    process.exit(0);
-  });
-=======
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', service: 'tax-calculator-api' });
-});
-
-app.listen(PORT, () => {
   console.log(`🧮 API Tax Calculator corriendo en puerto ${PORT}`);
->>>>>>> dev
+});
+
+// Graceful shutdown
+process.on('SIGTERM', () => {
+  console.log('SIGTERM recibido. Cerrando servidor...');
+  server.close(() => {
+    console.log('Servidor cerrado correctamente');
+    process.exit(0);
+  });
+});
+
+process.on('SIGINT', () => {
+  console.log('SIGINT recibido. Cerrando servidor...');
+  server.close(() => {
+    console.log('Servidor cerrado correctamente');
+    process.exit(0);
+  });
 });

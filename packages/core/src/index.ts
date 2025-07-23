@@ -53,7 +53,7 @@ export const validateTaxId = (taxId: string): boolean => {
 export const formatCurrency = (amount: number): string => {
   return new Intl.NumberFormat('es-ES', {
     style: 'currency',
-    currency: 'EUR'
+    currency: 'EUR',
   }).format(amount);
 };
 
@@ -64,23 +64,29 @@ export const formatDate = (date: Date): string => {
 // Constantes de negocio
 export const VAT_RATES = {
   GENERAL: 0.21,
-  REDUCED: 0.10,
-  SUPER_REDUCED: 0.04
+  REDUCED: 0.1,
+  SUPER_REDUCED: 0.04,
 } as const;
 
 export const INVOICE_STATUS = {
   DRAFT: 'draft',
-  SENT: 'sent',
+  PENDING: 'pending',
   PAID: 'paid',
-  OVERDUE: 'overdue'
+  OVERDUE: 'overdue',
 } as const;
 
 // Utilidades de cálculo
-export const calculateVAT = (amount: number, rate: number = VAT_RATES.GENERAL): number => {
+export const calculateVAT = (
+  amount: number,
+  rate: number = VAT_RATES.GENERAL
+): number => {
   return amount * rate;
 };
 
-export const calculateTotalAmount = (amount: number, vatRate: number = VAT_RATES.GENERAL): number => {
+export const calculateTotalAmount = (
+  amount: number,
+  vatRate: number = VAT_RATES.GENERAL
+): number => {
   return amount + calculateVAT(amount, vatRate);
 };
 
@@ -104,15 +110,21 @@ export class BusinessError extends Error {
 
 // Utilidades de logging
 export const logger = {
-  info: (message: string, data?: any) => {
-    console.log(`[INFO] ${new Date().toISOString()}: ${message}`, data || '');
+  info: (message: string, data?: unknown) => {
+    // eslint-disable-next-line no-console
+    console.log(`[INFO] ${new Date().toISOString()}: ${message}`, data ?? '');
   },
-  error: (message: string, error?: any) => {
-    console.error(`[ERROR] ${new Date().toISOString()}: ${message}`, error || '');
+  error: (message: string, error?: unknown) => {
+    // eslint-disable-next-line no-console
+    console.error(
+      `[ERROR] ${new Date().toISOString()}: ${message}`,
+      error ?? ''
+    );
   },
-  warn: (message: string, data?: any) => {
-    console.warn(`[WARN] ${new Date().toISOString()}: ${message}`, data || '');
-  }
+  warn: (message: string, data?: unknown) => {
+    // eslint-disable-next-line no-console
+    console.warn(`[WARN] ${new Date().toISOString()}: ${message}`, data ?? '');
+  },
 };
 
 // Exportar calculador fiscal
@@ -129,9 +141,8 @@ export default {
   calculateTotalAmount,
   generateInvoiceNumber,
   BusinessError,
-  logger
+  logger,
 };
 
 // Placeholder for core functionality
-export const version = "1.0.0";
-dev
+export const version = '1.0.0';
