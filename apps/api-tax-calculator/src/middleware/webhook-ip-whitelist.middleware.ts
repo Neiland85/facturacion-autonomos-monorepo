@@ -14,7 +14,11 @@ export class WebhookIPWhitelistMiddleware {
   /**
    * Middleware para verificar IP en lista blanca
    */
-  public checkIPWhitelist = (req: Request, res: Response, next: NextFunction): void => {
+  public checkIPWhitelist = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void => {
     const clientIP = this.getClientIP(req);
 
     // En desarrollo, permitir localhost
@@ -101,7 +105,9 @@ export class WebhookIPWhitelistMiddleware {
 
       // Conversión básica para IPv4
       const ipToNum = (ip: string): number => {
-        return ip.split('.').reduce((acc, octet) => (acc << 8) + parseInt(octet), 0);
+        return ip
+          .split('.')
+          .reduce((acc, octet) => (acc << 8) + parseInt(octet), 0);
       };
 
       const mask = ~(0xffffffff >>> cidrNum);

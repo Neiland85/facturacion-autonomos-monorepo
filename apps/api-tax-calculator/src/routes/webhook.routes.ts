@@ -26,13 +26,19 @@ router.post(
  * GET /api/webhooks/aeat/:webhookId/status
  * Obtener estado de un webhook específico
  */
-router.get('/aeat/:webhookId/status', asyncHandler(webhookController.getWebhookStatus));
+router.get(
+  '/aeat/:webhookId/status',
+  asyncHandler(webhookController.getWebhookStatus)
+);
 
 /**
  * POST /api/webhooks/aeat/:webhookId/retry
  * Reintentar procesamiento de un webhook fallido
  */
-router.post('/aeat/:webhookId/retry', asyncHandler(webhookController.retryWebhook));
+router.post(
+  '/aeat/:webhookId/retry',
+  asyncHandler(webhookController.retryWebhook)
+);
 
 /**
  * GET /api/webhooks/aeat

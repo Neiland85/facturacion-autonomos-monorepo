@@ -1,9 +1,0 @@
-{
-  "version": 2,
-  "framework": "nextjs",
-  "installCommand": "corepack enable && yarn install --immutable",
-  "buildCommand": "yarn workspace @facturacion/web build",
-  "outputDirectory": ".next",
-  "rootDirectory": ".",
-  "ignoreCommand": "git diff --quiet HEAD^ HEAD ."
-}

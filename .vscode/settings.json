@@ -1,0 +1,48 @@
+{
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always"
+  },
+  "extensions.autoUpdate": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "typescriptreact",
+    "json"
+  ],
+  "files.exclude": {
+    "**/.git": true,
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true
+  },
+  "files.associations": {
+    "*.graphql": "graphql",
+    "*.gql": "graphql"
+  },
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "prettier.requireConfig": true,
+  "editor.tabSize": 2,
+  "editor.insertSpaces": true,
+  "editor.detectIndentation": false,
+  "terminal.integrated.defaultProfile.osx": "zsh",
+  "workbench.colorTheme": "Default Dark+",
+  "workbench.iconTheme": "none",
+  "workbench.editor.enablePreview": false,
+  "workbench.startupEditor": "none",
+  "debug.node.autoAttach": "on",
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/build": true
+  },
+  "git.ignoreLimitWarning": true,
+  "git.autofetch": true,
+  "git.confirmSync": false,
+  "git.enableSmartCommit": true,
+  "git.postCommitCommand": "sync",
+  "npm.packageManager": "pnpm",
+  "pnpm.enablePnp": true,
+  "pnpm.workspaceRoot": true
+}

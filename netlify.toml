@@ -1,0 +1,44 @@
+[build]
+<<<<<<< HEAD
+  command = "corepack enable && corepack prepare yarn@4.9.2 --activate && yarn install --frozen-lockfile && yarn workspace @facturacion/web build"
+  publish = "apps/web/.next"
+  base = "."
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+
+[build.environment]
+  NODE_ENV = "production"
+  NODE_VERSION = "20"
+  COREPACK_ENABLE_STRICT = "0"
+  YARN_ENABLE_IMMUTABLE_INSTALLS = "true"
+
+[context.production.environment]
+  NEXT_PUBLIC_APP_URL = "https://facturacion-autonomos.netlify.app"
+  NEXT_PUBLIC_API_BASE_URL = "https://facturacion-autonomos.netlify.app/api"
+
+[context.branch-deploy.environment]  
+  NEXT_PUBLIC_APP_URL = "https://deploy-preview-{REVIEW_ID}--facturacion-autonomos.netlify.app"
+  NEXT_PUBLIC_API_BASE_URL = "https://deploy-preview-{REVIEW_ID}--facturacion-autonomos.netlify.app/api"
+
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    
+[[headers]]
+  for = "/_next/static/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+=======
+  base = "."
+  command = "yarn install --immutable && yarn workspaces foreach --topological run build"
+  publish = "apps/web/.next"
+
+[build.environment]
+  NODE_VERSION = "20.12.2"
+  YARN_VERSION = "4.9.2"
+>>>>>>> develop

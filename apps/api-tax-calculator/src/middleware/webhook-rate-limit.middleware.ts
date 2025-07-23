@@ -37,7 +37,11 @@ export class WebhookRateLimitMiddleware {
   /**
    * Middleware para aplicar rate limit a webhooks
    */
-  public limitWebhookRequests = (req: Request, res: Response, next: NextFunction): void => {
+  public limitWebhookRequests = (
+    req: Request,
+    res: Response,
+    next: NextFunction
+  ): void => {
     this.rateLimiter(req, res, next);
   };
 

@@ -1,10 +1,9 @@
-<<<<<<< HEAD
 /**
  * @fileoverview Shared services and API clients for the facturacion-autonomos project
  * @version 1.0.0
  */
 
-import { User, Invoice, Client } from '@facturacion/core';
+import { Client, Invoice, User } from '@facturacion/core';
 
 // Configuración base para APIs
 export interface ApiConfig {
@@ -268,7 +267,7 @@ export default {
   DEFAULT_API_CONFIG,
   TAX_CALCULATOR_CONFIG
 };
-=======
 // Placeholder for services
 export const servicesVersion = "1.0.0";
->>>>>>> dev
+
+const a = 1; // Selecciona la versión correcta
