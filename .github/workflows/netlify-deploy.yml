@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 name: 🚀 Netlify Deployment
 
 on:
@@ -46,39 +45,3 @@ jobs:
         env:
           NODE_ENV: production
           SWC_BINARY_TARGET: "x86_64-unknown-linux-gnu"
-=======
-name: Netlify Deploy
-
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: |
-          corepack enable
-          corepack prepare yarn@4.9.2 --activate
-          yarn install --frozen-lockfile
-
-      - name: Build and deploy to Netlify
-        run: |
-          yarn workspace @facturacion/web build
-          yarn netlify deploy --prod
-        env:
-          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
-          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
->>>>>>> develop
