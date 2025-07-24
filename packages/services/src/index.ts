@@ -3,11 +3,7 @@
  * @version 1.0.0
  */
 
-<<<<<<< HEAD
-import { Client, Invoice, User } from '@facturacion/core';
-=======
 import type { Client, Invoice, User } from '@facturacion/core';
->>>>>>> origin/develop
 
 // Configuración base para APIs
 export interface ApiConfig {
@@ -285,10 +281,3 @@ export default {
   TAX_CALCULATOR_CONFIG,
   servicesVersion,
 };
-<<<<<<< HEAD
-// Placeholder for services
-export const servicesVersion = "1.0.0";
-
-const a = 1; // Selecciona la versión correcta
-=======
->>>>>>> origin/develop
