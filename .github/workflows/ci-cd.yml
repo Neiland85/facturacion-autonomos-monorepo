@@ -1,16 +1,33 @@
-<<<<<<< HEAD
-name: 🚀 Netlify CI/CD
+name: 🚀 Simplified CI/CD
 
 on:
   push:
-    branches: [main, fix/netlify-deployment]
+    branches: 
+      - main
+      - develop
   pull_request:
-    branches: [main]
+    branches: 
+      - main
+      - develop
 
 jobs:
-  test-and-build:
-    name: 🧪 Test & Build for Netlify
+  basic-check:
+    name: 🔍 Basic Check
     runs-on: ubuntu-latest
+    
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_PASSWORD: postgres_test
+          POSTGRES_DB: facturacion_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
 
     steps:
       - name: 📁 Checkout code
@@ -19,7 +36,7 @@ jobs:
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20.x
+          node-version: '20'
 
       - name: ⚙️ Enable Corepack
         run: |
@@ -27,59 +44,18 @@ jobs:
           corepack prepare yarn@4.9.2 --activate
 
       - name: 📦 Install dependencies
-        run: yarn install --immutable
+        run: yarn install --frozen-lockfile
 
-      - name: 🔍 Lint code
-        run: yarn workspace @facturacion/web lint
-
-      - name: 🧪 Run tests
-        run: yarn workspace @facturacion/web test:ci
+      - name: 🗄️ Run database migrations
+        run: ./db/run-migrations.sh
         env:
-          NODE_OPTIONS: "--experimental-vm-modules"
+          DATABASE_URL: postgresql://postgres:postgres_test@localhost:5432/facturacion_test
 
-      - name: 🏗️ Build application
-        run: yarn workspace @facturacion/web build
+      - name: 🔍 Type check
+        run: yarn type-check
 
-      - name: 🎉 Build success notification
-        run: echo "✅ Build completed successfully for Netlify deployment!"
-=======
-name: CI/CD Pipeline
-
-on:
-  push:
-    branches:
-      - main
-      - develop
-  pull_request:
-    branches:
-      - '*'
-
-jobs:
-  lint-test-build:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'yarn'
-
-      - name: Install dependencies
-        run: |
-          corepack enable
-          corepack prepare yarn@4.9.2 --activate
-          yarn install --frozen-lockfile
-
-      - name: Lint code
+      - name: 🧹 Lint check
         run: yarn lint
 
-      - name: Run tests
-        run: yarn test
-
-      - name: Build project
-        run: yarn build
->>>>>>> develop
+      - name: 🎉 Success notification
+        run: echo "✅ All checks passed successfully!"

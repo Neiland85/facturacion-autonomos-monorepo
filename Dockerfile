@@ -1,20 +1,60 @@
-# Usa una imagen base de Node.js
-FROM node:20
+# Multi-stage Dockerfile for facturacion-autonomos-monorepo
+FROM node:20-alpine AS base
 
-# Establece el directorio de trabajo dentro del contenedor
+# Install PostgreSQL client for migrations
+RUN apk add --no-cache postgresql-client
+
+# Enable Corepack for Yarn 4
+RUN corepack enable && corepack prepare yarn@4.9.2 --activate
+
+# Set working directory
 WORKDIR /usr/src/app
 
-# Copia los archivos necesarios para instalar dependencias
+# Copy package files
 COPY package.json yarn.lock ./
+COPY packages/*/package.json ./packages/*/
+COPY apps/*/package.json ./apps/*/
 
-# Instala las dependencias
-RUN yarn install
+# Install dependencies
+RUN yarn install --frozen-lockfile
 
-# Copia el resto de los archivos del proyecto
+# Copy source code
 COPY . .
 
-# Expone el puerto en el que corre el servicio
+# Copy database migration files
+COPY db/ ./db/
+RUN chmod +x ./db/run-migrations.sh
+
+# Build the project
+RUN yarn build
+
+# Production stage
+FROM node:20-alpine AS production
+
+# Install PostgreSQL client for migrations
+RUN apk add --no-cache postgresql-client
+
+# Enable Corepack for Yarn 4
+RUN corepack enable && corepack prepare yarn@4.9.2 --activate
+
+WORKDIR /usr/src/app
+
+# Copy package files
+COPY package.json yarn.lock ./
+
+# Install only production dependencies
+RUN yarn install --frozen-lockfile --production
+
+# Copy built application from base stage
+COPY --from=base /usr/src/app/dist ./dist
+COPY --from=base /usr/src/app/db ./db
+
+# Set up health check
+HEALTHCHECK --interval=30s --timeout=3s --start-period=5s --retries=3 \
+  CMD curl -f http://localhost:3000/health || exit 1
+
+# Expose port
 EXPOSE 3000
 
-# Comando para iniciar el servicio
-CMD ["yarn", "start"]
+# Start script that runs migrations and then starts the app
+CMD ["sh", "-c", "./db/run-migrations.sh && yarn start"]

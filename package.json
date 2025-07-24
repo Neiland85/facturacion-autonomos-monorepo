@@ -43,6 +43,8 @@
     "db:generate": "turbo run db:generate",
     "db:push": "turbo run db:push",
     "db:studio": "turbo run db:studio",
+    "db:migrate": "./db/run-migrations.sh",
+    "db:migrate:test": "DATABASE_URL=postgresql://postgres:postgres_test@localhost:5432/facturacion_test ./db/run-migrations.sh",
     "format": "turbo run format",
     "format:check": "turbo run format:check",
     "audit": "npm audit"
