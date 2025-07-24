@@ -5,6 +5,7 @@
 ### 1. CONFIGURACIÓN DE SITIO NETLIFY
 
 #### 📋 **Configuración Básica**
+
 ```
 Site name: facturacion-autonomos-monorepo
 Domain: facturacion-autonomos-monorepo.netlify.app
@@ -13,6 +14,7 @@ Branch: feature/security-validation-system
 ```
 
 #### 🏗️ **Build Settings**
+
 ```bash
 Base directory: (vacío - raíz del repo)
 Build command: corepack enable && corepack prepare yarn@4.9.2 --activate && yarn install --immutable && yarn workspace @facturacion/web build
@@ -21,6 +23,7 @@ Functions directory: apps/web/functions
 ```
 
 #### 🔧 **Environment Variables**
+
 En Netlify Dashboard > Site settings > Environment variables:
 
 ```bash
@@ -35,6 +38,7 @@ NEXT_PUBLIC_API_BASE_URL=https://facturacion-autonomos-monorepo.netlify.app/api
 ### 2. CONFIGURACIÓN EN netlify.toml ✅
 
 El archivo `netlify.toml` ya está configurado con:
+
 - ✅ Build command optimizado para Yarn 4.9.2
 - ✅ Variables de entorno correctas
 - ✅ Headers de seguridad (X-Frame-Options, CSP, etc.)
@@ -45,11 +49,13 @@ El archivo `netlify.toml` ya está configurado con:
 ### 3. PASOS EN NETLIFY DASHBOARD
 
 #### **Paso 1: Acceder a Netlify**
+
 1. Ve a https://app.netlify.com
 2. Inicia sesión con tu cuenta
 3. Selecciona tu sitio "facturacion-autonomos-monorepo"
 
 #### **Paso 2: Deploy Settings**
+
 ```bash
 Site settings > Build & deploy > Continuous Deployment
 
@@ -62,6 +68,7 @@ Site settings > Build & deploy > Continuous Deployment
 ```
 
 #### **Paso 3: Environment Variables**
+
 ```bash
 Site settings > Environment variables > Add variable
 
@@ -72,6 +79,7 @@ YARN_ENABLE_IMMUTABLE_INSTALLS → true
 ```
 
 #### **Paso 4: Plugin Configuration**
+
 ```bash
 Site settings > Build & deploy > Build plugins
 
@@ -82,11 +90,13 @@ Site settings > Build & deploy > Build plugins
 ### 4. VERIFICACIÓN DE DEPLOY
 
 #### **Deploy Manual**
+
 1. Ve a "Deploys" tab
 2. Click "Trigger deploy" > "Deploy site"
 3. Monitorea el log de build
 
 #### **Log de Build Esperado**
+
 ```bash
 2:14:20 PM: Started building repository
 2:14:20 PM: corepack enable
@@ -100,6 +110,7 @@ Site settings > Build & deploy > Build plugins
 ### 5. TROUBLESHOOTING
 
 #### **Error: "Build failed"**
+
 ```bash
 # Si falla, revisar:
 1. Build logs en Netlify dashboard
@@ -109,6 +120,7 @@ Site settings > Build & deploy > Build plugins
 ```
 
 #### **Error: "Function size exceeded"**
+
 ```bash
 # Si las funciones son muy grandes:
 1. Site settings > Functions > Function bundling
@@ -116,6 +128,7 @@ Site settings > Build & deploy > Build plugins
 ```
 
 #### **Error: "Module not found"**
+
 ```bash
 # Si faltan módulos:
 1. Verificar workspace dependencies en package.json
@@ -126,6 +139,7 @@ Site settings > Build & deploy > Build plugins
 ### 6. COMANDOS ÚTILES
 
 #### **Local Testing**
+
 ```bash
 # Instalar Netlify CLI
 npm install -g netlify-cli
@@ -144,6 +158,7 @@ netlify deploy --dir=apps/web/.next --functions=apps/web/functions
 ```
 
 #### **Git Workflow**
+
 ```bash
 # Commit final
 git add -A
@@ -159,6 +174,7 @@ git push origin main
 ### 7. MONITOREO POST-DEPLOY
 
 #### **URLs a Verificar**
+
 ```bash
 ✅ https://facturacion-autonomos-monorepo.netlify.app
 ✅ https://facturacion-autonomos-monorepo.netlify.app/health
@@ -166,6 +182,7 @@ git push origin main
 ```
 
 #### **Headers de Seguridad**
+
 ```bash
 # Verificar con curl
 curl -I https://facturacion-autonomos-monorepo.netlify.app
@@ -180,6 +197,7 @@ Content-Security-Policy: ...
 ### 8. PERFORMANCE OPTIMIZATION
 
 #### **Next.js Optimizations**
+
 ```bash
 # En netlify.toml ya configurado:
 ✅ Static file caching (31536000 seconds)
@@ -191,6 +209,7 @@ Content-Security-Policy: ...
 ## 🎉 ¡LISTO PARA PRODUCCIÓN!
 
 Tu aplicación está configurada con:
+
 - ✅ **Seguridad**: Headers CSP, XSS protection, frame options
 - ✅ **Performance**: Cache optimization, bundle splitting
 - ✅ **Monorepo**: Yarn workspaces completamente funcional

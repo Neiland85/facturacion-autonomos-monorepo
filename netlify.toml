@@ -20,6 +20,13 @@
 [functions]
   directory = "apps/web/functions"
 
+[dev]
+  command = "yarn workspace @facturacion/web dev"  # o "yarn dev" si quieres levantar todas las apps
+  port    = 3000
+
+[dev.functions]
+  directory = "netlify/functions"  # si usas funciones
+
 [[plugins]]
   package = "@netlify/plugin-nextjs"
 

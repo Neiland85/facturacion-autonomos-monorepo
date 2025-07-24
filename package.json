@@ -57,13 +57,8 @@
     "@types/jest": "^30.0.0",
     "@types/morgan": "^1",
     "@types/node": "^24.0.10",
-<<<<<<< HEAD
     "@types/react": "^19",
     "@types/react-dom": "^19",
-=======
-    "@types/react": "18",
-    "@types/react-dom": "^18",
->>>>>>> origin/develop
     "@types/supertest": "^6.0.3",
     "@types/swagger-jsdoc": "^6",
     "@types/swagger-ui-express": "^4.1.8",
@@ -99,13 +94,8 @@
     "morgan": "^1.10.0",
     "prisma": "^6.11.1",
     "qrcode": "^1.5.4",
-<<<<<<< HEAD
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-=======
-    "react": "18",
-    "react-dom": "18",
->>>>>>> origin/develop
     "speakeasy": "^2.0.0",
     "swagger-jsdoc": "^6.2.8",
     "swagger-ui-express": "^5.0.1",
