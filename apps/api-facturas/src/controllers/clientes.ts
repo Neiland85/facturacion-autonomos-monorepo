@@ -16,12 +16,12 @@ export class ClienteController {
 
       // Construir filtros
       const where: any = {};
-      
+
       if (buscar) {
         where.OR = [
           { nombre: { contains: buscar, mode: 'insensitive' } },
           { nif: { contains: buscar, mode: 'insensitive' } },
-          { email: { contains: buscar, mode: 'insensitive' } }
+          { email: { contains: buscar, mode: 'insensitive' } },
         ];
       }
 
@@ -31,9 +31,9 @@ export class ClienteController {
           where,
           skip,
           take: limit,
-          orderBy: { nombre: 'asc' }
+          orderBy: { nombre: 'asc' },
         }),
-        prisma.cliente.count({ where })
+        prisma.cliente.count({ where }),
       ]);
 
       const totalPages = Math.ceil(total / limit);
@@ -46,8 +46,8 @@ export class ClienteController {
           totalItems: total,
           itemsPerPage: limit,
           hasNextPage: page < totalPages,
-          hasPreviousPage: page > 1
-        }
+          hasPreviousPage: page > 1,
+        },
       });
     } catch (error) {
       console.error('Error al obtener clientes:', error);
@@ -55,7 +55,7 @@ export class ClienteController {
         error: 'INTERNAL_SERVER_ERROR',
         message: 'Error al obtener los clientes',
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -73,12 +73,12 @@ export class ClienteController {
               numero: true,
               fecha: true,
               estado: true,
-              total: true
+              total: true,
             },
             orderBy: { fecha: 'desc' },
-            take: 10
-          }
-        }
+            take: 10,
+          },
+        },
       });
 
       if (!cliente) {
@@ -86,7 +86,7 @@ export class ClienteController {
           error: 'NOT_FOUND',
           message: 'Cliente no encontrado',
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
@@ -97,7 +97,7 @@ export class ClienteController {
         error: 'INTERNAL_SERVER_ERROR',
         message: 'Error al obtener el cliente',
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -113,7 +113,7 @@ export class ClienteController {
         codigoPostal,
         ciudad,
         provincia,
-        pais = 'España'
+        pais = 'España',
       } = req.body;
 
       // Validar NIF
@@ -121,19 +121,21 @@ export class ClienteController {
         return res.status(422).json({
           error: 'VALIDATION_ERROR',
           message: 'Los datos enviados no son válidos',
-          details: [{
-            field: 'nif',
-            message: 'El NIF/CIF no tiene un formato válido',
-            code: 'INVALID_NIF'
-          }],
+          details: [
+            {
+              field: 'nif',
+              message: 'El NIF/CIF no tiene un formato válido',
+              code: 'INVALID_NIF',
+            },
+          ],
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
       // Verificar que el NIF no existe
       const clienteExistente = await prisma.cliente.findFirst({
-        where: { nif }
+        where: { nif },
       });
 
       if (clienteExistente) {
@@ -141,7 +143,7 @@ export class ClienteController {
           error: 'CONFLICT',
           message: 'Ya existe un cliente con ese NIF',
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
@@ -158,13 +160,13 @@ export class ClienteController {
           ciudad,
           provincia,
           pais,
-          activo: true
-        }
+          activo: true,
+        },
       });
 
       res.status(201).json({
         data: cliente,
-        message: 'Cliente creado correctamente'
+        message: 'Cliente creado correctamente',
       });
     } catch (error) {
       console.error('Error al crear cliente:', error);
@@ -172,7 +174,7 @@ export class ClienteController {
         error: 'INTERNAL_SERVER_ERROR',
         message: 'Error al crear el cliente',
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -184,7 +186,7 @@ export class ClienteController {
 
       // Verificar que el cliente existe
       const clienteExistente = await prisma.cliente.findUnique({
-        where: { id }
+        where: { id },
       });
 
       if (!clienteExistente) {
@@ -192,7 +194,7 @@ export class ClienteController {
           error: 'NOT_FOUND',
           message: 'Cliente no encontrado',
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
@@ -202,22 +204,24 @@ export class ClienteController {
           return res.status(422).json({
             error: 'VALIDATION_ERROR',
             message: 'Los datos enviados no son válidos',
-            details: [{
-              field: 'nif',
-              message: 'El NIF/CIF no tiene un formato válido',
-              code: 'INVALID_NIF'
-            }],
+            details: [
+              {
+                field: 'nif',
+                message: 'El NIF/CIF no tiene un formato válido',
+                code: 'INVALID_NIF',
+              },
+            ],
             timestamp: new Date().toISOString(),
-            path: req.path
+            path: req.path,
           });
         }
 
         // Verificar que el NIF no existe
         const clienteConNIF = await prisma.cliente.findFirst({
-          where: { 
+          where: {
             nif: updateData.nif,
-            id: { not: id }
-          }
+            id: { not: id },
+          },
         });
 
         if (clienteConNIF) {
@@ -225,7 +229,7 @@ export class ClienteController {
             error: 'CONFLICT',
             message: 'Ya existe un cliente con ese NIF',
             timestamp: new Date().toISOString(),
-            path: req.path
+            path: req.path,
           });
         }
       }
@@ -235,13 +239,13 @@ export class ClienteController {
         where: { id },
         data: {
           ...updateData,
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       });
 
       res.json({
         data: cliente,
-        message: 'Cliente actualizado correctamente'
+        message: 'Cliente actualizado correctamente',
       });
     } catch (error) {
       console.error('Error al actualizar cliente:', error);
@@ -249,7 +253,7 @@ export class ClienteController {
         error: 'INTERNAL_SERVER_ERROR',
         message: 'Error al actualizar el cliente',
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -262,8 +266,8 @@ export class ClienteController {
       const cliente = await prisma.cliente.findUnique({
         where: { id },
         include: {
-          facturas: true
-        }
+          facturas: true,
+        },
       });
 
       if (!cliente) {
@@ -271,7 +275,7 @@ export class ClienteController {
           error: 'NOT_FOUND',
           message: 'Cliente no encontrado',
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
@@ -281,13 +285,13 @@ export class ClienteController {
           error: 'CONFLICT',
           message: 'No se puede eliminar un cliente con facturas asociadas',
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
       // Eliminar cliente
       await prisma.cliente.delete({
-        where: { id }
+        where: { id },
       });
 
       res.status(204).send();
@@ -297,7 +301,7 @@ export class ClienteController {
         error: 'INTERNAL_SERVER_ERROR',
         message: 'Error al eliminar el cliente',
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }

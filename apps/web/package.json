@@ -14,6 +14,7 @@
     "clean": "rm -rf .next dist"
   },
   "dependencies": {
+    "@facturacion/types": "workspace:*",
     "@headlessui/react": "^2.2.0",
     "@heroicons/react": "^2.1.5",
     "@hookform/resolvers": "^3.9.1",

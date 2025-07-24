@@ -45,17 +45,16 @@ export class WebhookIPWhitelistMiddleware {
    * Obtiene IPs permitidas desde configuración
    */
   private getAllowedIPs(): string[] {
-    const allowedIPs = process.env.WEBHOOK_ALLOWED_IPS?.split(',') || [];
+    // Configuración simplificada para desarrollo local
+    const allowedIPs: string[] = [];
 
-    // IPs conocidas de AEAT (sandbox y producción)
-    const aeatIPs = [
-      '193.146.16.0/20', // Rango AEAT sandbox
-      '193.146.32.0/19', // Rango AEAT producción
+    // Solo localhost para desarrollo
+    const basicIPs = [
       '127.0.0.1', // Localhost para desarrollo
       '::1', // IPv6 localhost
     ];
 
-    return [...allowedIPs, ...aeatIPs];
+    return [...allowedIPs, ...basicIPs];
   }
 
   /**

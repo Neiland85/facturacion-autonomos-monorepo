@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import { render, screen } from '@testing-library/react';
 <<<<<<< HEAD
+=======
+import '@testing-library/jest-dom';
+import { render, screen } from '@testing-library/react';
+>>>>>>> origin/develop
 import userEvent from '@testing-library/user-event';
 
 // Componente de prueba simple
@@ -41,6 +46,7 @@ describe('Basic Tests', () => {
     expect(button).toBeInTheDocument();
   });
 });
+<<<<<<< HEAD
 =======
 import '@testing-library/jest-dom';
 import React from 'react';
@@ -52,3 +58,5 @@ test('renders learn react link', () => {
   expect(linkElement).toBeInTheDocument();
 });
 >>>>>>> develop
+=======
+>>>>>>> origin/develop

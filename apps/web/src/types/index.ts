@@ -1,11 +1,20 @@
-// Global types for the application
-export interface User {
-  id: string;
-  email: string;
-  name: string;
-  role?: 'admin' | 'user';
+// Re-export shared types from the types package
+export * from '@facturacion/types';
+export type { Invoice, InvoiceStats } from '@facturacion/types';
+
+// Additional frontend-specific types can be defined here if needed
+export interface UIState {
+  loading: boolean;
+  error: string | null;
 }
 
+export interface DashboardState extends UIState {
+  stats: InvoiceStats | null;
+  recentInvoices: Invoice[];
+}
+
+// Legacy type definitions - these should be migrated to @facturacion/types
+// Keeping temporarily for backward compatibility
 export interface Company {
   name: string;
   taxId: string;
@@ -15,84 +24,4 @@ export interface Company {
   country: string;
   email?: string;
   phone?: string;
-}
-
-export interface InvoiceItem {
-  description: string;
-  quantity: number;
-  unitPrice: number;
-  discount?: number;
-  taxType?: 'iva_21' | 'iva_10' | 'iva_4' | 'iva_0' | 'exento';
-  taxRate?: number;
-  retentionRate?: number;
-
-  // Calculated fields
-  subtotal?: number;
-  taxAmount?: number;
-  retentionAmount?: number;
-  total?: number;
-}
-
-export interface Invoice {
-  id?: string;
-  number?: string;
-  series?: string;
-  status: 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
-  issueDate: Date | string;
-  dueDate?: Date | string;
-
-  issuer: Company;
-  client: Company;
-  items: InvoiceItem[];
-
-  // Calculated totals
-  subtotal?: number;
-  totalTax?: number;
-  totalRetention?: number;
-  total?: number;
-
-  // Optional fields
-  notes?: string;
-  paymentTerms?: string;
-  paymentMethod?: string;
-
-  // Metadata
-  createdAt?: Date | string;
-  updatedAt?: Date | string;
-}
-
-export interface InvoiceFilters {
-  status?: string;
-  dateFrom?: Date;
-  dateTo?: Date;
-  series?: string;
-  search?: string;
-  page?: number;
-  limit?: number;
-}
-
-export interface ApiResponse<T> {
-  success: boolean;
-  data?: T;
-  error?: string;
-  message?: string;
-}
-
-export interface PaginatedResponse<T> {
-  data: T[];
-  pagination: {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-  };
-}
-
-export interface InvoiceStats {
-  totalInvoices: number;
-  totalAmount: number;
-  paidAmount: number;
-  pendingAmount: number;
-  overdueAmount: number;
-  statusBreakdown: Record<string, number>;
 }

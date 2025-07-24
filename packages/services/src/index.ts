@@ -3,7 +3,11 @@
  * @version 1.0.0
  */
 
+<<<<<<< HEAD
 import { Client, Invoice, User } from '@facturacion/core';
+=======
+import type { Client, Invoice, User } from '@facturacion/core';
+>>>>>>> origin/develop
 
 // Configuración base para APIs
 export interface ApiConfig {
@@ -14,7 +18,7 @@ export interface ApiConfig {
 
 // Cliente HTTP base
 export class HttpClient {
-  private config: ApiConfig;
+  private readonly config: ApiConfig;
 
   constructor(config: ApiConfig) {
     this.config = config;
@@ -26,8 +30,8 @@ export class HttpClient {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        ...this.config.headers
-      }
+        ...this.config.headers,
+      },
     });
 
     if (!response.ok) {
@@ -37,15 +41,15 @@ export class HttpClient {
     return response.json();
   }
 
-  async post<T>(endpoint: string, data: any): Promise<T> {
+  async post<T>(endpoint: string, data: unknown): Promise<T> {
     const url = `${this.config.baseUrl}${endpoint}`;
     const response = await fetch(url, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...this.config.headers
+        ...this.config.headers,
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -55,15 +59,15 @@ export class HttpClient {
     return response.json();
   }
 
-  async put<T>(endpoint: string, data: any): Promise<T> {
+  async put<T>(endpoint: string, data: unknown): Promise<T> {
     const url = `${this.config.baseUrl}${endpoint}`;
     const response = await fetch(url, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        ...this.config.headers
+        ...this.config.headers,
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -79,8 +83,8 @@ export class HttpClient {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        ...this.config.headers
-      }
+        ...this.config.headers,
+      },
     });
 
     if (!response.ok) {
@@ -93,17 +97,22 @@ export class HttpClient {
 
 // Servicio de autenticación
 export class AuthService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor(config: ApiConfig) {
     this.httpClient = new HttpClient(config);
   }
 
-  async login(email: string, password: string): Promise<{ token: string; user: User }> {
+  async login(
+    email: string,
+    password: string
+  ): Promise<{ token: string; user: User }> {
     return this.httpClient.post('/auth/login', { email, password });
   }
 
-  async register(userData: Partial<User>): Promise<{ token: string; user: User }> {
+  async register(
+    userData: Partial<User>
+  ): Promise<{ token: string; user: User }> {
     return this.httpClient.post('/auth/register', userData);
   }
 
@@ -118,7 +127,7 @@ export class AuthService {
 
 // Servicio de facturas
 export class InvoiceService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor(config: ApiConfig) {
     this.httpClient = new HttpClient(config);
@@ -136,7 +145,10 @@ export class InvoiceService {
     return this.httpClient.post('/api/facturas', invoiceData);
   }
 
-  async updateInvoice(id: string, invoiceData: Partial<Invoice>): Promise<Invoice> {
+  async updateInvoice(
+    id: string,
+    invoiceData: Partial<Invoice>
+  ): Promise<Invoice> {
     return this.httpClient.put(`/api/facturas/${id}`, invoiceData);
   }
 
@@ -152,7 +164,7 @@ export class InvoiceService {
 
 // Servicio de clientes
 export class ClientService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor(config: ApiConfig) {
     this.httpClient = new HttpClient(config);
@@ -181,7 +193,7 @@ export class ClientService {
 
 // Servicio de cálculos fiscales
 export class TaxCalculatorService {
-  private httpClient: HttpClient;
+  private readonly httpClient: HttpClient;
 
   constructor(config: ApiConfig) {
     this.httpClient = new HttpClient(config);
@@ -204,18 +216,20 @@ export class TaxCalculatorService {
     return this.httpClient.post('/api/calculate-tax', data);
   }
 
-  async getTaxTypes(): Promise<Array<{
-    id: string;
-    name: string;
-    description: string;
-  }>> {
+  async getTaxTypes(): Promise<
+    Array<{
+      id: string;
+      name: string;
+      description: string;
+    }>
+  > {
     return this.httpClient.get('/api/tax-types');
   }
 }
 
 // Factory para crear servicios con configuración
 export class ServiceFactory {
-  private config: ApiConfig;
+  private readonly config: ApiConfig;
 
   constructor(config: ApiConfig) {
     this.config = config;
@@ -243,19 +257,22 @@ export const DEFAULT_API_CONFIG: ApiConfig = {
   baseUrl: process.env.API_BASE_URL || 'http://localhost:3001',
   timeout: 30000,
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 };
 
 export const TAX_CALCULATOR_CONFIG: ApiConfig = {
   baseUrl: process.env.TAX_CALCULATOR_URL || 'http://localhost:3002',
   timeout: 30000,
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 };
+
+// Versión del paquete
+export const servicesVersion = '1.0.0';
 
 export default {
   HttpClient,
@@ -265,9 +282,13 @@ export default {
   TaxCalculatorService,
   ServiceFactory,
   DEFAULT_API_CONFIG,
-  TAX_CALCULATOR_CONFIG
+  TAX_CALCULATOR_CONFIG,
+  servicesVersion,
 };
+<<<<<<< HEAD
 // Placeholder for services
 export const servicesVersion = "1.0.0";
 
 const a = 1; // Selecciona la versión correcta
+=======
+>>>>>>> origin/develop

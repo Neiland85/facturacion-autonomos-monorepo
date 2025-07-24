@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/develop
 name: 🚀 Netlify Deployment
 
 on:
@@ -46,6 +49,7 @@ jobs:
         env:
           NODE_ENV: production
           SWC_BINARY_TARGET: "x86_64-unknown-linux-gnu"
+<<<<<<< HEAD
 =======
 name: Netlify Deploy
 
@@ -82,3 +86,5 @@ jobs:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
 >>>>>>> develop
+=======
+>>>>>>> origin/develop

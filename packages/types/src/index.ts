@@ -130,20 +130,20 @@ export interface RegisterRequest {
 
 // Tipos de cálculos fiscales
 export interface TaxCalculationRequest {
-  income: number;
-  expenses: number;
-  taxYear: number;
-  taxpayerType: 'individual' | 'company';
+  amount: number;
+  vatRate: number;
+  retentionRate?: number;
+  taxYear?: number;
+  taxpayerType?: 'individual' | 'company';
 }
 
 export interface TaxCalculationResponse {
-  grossIncome: number;
-  netIncome: number;
-  irpf: number;
-  vat: number;
-  socialSecurity: number;
-  totalTax: number;
-  netAfterTax: number;
+  baseAmount: number;
+  vatRate: number;
+  vatAmount: number;
+  totalAmount: number;
+  retentionAmount: number;
+  netAmount: number;
 }
 
 export interface TaxType {
@@ -278,29 +278,39 @@ export interface ReportData {
   taxAmount: number;
 }
 
+// Tipos de estadísticas de facturas
+export interface InvoiceStats {
+  totalInvoices: number;
+  totalAmount: number;
+  paidAmount: number;
+  pendingAmount: number;
+  overdueAmount: number;
+  statusBreakdown: Record<string, number>;
+}
+
 // Constantes de tipos
 export const INVOICE_STATUS = {
   DRAFT: 'draft',
   SENT: 'sent',
   PAID: 'paid',
   OVERDUE: 'overdue',
-  CANCELLED: 'cancelled'
+  CANCELLED: 'cancelled',
 } as const;
 
 export const USER_ROLES = {
   ADMIN: 'admin',
-  USER: 'user'
+  USER: 'user',
 } as const;
 
 export const TAXPAYER_TYPES = {
   INDIVIDUAL: 'individual',
-  COMPANY: 'company'
+  COMPANY: 'company',
 } as const;
 
 export const VAT_RATES = {
   GENERAL: 0.21,
-  REDUCED: 0.10,
-  SUPER_REDUCED: 0.04
+  REDUCED: 0.1,
+  SUPER_REDUCED: 0.04,
 } as const;
 
 // Tipos de utilidades
@@ -317,5 +327,5 @@ export default {
   INVOICE_STATUS,
   USER_ROLES,
   TAXPAYER_TYPES,
-  VAT_RATES
+  VAT_RATES,
 };

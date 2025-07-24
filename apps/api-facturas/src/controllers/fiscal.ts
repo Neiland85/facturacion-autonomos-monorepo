@@ -12,7 +12,7 @@ export class FiscalController {
           error: 'BAD_REQUEST',
           message: 'Base imponible requerida y debe ser mayor que 0',
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
@@ -21,11 +21,11 @@ export class FiscalController {
         baseImponible,
         tipoIVA: tipoIVA || 21,
         tipoIRPF: tipoIRPF || 0,
-        regimenEspecial: regimenEspecial || 'general'
+        regimenEspecial: regimenEspecial || 'general',
       });
 
       res.json({
-        data: resultado
+        data: resultado,
       });
     } catch (error) {
       console.error('Error al calcular impuestos:', error);
@@ -33,7 +33,7 @@ export class FiscalController {
         error: 'INTERNAL_SERVER_ERROR',
         message: 'Error al calcular los impuestos',
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -44,11 +44,11 @@ export class FiscalController {
         { tipo: 0, descripcion: 'Exento', vigente: true },
         { tipo: 4, descripcion: 'Superreducido', vigente: true },
         { tipo: 10, descripcion: 'Reducido', vigente: true },
-        { tipo: 21, descripcion: 'General', vigente: true }
+        { tipo: 21, descripcion: 'General', vigente: true },
       ];
 
       res.json({
-        data: tiposIVA
+        data: tiposIVA,
       });
     } catch (error) {
       console.error('Error al obtener tipos de IVA:', error);
@@ -56,7 +56,7 @@ export class FiscalController {
         error: 'INTERNAL_SERVER_ERROR',
         message: 'Error al obtener los tipos de IVA',
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -70,7 +70,7 @@ export class FiscalController {
           error: 'BAD_REQUEST',
           message: 'NIF requerido',
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
@@ -93,7 +93,7 @@ export class FiscalController {
       res.json({
         valid: resultado,
         tipo,
-        message: mensaje
+        message: mensaje,
       });
     } catch (error) {
       console.error('Error al validar NIF:', error);
@@ -101,7 +101,7 @@ export class FiscalController {
         error: 'INTERNAL_SERVER_ERROR',
         message: 'Error al validar el NIF',
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
