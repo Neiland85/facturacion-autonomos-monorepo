@@ -22,8 +22,9 @@ export default function DashboardPage() {
 
         // Load recent invoices
         const invoicesResponse = await invoiceService.getInvoices({ limit: 5 });
-        setRecentInvoices(invoicesResponse.invoices || []);
+        setRecentInvoices(invoicesResponse.invoices ?? []);
       } catch (error) {
+        // eslint-disable-next-line no-console
         console.error('Error loading dashboard data:', error);
       } finally {
         setLoading(false);
@@ -216,7 +217,7 @@ export default function DashboardPage() {
                           {getStatusBadge(invoice.status)}
                         </td>
                         <td className="table-cell">
-                          {formatCurrency(invoice.total || 0)}
+                          {formatCurrency(invoice.total ?? 0)}
                         </td>
                         <td className="table-cell">
                           <button className="text-blue-600 hover:text-blue-900 mr-3">

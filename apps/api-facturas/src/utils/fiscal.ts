@@ -33,7 +33,7 @@ function validarNIFPersona(nif: string): boolean {
   const letras = 'TRWAGMYFPDXBNJZSQVHLCKE';
   const numero = parseInt(nif.substring(0, 8), 10);
   const letra = nif.charAt(8);
-  
+
   return letras.charAt(numero % 23) === letra;
 }
 
@@ -46,18 +46,36 @@ function validarCIF(cif: string): boolean {
   const control = cif.charAt(8);
 
   // Códigos de organización válidos
-  const codigosValidos = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'J', 'N', 'P', 'Q', 'R', 'S', 'U', 'V', 'W'];
-  
+  const codigosValidos = [
+    'A',
+    'B',
+    'C',
+    'D',
+    'E',
+    'F',
+    'G',
+    'H',
+    'J',
+    'N',
+    'P',
+    'Q',
+    'R',
+    'S',
+    'U',
+    'V',
+    'W',
+  ];
+
   if (!codigosValidos.includes(codigoOrganizacion)) {
     return false;
   }
 
   // Calcular dígito de control
   let suma = 0;
-  
+
   for (let i = 0; i < 7; i++) {
     const digito = parseInt(numero.charAt(i), 10);
-    
+
     if (i % 2 === 0) {
       // Posiciones pares: multiplicar por 2
       const multiplicacion = digito * 2;
@@ -85,7 +103,7 @@ export const TIPOS_IVA = {
   EXENTO: 0,
   SUPERREDUCIDO: 4,
   REDUCIDO: 10,
-  GENERAL: 21
+  GENERAL: 21,
 } as const;
 
 /**
@@ -94,7 +112,7 @@ export const TIPOS_IVA = {
 export const TIPOS_IRPF = {
   EXENTO: 0,
   PROFESIONAL: 15,
-  ACTIVIDAD_ECONOMICA: 1
+  ACTIVIDAD_ECONOMICA: 1,
 } as const;
 
 /**
@@ -119,7 +137,7 @@ export function formatearMoneda(cantidad: number): string {
     style: 'currency',
     currency: 'EUR',
     minimumFractionDigits: 2,
-    maximumFractionDigits: 2
+    maximumFractionDigits: 2,
   }).format(cantidad);
 }
 
@@ -130,14 +148,17 @@ export function formatearFecha(fecha: Date): string {
   return new Intl.DateTimeFormat('es-ES', {
     year: 'numeric',
     month: '2-digit',
-    day: '2-digit'
+    day: '2-digit',
   }).format(fecha);
 }
 
 /**
  * Calcular fecha de vencimiento (30 días por defecto)
  */
-export function calcularFechaVencimiento(fechaEmision: Date, dias: number = 30): Date {
+export function calcularFechaVencimiento(
+  fechaEmision: Date,
+  dias: number = 30
+): Date {
   const fechaVencimiento = new Date(fechaEmision);
   fechaVencimiento.setDate(fechaVencimiento.getDate() + dias);
   return fechaVencimiento;

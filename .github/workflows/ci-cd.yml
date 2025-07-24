@@ -1,0 +1,43 @@
+name: 🚀 Netlify CI/CD
+
+on:
+  push:
+    branches: [main, fix/netlify-deployment]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-and-build:
+    name: 🧪 Test & Build for Netlify
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 📁 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20.x
+
+      - name: ⚙️ Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare yarn@4.9.2 --activate
+
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
+      - name: 🔍 Lint code
+        run: yarn workspace @facturacion/web lint
+
+      - name: 🧪 Run tests
+        run: yarn workspace @facturacion/web test:ci
+        env:
+          NODE_OPTIONS: "--experimental-vm-modules"
+
+      - name: 🏗️ Build application
+        run: yarn workspace @facturacion/web build
+
+      - name: 🎉 Build success notification
+        run: echo "✅ Build completed successfully for Netlify deployment!"

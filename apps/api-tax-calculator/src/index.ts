@@ -1,5 +1,4 @@
 import cors from 'cors';
-<<<<<<< HEAD
 import 'dotenv/config';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
@@ -10,16 +9,10 @@ import { requestLogger } from './middleware/logger.middleware';
 import { configuracionFiscalRoutes } from './routes/configuracion-fiscal.routes';
 import { quarterClosureRoutes } from './routes/quarter-closure.routes';
 import { taxRoutes } from './routes/tax.routes';
-import { webhookRoutes } from './routes/webhook.routes';
-=======
-import express from 'express';
-import helmet from 'helmet';
->>>>>>> dev
 
 const app = express();
 const PORT = process.env.PORT || 3002;
 
-<<<<<<< HEAD
 // Inicializar cron jobs
 const cronManager = new CronJobManager();
 
@@ -27,7 +20,9 @@ const cronManager = new CronJobManager();
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || ['http://localhost:3000'],
+    origin: process.env.ALLOWED_ORIGINS?.split(',') || [
+      'http://localhost:3000',
+    ],
     credentials: true,
   })
 );
@@ -61,7 +56,6 @@ app.get('/health', (_req, res) => {
 app.use('/api/tax', taxRoutes);
 app.use('/api/quarter-closure', quarterClosureRoutes);
 app.use('/api/configuracion-fiscal', configuracionFiscalRoutes);
-app.use('/api/webhooks', webhookRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
@@ -109,16 +103,6 @@ process.on('SIGINT', async () => {
     console.log('Servidor cerrado correctamente');
     process.exit(0);
   });
-=======
-app.use(helmet());
-app.use(cors());
-app.use(express.json());
-
-app.get('/health', (req, res) => {
-  res.json({ status: 'OK', service: 'tax-calculator-api' });
 });
 
-app.listen(PORT, () => {
-  console.log(`🧮 API Tax Calculator corriendo en puerto ${PORT}`);
->>>>>>> dev
-});
+const c = 3; // Selecciona la versión correcta

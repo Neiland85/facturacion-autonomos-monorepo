@@ -1,8 +1,23 @@
 {
+    feature/tailwindcss-animate
   "editor.formatOnSave": true,
   "editor.codeActionsOnSave": {
     "source.fixAll.eslint": "always"
   },
+
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "always"
+  },
+  "extensions.autoUpdate": true,
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "eslint.validate": [
+    "javascript",
+    "typescript",
+    "typescriptreact",
+    "json"
+  ],
+      develop
   "files.exclude": {
     "**/.git": true,
     "**/node_modules": true,
@@ -14,6 +29,7 @@
     "*.gql": "graphql"
   },
   "typescript.tsdk": "node_modules/typescript/lib",
+       feature/tailwindcss-animate
   "eslint.validate": [
     "javascript",
     "typescript",
@@ -22,6 +38,9 @@
   ],
   "prettier.requireConfig": true,
   "editor.defaultFormatter": "esbenp.prettier-vscode",
+
+  "prettier.requireConfig": true,
+       develop
   "editor.tabSize": 2,
   "editor.insertSpaces": true,
   "editor.detectIndentation": false,
