@@ -1,11 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuración optimizada para Netlify
+  // Configuración optimizada para Railway
   output: 'standalone',
 
-  // Configuración de imágenes para Netlify
+  // Configuración de imágenes para Railway
   images: {
-    unoptimized: true, // Netlify maneja la optimización de imágenes
+    unoptimized: false, // Railway puede manejar optimización de imágenes
   },
 
   // Variables de entorno públicas
@@ -18,7 +18,7 @@ const nextConfig = {
 
   // Configuración de webpack personalizada
   webpack: (config, { dev, isServer }) => {
-    // Optimizaciones para Netlify
+    // Optimizaciones para Railway
     if (!dev && !isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,

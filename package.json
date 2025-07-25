@@ -47,7 +47,12 @@
     "db:migrate:test": "DATABASE_URL=postgresql://postgres:postgres_test@localhost:5432/facturacion_test ./db/run-migrations.sh",
     "format": "turbo run format",
     "format:check": "turbo run format:check",
-    "audit": "npm audit"
+    "audit": "npm audit",
+    "railway:setup": "./setup-railway.sh",
+    "railway:deploy": "railway up",
+    "railway:logs": "railway logs",
+    "railway:db": "railway connect",
+    "railway:build": "docker build -f Dockerfile.railway -t facturacion-autonomos ."
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",

@@ -13,6 +13,8 @@ import morgan from 'morgan';
 import { errorHandler } from './middleware/error.middleware';
 import { requestLogger } from './middleware/logger.middleware';
 import { authRoutes } from './routes/auth.routes';
+import { healthRoutes } from './routes/health.routes';
+import { userRoutes } from './routes/user.routes';
 
 const app = express();
 const PORT = process.env.PORT || 3003;
@@ -23,9 +25,9 @@ const redis = new Redis({
   port: parseInt(process.env.REDIS_PORT || '6379'),
   password: process.env.REDIS_PASSWORD,
   db: 0,
-  retryDelayOnFailover: 100,
   enableOfflineQueue: false,
   maxRetriesPerRequest: 3,
+  lazyConnect: true,
 });
 
 // Store de sesiones Redis
@@ -157,14 +159,16 @@ app.get('/health', (req, res) => {
     timestamp: new Date().toISOString(),
     version: process.env.npm_package_version || '1.0.0',
     session: {
-      connected: redisStore.client?.status === 'ready',
+      connected: redis.status === 'ready',
       store: 'redis'
     }
   });
 });
 
 // Rutas
+app.use('/health', healthRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {

@@ -1,14 +1,10 @@
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> origin/develop
 name: 🚀 Netlify Deployment
 
 on:
   push:
-    branches: [main, develop, fix/*]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 env:
   NODE_VERSION: '20.x'
@@ -44,47 +40,51 @@ jobs:
       - name: 🧪 Test
         run: yarn workspace @facturacion/web test:ci
 
-      - name: 🏗️ Build (Critical for Netlify)
+      - name: 🏗️ Build for Netlify
         run: yarn workspace @facturacion/web build
         env:
           NODE_ENV: production
           SWC_BINARY_TARGET: "x86_64-unknown-linux-gnu"
-<<<<<<< HEAD
-=======
-name: Netlify Deploy
 
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
+  deploy-to-netlify:
+    name: 🚀 Deploy to Netlify
     runs-on: ubuntu-latest
-
+    needs: test-and-build
+    if: github.ref == 'refs/heads/main' || github.ref == 'refs/heads/develop'
+    
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: ${{ env.NODE_VERSION }}
           cache: 'yarn'
+          cache-dependency-path: yarn.lock
 
-      - name: Install dependencies
+      - name: 🎯 Enable Corepack and install correct Yarn version
         run: |
           corepack enable
           corepack prepare yarn@4.9.2 --activate
-          yarn install --frozen-lockfile
+          yarn --version
 
-      - name: Build and deploy to Netlify
+      - name: 📦 Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: 🏗️ Build for production
+        run: yarn workspace @facturacion/web build
+        env:
+          NODE_ENV: production
+          SWC_BINARY_TARGET: "x86_64-unknown-linux-gnu"
+
+      - name: 🚀 Deploy to Netlify
         run: |
-          yarn workspace @facturacion/web build
-          yarn netlify deploy --prod
+          if [ "${{ github.ref }}" = "refs/heads/main" ]; then
+            yarn netlify deploy --prod --dir=apps/web/dist
+          else
+            yarn netlify deploy --dir=apps/web/dist
+          fi
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
->>>>>>> develop
-=======
->>>>>>> origin/develop

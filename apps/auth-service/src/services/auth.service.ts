@@ -247,4 +247,149 @@ export class AuthService {
   sanitizeInput(input: string): string {
     return input.trim().toLowerCase();
   }
+
+  /**
+   * Actualizar usuario
+   */
+  async updateUser(userId: string, data: { name?: string; email?: string }): Promise<User> {
+    try {
+      const user = await this.findUserById(userId);
+      if (!user) {
+        throw new Error('Usuario no encontrado');
+      }
+
+      // Actualizar campos
+      if (data.name !== undefined) {
+        user.name = data.name;
+      }
+      if (data.email !== undefined) {
+        // Actualizar índice de email si cambió
+        if (data.email !== user.email) {
+          await redis.del(`user:email:${user.email}`);
+          await redis.setex(`user:email:${data.email}`, 86400, userId);
+        }
+        user.email = data.email;
+      }
+
+      user.updatedAt = new Date();
+
+      await redis.setex(`user:${userId}`, 86400, JSON.stringify(user));
+
+      return user;
+    } catch (error) {
+      console.error('Error actualizando usuario:', error);
+      throw new Error('Error al actualizar usuario');
+    }
+  }
+
+  /**
+   * Obtener sesiones activas del usuario
+   */
+  async getUserActiveSessions(userId: string): Promise<any[]> {
+    try {
+      const sessionKeys = await redis.keys(`facturacion_sess:*`);
+      const sessions = [];
+
+      for (const sessionKey of sessionKeys) {
+        const sessionData = await redis.get(sessionKey);
+        if (sessionData) {
+          try {
+            const session = JSON.parse(sessionData);
+            if (session.userId === userId) {
+              sessions.push({
+                id: sessionKey.replace('facturacion_sess:', ''),
+                userId: session.userId,
+                createdAt: session.createdAt || new Date().toISOString(),
+                lastActivity: session.lastActivity || new Date().toISOString(),
+                ip: session.ip || 'unknown',
+                userAgent: session.userAgent || 'unknown'
+              });
+            }
+          } catch (error) {
+            console.error('Error parsing session data:', error);
+          }
+        }
+      }
+
+      return sessions;
+    } catch (error) {
+      console.error('Error obteniendo sesiones activas:', error);
+      throw new Error('Error al obtener sesiones activas');
+    }
+  }
+
+  /**
+   * Revocar sesión específica de usuario
+   */
+  async revokeUserSession(userId: string, sessionId: string): Promise<boolean> {
+    try {
+      const sessionKey = `facturacion_sess:${sessionId}`;
+      const sessionData = await redis.get(sessionKey);
+      
+      if (!sessionData) {
+        return false;
+      }
+
+      const session = JSON.parse(sessionData);
+      if (session.userId !== userId) {
+        return false;
+      }
+
+      await redis.del(sessionKey);
+      return true;
+    } catch (error) {
+      console.error('Error revocando sesión:', error);
+      throw new Error('Error al revocar sesión');
+    }
+  }
+
+  /**
+   * Listar usuarios con paginación (solo admin)
+   */
+  async listUsers(page: number = 1, limit: number = 10): Promise<{
+    users: User[];
+    pagination: {
+      page: number;
+      limit: number;
+      total: number;
+      totalPages: number;
+    };
+  }> {
+    try {
+      // En una implementación real, esto sería una consulta a la base de datos
+      // Por ahora, simulamos con Redis
+      const userKeys = await redis.keys('user:*');
+      const userIds = userKeys
+        .filter(key => !key.includes('email:'))
+        .map(key => key.replace('user:', ''));
+
+      const total = userIds.length;
+      const totalPages = Math.ceil(total / limit);
+      const startIndex = (page - 1) * limit;
+      const endIndex = startIndex + limit;
+
+      const paginatedUserIds = userIds.slice(startIndex, endIndex);
+      const users: User[] = [];
+
+      for (const userId of paginatedUserIds) {
+        const user = await this.findUserById(userId);
+        if (user) {
+          users.push(user);
+        }
+      }
+
+      return {
+        users,
+        pagination: {
+          page,
+          limit,
+          total,
+          totalPages
+        }
+      };
+    } catch (error) {
+      console.error('Error listando usuarios:', error);
+      throw new Error('Error al listar usuarios');
+    }
+  }
 }

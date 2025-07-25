@@ -1,28 +1,28 @@
-import express from 'express';
-import cors from 'cors';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import compression from 'compression';
 import { prisma } from '@facturacion/database';
-import { rateLimit } from 'express-rate-limit';
+import compression from 'compression';
+import express from 'express';
+import morgan from 'morgan';
 import facturasRoutes from './routes/facturas-simple';
+
+// Importar middleware de seguridad completa
+const { setupCompleteSecurity } = require('../../../packages/security/src/complete-security');
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware de seguridad
-app.use(helmet());
-app.use(cors());
+// 🛡️ Configuración de seguridad completa con CSRF + Error Handling
+setupCompleteSecurity(app, {
+  enableCSRF: true,
+  strictCSRF: process.env.NODE_ENV === 'production',
+  enableErrorHandling: true,
+  enableRequestLogging: true,
+  customCSRFIgnoreRoutes: ['/api/public'],
+  requestTimeoutMs: 30000
+});
+
+// Middleware adicional
 app.use(compression());
 app.use(morgan('combined'));
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // máximo 100 requests por ventana
-  message: 'Too many requests from this IP, please try again later.',
-});
-app.use('/api/', limiter);
 
 // Middleware para parsing JSON
 app.use(express.json({ limit: '10mb' }));

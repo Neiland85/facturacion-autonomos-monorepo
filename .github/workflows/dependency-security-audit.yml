@@ -1,0 +1,285 @@
+name: 🔐 Security Dependency Audit
+
+on:
+  schedule:
+    # Ejecutar todos los lunes a las 8:00 AM UTC
+    - cron: '0 8 * * 1'
+  push:
+    branches: [main, develop]
+    paths:
+      - 'package*.json'
+      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
+      - '**/package*.json'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'package*.json'
+      - 'yarn.lock'
+      - 'pnpm-lock.yaml'
+      - '**/package*.json'
+  workflow_dispatch:
+    inputs:
+      force_update:
+        description: 'Forzar actualización de dependencias'
+        required: false
+        default: false
+        type: boolean
+
+jobs:
+  dependency-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    permissions:
+      contents: read
+      security-events: write
+      issues: write
+      pull-requests: write
+
+    steps:
+      - name: 📥 Checkout código
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Instalar dependencias
+        run: npm ci
+
+      - name: 🔍 Ejecutar auditoría de seguridad
+        run: |
+          chmod +x scripts/dependency-security-audit.sh
+          ./scripts/dependency-security-audit.sh
+        continue-on-error: true
+
+      - name: 📊 Ejecutar npm audit
+        id: npm-audit
+        run: |
+          npm audit --audit-level=moderate --json > audit-results.json || true
+          echo "audit-results<<EOF" >> $GITHUB_OUTPUT
+          cat audit-results.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+        continue-on-error: true
+
+      - name: 📋 Verificar dependencias desactualizadas
+        id: outdated
+        run: |
+          npm outdated --json > outdated.json || true
+          echo "outdated-results<<EOF" >> $GITHUB_OUTPUT
+          cat outdated.json >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: 🔒 Verificar paquetes de alto riesgo
+        id: risky-packages
+        run: |
+          echo "Verificando paquetes de alto riesgo..."
+          risky_found=""
+
+          risky_packages=("xml-crypto" "node-forge" "tesseract.js" "request" "moment")
+
+          for package in "${risky_packages[@]}"; do
+            if npm list "$package" >/dev/null 2>&1; then
+              version=$(npm list "$package" --depth=0 2>/dev/null | grep "$package" | sed 's/.*@//' | sed 's/ .*//' || echo "unknown")
+              risky_found="${risky_found}$package@$version "
+            fi
+          done
+
+          echo "risky-packages=$risky_found" >> $GITHUB_OUTPUT
+
+      - name: 📄 Generar reporte de seguridad
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+
+            // Leer resultados de auditoría
+            let auditResults = {};
+            try {
+              const auditData = fs.readFileSync('audit-results.json', 'utf8');
+              auditResults = JSON.parse(auditData);
+            } catch (e) {
+              console.log('No se pudieron leer los resultados de auditoría');
+            }
+
+            // Leer dependencias desactualizadas
+            let outdatedResults = {};
+            try {
+              const outdatedData = fs.readFileSync('outdated.json', 'utf8');
+              outdatedResults = JSON.parse(outdatedData);
+            } catch (e) {
+              console.log('No se pudieron leer las dependencias desactualizadas');
+            }
+
+            // Contar vulnerabilidades
+            const vulns = auditResults.metadata?.vulnerabilities || {};
+            const totalVulns = vulns.total || 0;
+            const criticalVulns = vulns.critical || 0;
+            const highVulns = vulns.high || 0;
+            const moderateVulns = vulns.moderate || 0;
+            const lowVulns = vulns.low || 0;
+
+            // Contar paquetes desactualizados
+            const outdatedCount = Object.keys(outdatedResults).length;
+
+            // Paquetes de riesgo
+            const riskyPackages = '${{ steps.risky-packages.outputs.risky-packages }}';
+
+            // Generar reporte
+            const report = `# 🔐 Reporte de Auditoría de Seguridad
+
+            **Fecha:** ${new Date().toISOString()}
+            **Commit:** ${context.sha.substring(0, 8)}
+            **Branch:** ${context.ref.replace('refs/heads/', '')}
+
+            ## 📊 Resumen de Vulnerabilidades
+
+            | Severidad | Cantidad |
+            |-----------|----------|
+            | 🚨 Críticas | ${criticalVulns} |
+            | ⚠️ Altas | ${highVulns} |
+            | 📊 Moderadas | ${moderateVulns} |
+            | ℹ️ Bajas | ${lowVulns} |
+            | **Total** | **${totalVulns}** |
+
+            ## 📦 Estado de Dependencias
+
+            - **Paquetes desactualizados:** ${outdatedCount}
+            - **Paquetes de alto riesgo detectados:** ${riskyPackages || 'Ninguno'}
+
+            ## 🎯 Puntuación de Seguridad
+
+            ${(() => {
+              const score = Math.max(0, 100 - (criticalVulns * 25) - (highVulns * 10) - (moderateVulns * 5) - (lowVulns * 1));
+              if (score >= 90) return `🟢 **${score}/100** - Excelente estado de seguridad`;
+              if (score >= 70) return `🟡 **${score}/100** - Buen estado, mejoras recomendadas`;
+              if (score >= 50) return `🟠 **${score}/100** - Estado regular, se requieren mejoras`;
+              return `🔴 **${score}/100** - Estado crítico, acción inmediata requerida`;
+            })()}
+
+            ## 💡 Recomendaciones
+
+            ${totalVulns > 0 ? `
+            ### 🚨 Vulnerabilidades Detectadas
+            - Ejecutar: \`npm audit fix\`
+            - Revisar manualmente vulnerabilidades críticas y altas
+            - Considerar actualizar dependencias principales
+            ` : '✅ No se detectaron vulnerabilidades'}
+
+            ${outdatedCount > 5 ? `
+            ### 📦 Dependencias Desactualizadas
+            - Ejecutar: \`npm update\`
+            - Revisar: \`npm outdated\`
+            - Planificar actualizaciones major para próximo sprint
+            ` : ''}
+
+            ${riskyPackages ? `
+            ### ⚠️ Paquetes de Alto Riesgo
+            Los siguientes paquetes requieren atención especial:
+            ${riskyPackages.split(' ').filter(p => p).map(p => `- ${p}`).join('\n')}
+
+            Considera migrar a alternativas más seguras y mantenidas.
+            ` : ''}
+
+            ## 🔗 Enlaces Útiles
+
+            - [npm audit docs](https://docs.npmjs.com/cli/v8/commands/npm-audit)
+            - [Snyk Vulnerability Database](https://snyk.io/vuln/)
+            - [GitHub Security Advisories](https://github.com/advisories)
+            `;
+
+            // Guardar reporte
+            fs.writeFileSync('security-report.md', report);
+
+            // Determinar si falló la auditoría
+            const shouldFail = criticalVulns > 0 || highVulns > 0;
+            core.setOutput('security-failed', shouldFail);
+            core.setOutput('security-score', Math.max(0, 100 - (criticalVulns * 25) - (highVulns * 10) - (moderateVulns * 5) - (lowVulns * 1)));
+
+      - name: 📤 Subir reporte como artefacto
+        uses: actions/upload-artifact@v4
+        with:
+          name: security-audit-report
+          path: |
+            security-report.md
+            audit-results.json
+            outdated.json
+          retention-days: 30
+
+      - name: 💬 Comentar en PR (si aplica)
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('security-report.md', 'utf8');
+
+            // Buscar comentario existente
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+
+            const botComment = comments.data.find(comment => 
+              comment.user.type === 'Bot' && 
+              comment.body.includes('🔐 Reporte de Auditoría de Seguridad')
+            );
+
+            if (botComment) {
+              // Actualizar comentario existente
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: botComment.id,
+                body: report
+              });
+            } else {
+              // Crear nuevo comentario
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body: report
+              });
+            }
+
+      - name: 🚨 Crear issue si hay vulnerabilidades críticas
+        if: steps.npm-audit.outputs.audit-results != '' && contains(steps.npm-audit.outputs.audit-results, '"critical"')
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = '🚨 Vulnerabilidades Críticas Detectadas';
+            const fs = require('fs');
+            const report = fs.readFileSync('security-report.md', 'utf8');
+
+            // Verificar si ya existe un issue similar
+            const issues = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'security,critical'
+            });
+
+            const existingIssue = issues.data.find(issue => issue.title.includes('Vulnerabilidades Críticas'));
+
+            if (!existingIssue) {
+              await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: title,
+                body: `${report}\n\n---\n**Acción requerida:** Este issue se creó automáticamente debido a vulnerabilidades críticas detectadas.`,
+                labels: ['security', 'critical', 'automated']
+              });
+            }
+
+      - name: ❌ Fallar si hay vulnerabilidades críticas
+        if: contains(steps.npm-audit.outputs.audit-results, '"critical"')
+        run: |
+          echo "🚨 Se detectaron vulnerabilidades críticas - fallando el workflow"
+          exit 1

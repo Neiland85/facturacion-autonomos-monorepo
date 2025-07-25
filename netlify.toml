@@ -1,5 +1,5 @@
 [build]
-  command = "corepack enable && corepack prepare yarn@4.9.2 --activate && yarn install --immutable && yarn workspace @facturacion/web build"
+  command = "corepack enable && corepack prepare yarn@4.9.2 --activate && yarn install --immutable && yarn workspace @facturacion/security build && yarn workspace @facturacion/web build"
   publish = "apps/web/.next"
   base = "."
 
@@ -8,6 +8,10 @@
   NODE_VERSION = "20"
   COREPACK_ENABLE_STRICT = "0"
   YARN_ENABLE_IMMUTABLE_INSTALLS = "true"
+  # Security system variables
+  ENABLE_CSP = "true"
+  ENABLE_FRAME_GUARD = "true"
+  ENABLE_METRICS = "true"
 
 [context.production.environment]
   NEXT_PUBLIC_APP_URL = "https://facturacion-autonomos-monorepo.netlify.app"
@@ -38,14 +42,40 @@
 [[headers]]
   for = "/*"
   [headers.values]
+    # Security headers implementados por nuestro sistema de seguridad
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     X-Content-Type-Options = "nosniff"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: blob:; font-src 'self'; connect-src 'self' https:; frame-ancestors 'none';"
+    Strict-Transport-Security = "max-age=31536000; includeSubDomains; preload"
+    Permissions-Policy = "geolocation=(), microphone=(), camera=()"
+    # CSP mejorado para nuestro sistema de seguridad
+    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' 'nonce-*'; style-src 'self' 'unsafe-inline' 'nonce-*'; img-src 'self' data: blob: https:; font-src 'self' data:; connect-src 'self' https: wss:; frame-ancestors 'none'; base-uri 'self'; form-action 'self'; upgrade-insecure-requests; block-all-mixed-content;"
     
 [[headers]]
   for = "/_next/static/*"
   [headers.values]
     Cache-Control = "public, max-age=31536000, immutable"
     X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+
+# Headers específicos para el dashboard de seguridad
+[[headers]]
+  for = "/admin/security-dashboard"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Cache-Control = "no-cache, no-store, must-revalidate"
+    Pragma = "no-cache"
+    Expires = "0"
+
+# Headers para API endpoints
+[[headers]]
+  for = "/api/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    X-Permitted-Cross-Domain-Policies = "none"
+    Access-Control-Allow-Origin = "https://facturacion-autonomos-monorepo.netlify.app"
+    Access-Control-Allow-Methods = "GET, POST, PUT, DELETE, OPTIONS"
+    Access-Control-Allow-Headers = "Content-Type, Authorization, X-Requested-With"

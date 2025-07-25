@@ -1,0 +1,120 @@
+# 🔒 CONFIGURACIÓN DE DEPENDABOT PARA GITHUB
+# Automatiza las actualizaciones de seguridad y dependencias
+
+version: 2
+updates:
+  # 📦 DEPENDENCIAS DE NODE.JS
+  - package-ecosystem: 'npm'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Europe/Madrid'
+    open-pull-requests-limit: 10
+    reviewers:
+      - 'Neiland85'
+    assignees:
+      - 'Neiland85'
+    commit-message:
+      prefix: 'deps'
+      prefix-development: 'deps-dev'
+      include: 'scope'
+    labels:
+      - 'dependencies'
+      - 'automated'
+    # Agrupar actualizaciones menores y de parches
+    groups:
+      minor-patch-updates:
+        patterns:
+          - '*'
+        update-types:
+          - 'minor'
+          - 'patch'
+    # Configuraciones específicas para paquetes críticos
+    ignore:
+      # Ignorar actualizaciones major de frameworks críticos
+      - dependency-name: 'next'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'react-dom'
+        update-types: ['version-update:semver-major']
+      - dependency-name: 'typescript'
+        update-types: ['version-update:semver-major']
+      # Paquetes que requieren migración manual
+      - dependency-name: 'xml-crypto'
+      - dependency-name: 'node-forge'
+
+  # 📦 DEPENDENCIAS DE LOS WORKSPACES
+  - package-ecosystem: 'npm'
+    directory: '/apps/web'
+    schedule:
+      interval: 'weekly'
+      day: 'tuesday'
+      time: '09:00'
+      timezone: 'Europe/Madrid'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'Neiland85'
+    labels:
+      - 'dependencies'
+      - 'web-app'
+
+  - package-ecosystem: 'npm'
+    directory: '/apps/invoice-service'
+    schedule:
+      interval: 'weekly'
+      day: 'tuesday'
+      time: '10:00'
+      timezone: 'Europe/Madrid'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'Neiland85'
+    labels:
+      - 'dependencies'
+      - 'backend'
+
+  - package-ecosystem: 'npm'
+    directory: '/apps/auth-service'
+    schedule:
+      interval: 'weekly'
+      day: 'tuesday'
+      time: '11:00'
+      timezone: 'Europe/Madrid'
+    open-pull-requests-limit: 5
+    reviewers:
+      - 'Neiland85'
+    labels:
+      - 'dependencies'
+      - 'auth'
+
+  # 🔧 GITHUB ACTIONS
+  - package-ecosystem: 'github-actions'
+    directory: '/'
+    schedule:
+      interval: 'monthly'
+      day: 'monday'
+      time: '09:00'
+      timezone: 'Europe/Madrid'
+    open-pull-requests-limit: 3
+    reviewers:
+      - 'Neiland85'
+    labels:
+      - 'github-actions'
+      - 'ci-cd'
+
+  # 🐳 DOCKER
+  - package-ecosystem: 'docker'
+    directory: '/'
+    schedule:
+      interval: 'weekly'
+      day: 'wednesday'
+      time: '09:00'
+      timezone: 'Europe/Madrid'
+    open-pull-requests-limit: 3
+    reviewers:
+      - 'Neiland85'
+    labels:
+      - 'docker'
+      - 'infrastructure'

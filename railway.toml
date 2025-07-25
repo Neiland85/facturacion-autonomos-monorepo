@@ -1,0 +1,50 @@
+# 🚀 Railway Deployment Configuration
+
+# Build configuration
+[build]
+  builder = "nixpacks"
+  buildCommand = "corepack enable && corepack prepare yarn@4.9.2 --activate && yarn install --immutable && yarn workspace @facturacion/security build && yarn workspace @facturacion/web build"
+
+# Deploy configuration  
+[deploy]
+  startCommand = "yarn workspace @facturacion/web start"
+  healthcheckPath = "/api/health"
+  restartPolicyType = "always"
+
+# Environment variables
+[env]
+  NODE_ENV = "production"
+  NODE_VERSION = "20"
+  
+  # Security system variables
+  ENABLE_CSP = "true"
+  ENABLE_FRAME_GUARD = "true" 
+  ENABLE_METRICS = "true"
+  ENABLE_SENTRY = "true"
+  
+  # Next.js variables
+  NEXT_PUBLIC_APP_URL = "${{RAILWAY_PUBLIC_DOMAIN}}"
+  NEXT_PUBLIC_API_BASE_URL = "${{RAILWAY_PUBLIC_DOMAIN}}/api"
+  
+# Database service
+[[services]]
+  name = "postgres"
+  image = "postgres:15"
+  
+  [services.env]
+    POSTGRES_DB = "facturacion_prod"
+    POSTGRES_USER = "facturacion_user"
+    POSTGRES_PASSWORD = "${{POSTGRES_PASSWORD}}"
+    
+  [services.volumes]
+    "/var/lib/postgresql/data" = "postgres_data"
+
+# Web service
+[[services]]
+  name = "web"
+  build.dockerfile = "Dockerfile"
+  
+  [services.env]
+    DATABASE_URL = "${{DATABASE_URL}}"
+    JWT_SECRET = "${{JWT_SECRET}}"
+    SENTRY_DSN = "${{SENTRY_DSN}}"

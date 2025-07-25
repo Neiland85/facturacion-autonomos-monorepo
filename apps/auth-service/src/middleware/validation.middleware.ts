@@ -79,7 +79,23 @@ export const schemas = {
     body: z.object({
       refreshToken: z
         .string()
-        .optional() // Puede venir en cookie o body
+        .optional()    })
+  }),
+
+  updateProfile: z.object({
+    body: z.object({
+      name: z
+        .string()
+        .min(2, 'El nombre debe tener al menos 2 caracteres')
+        .max(50, 'El nombre no puede exceder 50 caracteres')
+        .regex(/^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$/, 'El nombre solo puede contener letras y espacios')
+        .optional(),
+      email: z
+        .string()
+        .email('Email inválido')
+        .min(5, 'Email debe tener al menos 5 caracteres')
+        .max(100, 'Email no puede exceder 100 caracteres')
+        .optional()
     })
   })
 };

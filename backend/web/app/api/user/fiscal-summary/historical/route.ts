@@ -1,28 +1,54 @@
-import { NextResponse, type NextRequest } from "next/server"
-import { neon } from "@neondatabase/serverless"
-import type { QuarterlyFinancials, HistoricalDataResponse } from "@/types/tax-projection" // Adjust path if necessary
+import type {
+    HistoricalDataResponse,
+    QuarterlyFinancials,
+} from '@/types/tax-projection'; // Adjust path if necessary
+import { neon } from '@neondatabase/serverless';
+import { NextResponse, type NextRequest } from 'next/server';
+import {
+    ensureServerSide,
+    validateServerEnvironment,
+} from '../../../../../utils/server-env-validation';
+
+// 🔐 VALIDACIÓN DE SEGURIDAD: Verificar que estamos en el servidor
+ensureServerSide('Historical Fiscal Summary API Route');
+
+// 🔐 VALIDACIÓN DE SEGURIDAD: Verificar variables de entorno del servidor
+try {
+  validateServerEnvironment();
+} catch (error) {
+  console.error('🚨 SERVER ENVIRONMENT VALIDATION FAILED:', error);
+  throw error;
+}
 
 // Initialize the Neon client.
 // The DATABASE_URL will be automatically picked up from environment variables.
-if (!process.env.DATABASE_URL || !process.env.DATABASE_URL.startsWith("postgresql://")) {
-  throw new Error("DATABASE_URL debe tener el formato correcto: postgresql://user:password@host.tld/dbname")
+if (!process.env.DATABASE_URL?.startsWith('postgresql://')) {
+  throw new Error(
+    'DATABASE_URL debe tener el formato correcto: postgresql://user:password@host.tld/dbname'
+  );
 }
-const sql = neon(process.env.DATABASE_URL!)
+const sql = neon(process.env.DATABASE_URL!);
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams
-    const userId = searchParams.get("userId")
-    const quartersParam = searchParams.get("quarters")
+    const searchParams = request.nextUrl.searchParams;
+    const userId = searchParams.get('userId');
+    const quartersParam = searchParams.get('quarters');
 
     if (!userId) {
-      return NextResponse.json({ message: "User ID is required." }, { status: 401 })
+      return NextResponse.json(
+        { message: 'User ID is required.' },
+        { status: 401 }
+      );
     }
 
-    const numQuarters = quartersParam ? Number.parseInt(quartersParam, 10) : 3
+    const numQuarters = quartersParam ? Number.parseInt(quartersParam, 10) : 3;
 
     if (isNaN(numQuarters) || numQuarters <= 0 || numQuarters > 12) {
-      return NextResponse.json({ message: "Invalid 'quarters' parameter. Must be between 1 and 12." }, { status: 400 })
+      return NextResponse.json(
+        { message: "Invalid 'quarters' parameter. Must be between 1 and 12." },
+        { status: 400 }
+      );
     }
 
     const dbResult = await sql`
@@ -36,7 +62,7 @@ export async function GET(request: NextRequest) {
       WHERE user_id = ${userId}
       ORDER BY year DESC, quarter_num DESC
       LIMIT ${numQuarters};
-    `
+    `;
 
     const historicalData: QuarterlyFinancials[] = dbResult
       .map((row: any) => ({
@@ -46,19 +72,24 @@ export async function GET(request: NextRequest) {
         vatPaid: Number.parseFloat(row.vat_paid),
         irpfPaid: Number.parseFloat(row.irpf_paid),
       }))
-      .reverse()
+      .reverse();
 
     if (!historicalData || historicalData.length === 0) {
       return NextResponse.json(
-        { message: `No historical data found for user ${userId}. Ensure data exists or try fewer quarters.` },
-        { status: 404 },
-      )
+        {
+          message: `No historical data found for user ${userId}. Ensure data exists or try fewer quarters.`,
+        },
+        { status: 404 }
+      );
     }
 
-    const response: HistoricalDataResponse = { data: historicalData }
-    return NextResponse.json(response, { status: 200 })
+    const response: HistoricalDataResponse = { data: historicalData };
+    return NextResponse.json(response, { status: 200 });
   } catch (error) {
-    console.error("Error fetching historical fiscal summary:", error)
-    return NextResponse.json({ message: "Internal Server Error" }, { status: 500 })
+    console.error('Error fetching historical fiscal summary:', error);
+    return NextResponse.json(
+      { message: 'Internal Server Error' },
+      { status: 500 }
+    );
   }
 }

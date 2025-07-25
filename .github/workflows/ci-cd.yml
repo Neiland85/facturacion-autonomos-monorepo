@@ -1,19 +1,19 @@
-<<<<<<< HEAD
-name: 🚀 Simplified CI/CD
+name: 🚀 Full-Stack CI/CD Pipeline
 
 on:
   push:
     branches: 
       - main
       - develop
+      - feature/*
   pull_request:
     branches: 
       - main
       - develop
 
 jobs:
-  basic-check:
-    name: 🔍 Basic Check
+  backend-test:
+    name: 🔍 Backend Tests & Security
     runs-on: ubuntu-latest
     
     services:
@@ -29,20 +29,38 @@ jobs:
           --health-retries 5
         ports:
           - 5432:5432
-=======
-name: 🚀 Netlify CI/CD
+    
+    steps:
+      - name: 📁 Checkout code
+        uses: actions/checkout@v4
 
-on:
-  push:
-    branches: [main, fix/netlify-deployment]
-  pull_request:
-    branches: [main]
+      - name: � Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          
+      - name: ⚙️ Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare yarn@4.9.2 --activate
 
-jobs:
-  test-and-build:
-    name: 🧪 Test & Build for Netlify
+      - name: 📦 Install dependencies
+        run: yarn install --immutable
+
+      - name: 🗄️ Run database migrations
+        run: ./db/run-migrations.sh
+        env:
+          DATABASE_URL: postgresql://postgres:postgres_test@localhost:5432/facturacion_test
+
+      - name: 🧪 Run backend tests
+        run: yarn test:backend
+        
+      - name: 🛡️ Security audit
+        run: yarn audit --groups dependencies
+
+  frontend-build:
+    name: 🌐 Frontend Build & Deploy
     runs-on: ubuntu-latest
->>>>>>> origin/develop
 
     steps:
       - name: 📁 Checkout code
@@ -92,5 +110,5 @@ jobs:
         run: yarn workspace @facturacion/web build
 
       - name: 🎉 Build success notification
-        run: echo "✅ Build completed successfully for Netlify deployment!"
+        run: echo "✅ Build completed successfully for Railway deployment!"
 >>>>>>> origin/develop
