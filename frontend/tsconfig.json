@@ -1,12 +1,21 @@
 {
   "compilerOptions": {
-<<<<<<< HEAD
     "target": "ES2020",
-    "module": "CommonJS",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "module": "ESNext",
+    "moduleResolution": "node",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "jsx": "preserve",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
     "baseUrl": "./",
     "paths": {
       "@core/*": [
@@ -26,30 +35,5 @@
     "node_modules",
     "dist",
     "build"
-=======
-    "target": "es5",
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": true,
-    "forceConsistentCasingInFileNames": true,
-    "noEmit": true,
-    "esModuleInterop": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "preserve"
-  },
-  "include": [
-    "src"
-  ],
-  "exclude": [
-    "node_modules"
->>>>>>> origin/develop
   ]
 }
