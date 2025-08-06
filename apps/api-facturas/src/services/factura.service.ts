@@ -314,7 +314,7 @@ export class FacturaService {
 
       const facturaActualizada = await this.facturaRepository.updateEstado(id, nuevoEstado);
       
-      invoicesCreated.inc({ 
+      invoicesStatusChanged.inc({ 
         type: facturaActualizada.formaPago || 'OTRO', 
         status: nuevoEstado 
       });
