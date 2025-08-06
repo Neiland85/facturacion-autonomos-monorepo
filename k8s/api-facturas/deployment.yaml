@@ -24,7 +24,7 @@ spec:
       serviceAccountName: api-facturas
       containers:
       - name: api-facturas
-        image: tributariapp/api-facturas:latest
+        image: tributariapp/api-facturas:v1.2.3
         imagePullPolicy: Always
         ports:
         - name: http
