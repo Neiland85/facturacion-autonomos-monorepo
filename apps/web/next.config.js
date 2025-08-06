@@ -1,11 +1,12 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuración optimizada para Netlify
+  // Configuración optimizada para producción
   output: 'standalone',
 
-  // Configuración de imágenes para Netlify
+  // Configuración de imágenes optimizada
   images: {
-    unoptimized: true, // Netlify maneja la optimización de imágenes
+    domains: ['localhost', 'via.placeholder.com'],
+    formats: ['image/webp', 'image/avif'],
   },
 
   // Variables de entorno públicas
@@ -18,7 +19,7 @@ const nextConfig = {
 
   // Configuración de webpack personalizada
   webpack: (config, { dev, isServer }) => {
-    // Optimizaciones para Netlify
+    // Optimizaciones para producción
     if (!dev && !isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,
@@ -26,6 +27,29 @@ const nextConfig = {
       };
     }
     return config;
+  },
+
+  // Configuración de seguridad
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          {
+            key: 'X-Frame-Options',
+            value: 'DENY',
+          },
+          {
+            key: 'X-Content-Type-Options',
+            value: 'nosniff',
+          },
+          {
+            key: 'Referrer-Policy',
+            value: 'origin-when-cross-origin',
+          },
+        ],
+      },
+    ];
   },
 };
 
