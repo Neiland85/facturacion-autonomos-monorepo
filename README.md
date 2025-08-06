@@ -1,708 +1,222 @@
-# 📊 Facturación Autónomos - Monorepo
+# TributariApp - Plataforma de Gestión Fiscal para Autónomos
 
-> Plataforma unificada para gestión y facturación de autónomos, organizada como monorepo modular con backend Node.js y frontend React. Arquitectura escalable, pruebas automáticas y CI/CD integrado.
+![TributariApp](https://img.shields.io/badge/TributariApp-v1.0.0-blue)
+![License](https://img.shields.io/badge/license-Apache%202.0-green)
+![Node](https://img.shields.io/badge/node-%3E%3D20.0.0-brightgreen)
+![TypeScript](https://img.shields.io/badge/typescript-%5E5.0.0-blue)
 
-[![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
-[![Node.js](https://img.shields.io/badge/Node.js-18%2B-green.svg)](https://nodejs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.7%2B-blue.svg)](https://www.typescriptlang.org/)
-[![Yarn](https://img.shields.io/badge/Yarn-4.9%2B-blue.svg)](https://yarnpkg.com/)
-[![Turbo](https://img.shields.io/badge/Turbo-2.3%2B-red.svg)](https://turbo.build/)
-[![Kubernetes](https://img.shields.io/badge/Kubernetes-Ready-326CE5.svg)](https://kubernetes.io/)
-[![Docker](https://img.shields.io/badge/Docker-Enabled-2496ED.svg)](https://docker.com/)
+## 🚀 Descripción
 
-## 🎯 Visión del Proyecto
+TributariApp es una plataforma integral de gestión fiscal diseñada específicamente para autónomos y pequeñas empresas en España. Ofrece una solución completa para la facturación electrónica, cálculos fiscales automatizados, y cumplimiento normativo con integraciones PEPPOL y AEAT.
 
-Esta plataforma está diseñada para simplificar la gestión administrativa y fiscal de autónomos, proporcionando herramientas integradas para facturación, cálculo de impuestos, y cumplimiento con las obligaciones fiscales españolas.
+## 🏗️ Arquitectura
 
-### 🌟 Características Principales
+### Microservicios
 
-- **💼 Gestión de Facturas**: Creación, edición y seguimiento de facturas
-- **🧮 Cálculo Fiscal**: Automatización de cálculos de IVA, IRPF y retenciones
-- **📊 Reporting**: Informes detallados y exportación de datos
-- **🔄 CI/CD Pipeline**: Despliegue automático en Kubernetes
-- **📈 Monitoreo**: Métricas con Prometheus y Grafana
-- **🔒 Seguridad**: Autenticación JWT y validación de datos
-- **🌐 API RESTful**: Documentación completa con OpenAPI/Swagger
+El sistema está construido con una arquitectura de microservicios para garantizar escalabilidad, mantenibilidad y desarrollo independiente:
 
-## 🚀 Pipeline CI/CD
+- **api-facturas**: Gestión completa de facturas electrónicas
+- **api-tax-calculator**: Cálculos fiscales automatizados (IVA, IRPF, retenciones)
+- **api-gateway**: Punto único de entrada, autenticación y enrutamiento
+- **auth-service**: Autenticación y autorización con JWT
+- **invoice-service**: Procesamiento avanzado de facturas
+- **api-clientes** (próximamente): Gestión de clientes
+- **api-integraciones** (próximamente): Integraciones PEPPOL/AEAT
 
-### Automatización Completa
-- ✅ **Build automático** del monorepo con Turbo
-- ✅ **Tests unitarios** y de integración
-- ✅ **Linting** y validación de código
-- ✅ **Construcción de Docker images** optimizadas
-- ✅ **Despliegue automático** en staging
-- ✅ **Despliegue manual** en producción
-- ✅ **Monitoreo** y alertas integradas
+### Stack Tecnológico
 
-### Infraestructura Kubernetes
-- 🎯 **Multi-ambiente**: Staging y Producción
-- 🔄 **Auto-scaling**: HPA configurado
-- 📊 **Observabilidad**: Logs, métricas y trazas
-- 🛡️ **Seguridad**: Policies de red y RBAC
-- 💾 **Persistencia**: Volúmenes para bases de datos
-- 🌐 **Ingress**: SSL/TLS automático con Let's Encrypt
+- **Backend**: Node.js, Express, TypeScript
+- **Frontend**: Next.js 14, React, TailwindCSS
+- **Base de datos**: PostgreSQL con Prisma ORM
+- **Cache**: Redis
+- **Contenedores**: Docker, Kubernetes
+- **CI/CD**: GitHub Actions
+- **Observabilidad**: Prometheus, Grafana, Winston, Datadog (opcional)
+- **Documentación API**: OpenAPI 3.0, Swagger UI
 
-## 🏗️ Arquitectura del Monorepo
+## 📋 Características Principales
 
-```
-🏠 Monorepo Root/
-├── 🌐 apps/
-│   ├── web/              # Next.js - Frontend principal
-│   ├── api-facturas/     # Express.js - API de facturas
-│   └── api-tax-calculator/ # Express.js - API de cálculos fiscales
-├── 📦 packages/
-│   ├── ui/               # Componentes UI compartidos
-│   ├── core/             # Lógica de negocio central
-│   ├── services/         # Servicios externos (AEAT, bancos)
-│   └── types/            # Tipos TypeScript compartidos
-├── 🗄️ prisma/            # Schema de base de datos
-└── 📚 docs/              # Documentación y ADRs
-```
+### ✅ Implementadas
 
-## 🚀 Inicio Rápido
+- ✅ **Gestión de Facturas**
+  - CRUD completo con validación Zod
+  - Estados de factura con transiciones validadas
+  - Generación automática de números de factura
+  - Cálculos automáticos de IVA y retenciones
+
+- ✅ **Arquitectura Robusta**
+  - Patrón Repository y Service Layer
+  - Validación de datos con Zod
+  - Logging estructurado con Winston
+  - Métricas con Prometheus
+  - Rate limiting y seguridad con Helmet
+
+- ✅ **DevOps y CI/CD**
+  - Pipelines automatizados con GitHub Actions
+  - Despliegue en Kubernetes con auto-escalado
+  - Configuración de NetworkPolicies
+  - Health checks y readiness probes
+
+- ✅ **Documentación**
+  - OpenAPI/Swagger para todas las APIs
+  - ADRs (Architecture Decision Records)
+  - Documentación técnica completa
+
+### 🚧 En Desarrollo
+
+- 🚧 **Integraciones Fiscales**
+  - Integración con PEPPOL para facturación B2B europea
+  - Conexión con AEAT (SII, Modelo 130/131)
+  - Generación de informes fiscales trimestrales
+
+- 🚧 **Frontend Mejorado**
+  - Dashboard interactivo con gráficos
+  - PWA para acceso móvil
+  - Validación en tiempo real
+
+## 🛠️ Instalación
 
 ### Prerrequisitos
 
-- **Node.js** 20+ ([Descargar](https://nodejs.org/))
-- **Yarn** 4.9+ (se instala automáticamente)
-- **PostgreSQL** 14+ (o usar Docker)
+- Node.js >= 20.0.0
+- Yarn 4.x
+- PostgreSQL 15+
+- Redis (opcional, para caché)
+- Docker y Docker Compose (para desarrollo)
 
-### Instalación
+### Configuración Local
 
+1. **Clonar el repositorio**
 ```bash
-# 1. Clonar el repositorio
-git clone https://github.com/tu-usuario/facturacion-autonomos-monorepo.git
-cd facturacion-autonomos-monorepo
+git clone https://github.com/tuusuario/tributariapp.git
+cd tributariapp
+```
 
-# 2. Configurar el entorno
-yarn setup
+2. **Instalar dependencias**
+```bash
+yarn install
+```
 
-# 3. Configurar variables de entorno
-cp .env.example .env.local
-# Editar .env.local con tus configuraciones
+3. **Configurar variables de entorno**
+```bash
+# Copiar archivos de ejemplo
+cp .env.example .env
+cp apps/api-facturas/.env.example apps/api-facturas/.env
+cp apps/api-tax-calculator/.env.example apps/api-tax-calculator/.env
+```
 
-# 4. Ejecutar migraciones de BD
-yarn db:push
+4. **Iniciar servicios con Docker**
+```bash
+docker-compose up -d
+```
 
-# 5. Iniciar todos los servicios
+5. **Ejecutar migraciones**
+```bash
+yarn db:migrate
+```
+
+6. **Iniciar en modo desarrollo**
+```bash
 yarn dev
 ```
 
-### 🎪 Servicios Disponibles
+## 📚 Documentación API
 
-| Servicio | Puerto | URL | Descripción |
-|----------|--------|-----|-------------|
-| **Web App** | 3000 | http://localhost:3000 | Frontend principal |
-| **API Facturas** | 3001 | http://localhost:3001 | API de gestión de facturas |
-| **API Tax Calculator** | 3002 | http://localhost:3002 | API de cálculos fiscales |
-| **Prisma Studio** | 5555 | http://localhost:5555 | Gestor visual de BD |
+La documentación interactiva de las APIs está disponible en:
 
-## 🛠️ Stack Tecnológico
+- API Facturas: http://localhost:3001/api-docs
+- API Tax Calculator: http://localhost:3002/api-docs
 
-### Frontend
-- **⚛️ React 18** - UI library
-- **🔄 Next.js 15** - Framework fullstack
-- **🎨 Tailwind CSS** - Styling
-- **📊 SWR** - Data fetching
-- **🔍 Zod** - Schema validation
-- **🧪 Jest + Testing Library** - Testing
-
-### Backend
-- **🚀 Node.js 20** - Runtime
-- **⚡ Express.js** - Web framework
-- **🗄️ Prisma** - ORM
-- **🐘 PostgreSQL** - Database
-- **🔐 JWT** - Authentication
-- **📝 Zod** - Schema validation
-
-### DevOps & Tooling
-- **📦 Yarn 4 PnP** - Package manager
-- **⚡ Turbo** - Monorepo build system
-- **🔧 TypeScript** - Type safety
-- **✨ ESLint + Prettier** - Code quality
-- **🐶 Husky + lint-staged** - Git hooks
-- **🧪 Jest + Cypress + Playwright** - Testing
-- **🐳 Docker** - Containerization
-
-## 📋 Comandos Disponibles
-
-### Desarrollo
-```bash
-yarn dev              # Iniciar todos los servicios
-yarn dev:web          # Solo frontend
-yarn build            # Build de producción
-yarn type-check       # Verificación de tipos
-```
-
-### Testing
-```bash
-yarn test             # Tests unitarios
-yarn test:watch       # Tests en modo watch
-yarn test:e2e         # Tests E2E con Playwright
-yarn test:e2e:ui      # Tests E2E con UI
-yarn copilot:test-all # Todos los tests (Copilot)
-```
-
-### Base de Datos
-```bash
-yarn db:generate     # Generar cliente Prisma
-yarn db:push         # Aplicar cambios al schema
-yarn db:studio       # Abrir Prisma Studio
-yarn db:migrate      # Crear migración
-yarn db:reset        # Reset completo de BD
-```
-
-### Calidad de Código
-```bash
-yarn lint             # Linting
-yarn lint:fix         # Linting con auto-fix
-yarn format          # Formatear código
-yarn format:check     # Verificar formato
-```
-
-### Documentación
-```bash
-yarn adr:new "Título" # Crear nuevo ADR
-```
-
-## 🤖 GitHub Copilot Agent
-
-Este proyecto está optimizado para trabajar con GitHub Copilot Agent. Utiliza los siguientes comandos:
+## 🧪 Testing
 
 ```bash
-# Generar un nuevo ADR
-@copilot /task generate:adr "Usar Redis para caché"
+# Tests unitarios
+yarn test
 
-# Crear un microservicio
-@copilot /task scaffold:service "auth" 3003
+# Tests con coverage
+yarn test:coverage
 
-# Crear un hook React
-@copilot /task scaffold:hook "Usuarios" "/api/usuarios"
+# Tests E2E
+yarn test:e2e
 
-# Ejecutar todos los tests
-@copilot /task test:all
+# Linting
+yarn lint
+
+# Type checking
+yarn type-check
 ```
 
-## 🌿 Flujo de Ramas
+## 🚀 Despliegue
 
+### Kubernetes
+
+```bash
+# Aplicar manifiestos
+kubectl apply -f k8s/namespace.yaml
+kubectl apply -f k8s/api-facturas/
+kubectl apply -f k8s/api-tax-calculator/
+
+# Verificar estado
+kubectl get pods -n tributariapp
+kubectl get svc -n tributariapp
 ```
-main         ──●──●──●──●── (Producción)
-              ╱  ╱  ╱  ╱
-develop    ──●──●──●──●──── (Integración)
-            ╱  ╱  ╱  ╱
-features  ──●──●  ●──●──── (Desarrollo)
-```
-
-### Flujo de Trabajo
-
-1. **Crear rama**: `git checkout -b feature/nueva-funcionalidad`
-2. **Desarrollar**: Commits frecuentes con mensajes descriptivos
-3. **Testing**: `yarn test && yarn lint`
-4. **Pull Request**: Hacia `develop`
-5. **Review & Merge**: Squash merge preferido
-6. **Deploy**: `develop` → `main` para releases
-
-## 📁 Estructura de Directorios
-
-<details>
-<summary>👆 Click para expandir estructura completa</summary>
-
-```
-facturacion-autonomos-monorepo/
-├── .copilot/                 # Configuración Copilot Agent
-│   ├── tasks.json           # Definición de tareas
-│   └── tasks/               # Scripts de tareas
-├── .github/                 # GitHub workflows
-├── .vscode/                 # Configuración VS Code
-├── apps/
-│   ├── web/                 # Next.js App
-│   │   ├── src/
-│   │   │   ├── app/         # App Router
-│   │   │   ├── components/  # Componentes React
-│   │   │   ├── hooks/       # Custom hooks
-│   │   │   ├── lib/         # Utilidades
-│   │   │   └── schemas/     # Esquemas Zod
-│   │   └── public/          # Assets estáticos
-│   ├── api-facturas/        # API Facturas
-│   │   └── src/
-│   │       ├── routes/      # Endpoints
-│   │       ├── middleware/  # Express middleware
-│   │       └── services/    # Lógica de negocio
-│   └── api-tax-calculator/  # API Cálculos Fiscales
-├── packages/
-│   ├── ui/                  # Librería de componentes
-│   ├── core/                # Lógica de negocio
-│   ├── services/            # Servicios externos
-│   └── types/               # Tipos compartidos
-├── prisma/                  # Base de datos
-│   ├── schema.prisma        # Schema Prisma
-│   └── migrations/          # Migraciones
-├── docs/                    # Documentación
-│   ├── adr/                 # Architecture Decision Records
-│   └── api/                 # Documentación API
-├── scripts/                 # Scripts de utilidad
-└── tests/                   # Tests E2E globales
-```
-
-</details>
-
-## 🧪 Testing Strategy
-
-### Niveles de Testing
-
-1. **Unit Tests** - Jest + Testing Library
-   - Lógica de negocio (`packages/core`)
-   - Servicios (`packages/services`)
-   - Hooks React (`apps/web/src/hooks`)
-
-2. **Integration Tests** - Supertest + Jest
-   - Endpoints API
-   - Conectividad de base de datos
-
-3. **E2E Tests** - Playwright + Cypress
-   - Flujos completos de usuario
-   - Cross-browser testing
-
-### Coverage Goals
-
-| Tipo | Mínimo | Objetivo |
-|------|--------|----------|
-| Statements | 70% | 85% |
-| Branches | 70% | 80% |
-| Functions | 70% | 85% |
-| Lines | 70% | 85% |
-
-## 🚢 Deployment
-
-### Environments
-
-- **Development** - Local + feature branches
-- **Staging** - Branch `develop`
-- **Production** - Branch `main`
 
 ### Docker
 
 ```bash
-# Build completo
-docker-compose build
+# Construir imágenes
+docker build -t tributariapp/api-facturas:latest -f apps/api-facturas/Dockerfile .
+docker build -t tributariapp/api-tax-calculator:latest -f apps/api-tax-calculator/Dockerfile .
 
-# Desarrollo
-docker-compose up -d
-
-# Solo servicios de soporte (BD, Redis)
-docker-compose up -d postgres redis
+# Ejecutar con docker-compose
+docker-compose -f docker-compose.prod.yml up -d
 ```
 
-## 🔄 Desarrollo y Despliegue
+## 📊 Monitoreo
 
-### Entorno Local con Docker
-```bash
-# Iniciar servicios de desarrollo
-docker-compose -f docker-compose.dev.yml up -d
+### Métricas Prometheus
 
-# Verificar servicios
-docker-compose -f docker-compose.dev.yml ps
+Las métricas están expuestas en `/metrics` en cada servicio:
 
-# Ver logs
-docker-compose -f docker-compose.dev.yml logs -f
-```
+- Request duration
+- Request count by status
+- Active connections
+- Business metrics (invoices created, tax calculations, etc.)
 
-### Pipeline CI/CD
+### Logs
 
-#### Configuración de Variables (GitLab CI/CD)
-```bash
-# Registry
-CI_REGISTRY_IMAGE=registry.gitlab.com/tu-grupo/facturacion-autonomos
-CI_REGISTRY_USER=gitlab-ci-token
-CI_REGISTRY_PASSWORD=<token>
+Los logs se generan en formato JSON estructurado, facilitando su análisis con herramientas como ELK Stack o Datadog.
 
-# Kubernetes
-KUBE_URL=https://tu-cluster.k8s.com
-KUBE_TOKEN=<service-account-token>
-KUBE_DOMAIN=tu-dominio.com
+## 🔒 Seguridad
 
-# Secrets (Base64)
-POSTGRES_PASSWORD_B64=<base64-encoded>
-JWT_SECRET_B64=<base64-encoded>
-DATABASE_URL_B64=<base64-encoded>
-```
-
-#### Despliegue Manual
-```bash
-# Staging
-./deploy.sh staging
-
-# Production
-./deploy.sh production
-```
-
-### Monitoreo y Observabilidad
-
-#### URLs de Acceso
-- **Aplicación**: `https://facturacion.tu-dominio.com`
-- **API Docs**: `https://api-facturacion.tu-dominio.com/api/docs`
-- **Grafana**: `https://grafana.tu-dominio.com`
-- **Prometheus**: `https://prometheus.tu-dominio.com`
-
-#### Health Checks
-```bash
-# API Facturas
-curl https://api-facturacion.tu-dominio.com/health
-
-# API Tax Calculator
-curl https://api-facturacion.tu-dominio.com/api/tax-calculator/health
-```
-
-## 🤝 Contribución
-
-1. **Fork** el repositorio
-2. **Crear** rama feature (`git checkout -b feature/AmazingFeature`)
-3. **Commit** cambios (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** a la rama (`git push origin feature/AmazingFeature`)
-5. **Abrir** Pull Request
-
-### Convenciones
-
-- **Commits**: [Conventional Commits](https://www.conventionalcommits.org/)
-- **Branches**: `feature/`, `fix/`, `docs/`, `refactor/`
-- **PRs**: Template obligatorio + review requerido
-
-## 📊 Monitoring & Analytics
-
-- **Error Tracking**: Sentry
-- **Performance**: Vercel Analytics
-- **Logs**: Winston + structured logging
-- **Health Checks**: `/api/health` endpoints
-
-## 🔒 Security
-
-- **Authentication**: NextAuth.js
-- **Authorization**: Role-based (RBAC)
-- **Data Validation**: Zod schemas
-- **SQL Injection**: Prisma ORM
-- **XSS Protection**: CSP headers
-- **HTTPS**: Force in production
-
-## 📚 Recursos
-
-- [📖 Documentación Técnica](./docs/INFORME_TECNICO_DETALLADO.md)
-- [🏗️ ADRs](./docs/adr/)
-- [🐛 Issue Tracker](https://github.com/tu-usuario/facturacion-autonomos-monorepo/issues)
-- [💬 Discusiones](https://github.com/tu-usuario/facturacion-autonomos-monorepo/discussions)
-
-## 📄 Licencia
-
-Este proyecto está licenciado bajo Apache License 2.0 - ver [LICENSE](LICENSE) para detalles.
-
----
-
-<div align="center">
-
-**[⬆ Volver arriba](#-facturación-autónomos---monorepo)**
-
-Hecho con ❤️ y ☕ por el equipo de desarrollo
-
-</div>
-
----
-
-## 🌟 Características Adicionales
-
-## 🏛️ Arquitectura
-
-```
-facturacion-autonomos-monorepo/
-├── apps/                    # Aplicaciones
-│   ├── web/                # Frontend Next.js
-│   ├── api-facturas/       # API de facturación
-│   └── api-tax-calculator/ # API calculadora de impuestos
-├── packages/               # Packages compartidos
-│   ├── core/              # Lógica de negocio central
-│   ├── services/          # Servicios compartidos
-│   ├── types/             # Tipos TypeScript
-│   └── ui/                # Componentes UI reutilizables
-└── prisma/                # Schema de base de datos
-```
-
-## 📁 Estructura del Proyecto
-
-### Apps
-
-- **`apps/web`** - Aplicación frontend Next.js 14 con App Router
-- **`apps/api-facturas`** - API RESTful para gestión de facturas (Express + Prisma)
-- **`apps/api-tax-calculator`** - Microservicio para cálculos fiscales
-
-### Packages
-
-- **`packages/core`** - Lógica de negocio y utilidades centrales
-- **`packages/services`** - Servicios y clientes API compartidos
-- **`packages/types`** - Definiciones de tipos TypeScript
-- **`packages/ui`** - Librería de componentes UI con Tailwind CSS
-
-## 📋 Requisitos Previos
-
-- **Node.js** >=20.0.0
-- **Yarn** >=4.0.0 (administrado por corepack)
-- **PostgreSQL** (para desarrollo local)
-
-## 🚀 Instalación
-
-1. **Clonar el repositorio**
-   ```bash
-   git clone <repository-url>
-   cd facturacion-autonomos-monorepo
-   ```
-
-2. **Habilitar corepack**
-   ```bash
-   corepack enable
-   ```
-
-3. **Instalar dependencias**
-   ```bash
-   yarn install
-   ```
-
-4. **Configurar variables de entorno**
-   ```bash
-   cp .env.example .env
-   # Editar .env con tus configuraciones
-   ```
-
-5. **Configurar base de datos**
-   ```bash
-   yarn db:push
-   yarn db:generate
-   ```
-
-## � Scripts Disponibles
-
-### Scripts Globales (TurboRepo)
-
-```bash
-# Desarrollo
-yarn dev              # Inicia todos los servicios en modo desarrollo
-yarn build            # Construye todas las aplicaciones
-yarn test             # Ejecuta todos los tests
-yarn lint             # Ejecuta linting en todo el monorepo
-yarn type-check       # Verifica tipos TypeScript
-yarn clean            # Limpia archivos generados
-
-# Formateo
-yarn format           # Formatea código con Prettier
-
-# Base de datos
-yarn db:generate      # Genera cliente Prisma
-yarn db:push          # Aplica cambios al schema
-yarn db:studio        # Abre Prisma Studio
-
-# ADR (Architecture Decision Records)
-yarn adr:new "Título" # Crea un nuevo ADR
-```
-
-### Scripts por Workspace
-
-```bash
-# Desarrollo de aplicaciones específicas
-yarn workspace @facturacion/web dev
-yarn workspace @facturacion/api-facturas dev
-yarn workspace @facturacion/api-tax-calculator dev
-
-# Build de packages específicos
-yarn workspace @facturacion/ui build
-yarn workspace @facturacion/core build
-```
-
-## 💻 Desarrollo
-
-### Iniciar Desarrollo Local
-
-```bash
-# Inicia todos los servicios
-yarn dev
-```
-
-Esto iniciará:
-- 🌐 **Frontend (web)**: http://localhost:3000
-- 🔌 **API Facturas**: http://localhost:3001
-- 📊 **API Tax Calculator**: http://localhost:3002
-
-### Desarrollar Componentes UI
-
-```bash
-cd packages/ui
-yarn dev
-```
-
-### Ejecutar Tests
-
-```bash
-# Todos los tests
-yarn test
-
-# Tests específicos
-yarn workspace @facturacion/core test
-yarn workspace @facturacion/web test:e2e
-```
-
-## 📝 ADR (Architecture Decision Records)
-
-Este proyecto utiliza ADRs para documentar decisiones arquitectónicas importantes.
-
-### Crear un nuevo ADR
-
-```bash
-yarn adr:new "Título de la decisión"
-```
-
-### Ver ADRs existentes
-
-Los ADRs se encuentran en `adr/` y siguen el formato [MADR 2.1](https://adr.github.io/madr/).
-
-## ⚙️ Configuración de VS Code
-
-### Workspace Aislado (Recomendado) 🔒
-
-Este proyecto incluye un **workspace aislado** que te permite tener todas las configuraciones específicas sin afectar tu configuración global de VS Code.
-
-#### Cómo usar el Workspace Aislado:
-
-```bash
-# Opción 1: Script automatizado (Recomendado)
-./open-workspace.sh        # En macOS/Linux
-open-workspace.bat         # En Windows
-
-# Opción 2: Desde terminal
-code facturacion-autonomos.code-workspace
-
-# Opción 3: Desde VS Code
-# File → Open Workspace from File → Seleccionar facturacion-autonomos.code-workspace
-```
-
-#### Características del Workspace:
-- 📁 **Folders organizados** por apps y packages
-- ⚙️ **Settings específicos** para el proyecto
-- 🧩 **Extensiones aisladas** que no afectan otros proyectos
-- 🔧 **Tasks predefinidas** para desarrollo
-- 🐛 **Debug configurations** listas para usar
-
-👉 **Ver guía completa**: [docs/WORKSPACE_AISLADO.md](./docs/WORKSPACE_AISLADO.md)
-
-### Extensiones Recomendadas
-
-El workspace incluye configuración automática para estas extensiones:
-
-- GitHub Copilot & Copilot Chat
-- TypeScript y JavaScript
-- Tailwind CSS IntelliSense
-- Prisma
-- ESLint & Prettier
-- Jest & Playwright
-- GraphQL
-
-### Settings Optimizados
-
-- Formateo automático al guardar
-- Configuración de TypeScript optimizada
-- Integración con Copilot Agent
-- Configuración de debugging
-
-## 🤖 Copilot Agent
-
-El proyecto está optimizado para GitHub Copilot Agent con tareas predefinidas:
-
-### Tareas Disponibles
-
-- **`generate:adr`** - Genera nuevos ADRs
-- **`scaffold:service`** - Crea nuevos microservicios
-- **`scaffold:component`** - Genera componentes UI
-- **`scaffold:page`** - Crea páginas Next.js
-- **`analyze:bundle`** - Analiza bundle sizes
-- **`audit:security`** - Auditoría de seguridad
-
-### Usar Copilot Agent
-
-1. Abre VS Code con la extensión GitHub Copilot
-2. Accede al panel de Copilot Agent
-3. Selecciona una tarea predefinida o haz preguntas sobre el código
-
-## 🛠️ Tecnologías
-
-### Frontend
-- **Next.js 14** - React framework con App Router
-- **React 18** - Librería UI con Server Components
-- **Tailwind CSS** - Utility-first CSS framework
-- **Headless UI** - Componentes accesibles
-- **Framer Motion** - Animaciones declarativas
-
-### Backend
-- **Express.js** - Framework web para Node.js
-- **Prisma** - ORM moderno para bases de datos
-- **JWT** - Autenticación basada en tokens
-- **Helmet** - Middleware de seguridad
-- **Winston** - Logging estructurado
-
-### DevTools
-- **TurboRepo** - Monorepo con caching inteligente
-- **TypeScript** - Superset tipado de JavaScript
-- **ESLint** - Linter para JavaScript/TypeScript
-- **Prettier** - Formateador de código
-- **Jest** - Framework de testing
-- **Cypress** - E2E testing
-- **Playwright** - Cross-browser testing
-
-### Package Management
-- **Yarn 4** - Package manager con node-modules linker
-- **corepack** - Gestor de package managers
+- ✅ Autenticación JWT
+- ✅ Rate limiting por IP
+- ✅ Validación de entrada con Zod
+- ✅ Headers de seguridad con Helmet
+- ✅ CORS configurado
+- ✅ Secretos manejados con Kubernetes Secrets
+- 🚧 Integración con Vault para gestión avanzada de secretos
 
 ## 🤝 Contribuir
 
-1. **Fork** el proyecto
-2. **Crear** una rama feature (`git checkout -b feature/AmazingFeature`)
-3. **Commit** cambios (`git commit -m 'Add some AmazingFeature'`)
-4. **Push** a la rama (`git push origin feature/AmazingFeature`)
-5. **Abrir** un Pull Request
-
-### Flujo de Desarrollo
-
-1. Asegúrate de que los tests pasen: `yarn test`
-2. Verifica el linting: `yarn lint`
-3. Ejecuta type checking: `yarn type-check`
-4. Documenta decisiones importantes con ADRs
-
-### Commits Convenionales
-
-Este proyecto utiliza [Conventional Commits](https://conventionalcommits.org/):
-
-```
-feat: agregar nueva funcionalidad
-fix: corregir bug
-docs: actualizar documentación
-style: cambios de formato
-refactor: refactorización de código
-test: agregar o modificar tests
-chore: tareas de mantenimiento
-```
+Por favor, lee [CONTRIBUTING.md](CONTRIBUTING.md) para detalles sobre nuestro código de conducta y el proceso para enviarnos pull requests.
 
 ## 📄 Licencia
 
-Este proyecto está bajo la Licencia MIT. Ver `LICENSE` para más detalles.
+Este proyecto está licenciado bajo la Licencia Apache 2.0 - ver el archivo [LICENSE](LICENSE) para más detalles.
+
+## 👥 Equipo
+
+- **Arquitectura y Backend**: [@tuusuario](https://github.com/tuusuario)
+- **Frontend**: [@frontend-dev](https://github.com/frontend-dev)
+- **DevOps**: [@devops-team](https://github.com/devops-team)
+
+## 📞 Soporte
+
+- 📧 Email: soporte@tributariapp.com
+- 💬 Slack: [tributariapp.slack.com](https://tributariapp.slack.com)
+- 📖 Documentación: [docs.tributariapp.com](https://docs.tributariapp.com)
 
 ---
 
-## 🔗 Enlaces Útiles
-
-- [TurboRepo Documentation](https://turbo.build/repo/docs)
-- [Next.js 14 Documentation](https://nextjs.org/docs)
-- [Prisma Documentation](https://www.prisma.io/docs)
-- [Tailwind CSS](https://tailwindcss.com/docs)
-- [MADR Template](https://adr.github.io/madr/)
-
----
-
-**¿Necesitas ayuda?** Abre un issue o contacta al equipo de desarrollo.
-
----
-
-© 2025 Neil Muñoz Lago ([Neiland85](https://github.com/Neiland85)). Todos los derechos reservados.
+Made with ❤️ by the TributariApp Team
