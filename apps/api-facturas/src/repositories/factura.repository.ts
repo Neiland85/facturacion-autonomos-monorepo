@@ -160,29 +160,36 @@ export class FacturaRepository {
   }
 
   async getNextNumeroFactura(prefix: string = ''): Promise<string> {
+    // This implementation assumes you have a table called 'factura_sequence' with columns:
+    // 'prefix' (string), 'year' (int), 'lastNumber' (int)
+    // and a unique constraint on (prefix, year)
     try {
       const year = new Date().getFullYear();
-      const pattern = `${prefix}${year}%`;
-      
-      const lastFactura = await this.prisma.factura.findFirst({
-        where: {
-          numeroFactura: {
-            startsWith: `${prefix}${year}`,
-          },
-        },
-        orderBy: {
-          numeroFactura: 'desc',
-        },
+      let nextNumber: number;
+
+      await this.prisma.$transaction(async (tx) => {
+        // Try to update the sequence row for this prefix/year
+        const updated = await tx.factura_sequence.updateMany({
+          where: { prefix, year },
+          data: { lastNumber: { increment: 1 } },
+        });
+        if (updated.count === 0) {
+          // If no row exists, create it
+          await tx.factura_sequence.create({
+            data: { prefix, year, lastNumber: 1 },
+          });
+          nextNumber = 1;
+        } else {
+          // Fetch the updated value
+          const seq = await tx.factura_sequence.findUnique({
+            where: { prefix_year: { prefix, year } },
+          });
+          nextNumber = seq?.lastNumber ?? 1;
+        }
       });
 
-      if (!lastFactura) {
-        return `${prefix}${year}/0001`;
-      }
-
-      const lastNumber = parseInt(lastFactura.numeroFactura.split('/').pop() || '0');
-      const nextNumber = (lastNumber + 1).toString().padStart(4, '0');
-      
-      return `${prefix}${year}/${nextNumber}`;
+      const numeroFactura = `${prefix}${year}/${nextNumber.toString().padStart(4, '0')}`;
+      return numeroFactura;
     } catch (error) {
       logger.error('Error getting next numero factura', { error, prefix });
       throw error;
