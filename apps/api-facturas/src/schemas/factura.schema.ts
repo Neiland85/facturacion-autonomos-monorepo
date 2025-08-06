@@ -15,7 +15,7 @@ export const CreateFacturaSchema = z.object({
     .regex(/^[A-Z0-9\-\/]+$/, 'Formato de número de factura inválido')
     .optional(),
   fecha: z.string().datetime().or(z.date()),
-  clienteId: z.string().uuid('ID de cliente inválido'),
+  clienteId: z.string().uuid('ID de cliente inválido').optional(),
   
   // Datos opcionales del cliente (para facturas rápidas)
   datosCliente: z.object({
