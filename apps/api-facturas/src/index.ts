@@ -68,7 +68,7 @@ if (process.env.NODE_ENV !== 'production') {
 app.get('/health', async (req: express.Request, res: express.Response) => {
   try {
     // Verificar conexión a base de datos
-    await prisma.$queryRaw`SELECT 1`;
+    await prisma.$connect();
     
     res.json({
       status: 'OK',
