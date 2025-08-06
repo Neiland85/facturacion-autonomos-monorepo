@@ -18,7 +18,7 @@ spec:
           app: api-gateway
     ports:
     - protocol: TCP
-      port: 3001
+      port: 80
   # Permitir tráfico desde Prometheus
   - from:
     - namespaceSelector:
