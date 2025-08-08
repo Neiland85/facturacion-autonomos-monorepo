@@ -190,6 +190,26 @@ export const Modal: React.FC<ModalProps> = ({
   children,
   size = 'md',
 }) => {
+  // Manejo de la tecla Escape para cerrar el modal
+  React.useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+      if (event.key === 'Escape' && isOpen) {
+        onClose();
+      }
+    };
+
+    if (isOpen) {
+      document.addEventListener('keydown', handleEscapeKey);
+      // Prevenir scroll del body cuando el modal está abierto
+      document.body.style.overflow = 'hidden';
+    }
+
+    return () => {
+      document.removeEventListener('keydown', handleEscapeKey);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const sizeClasses = {
@@ -202,17 +222,41 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <div className="fixed inset-0 z-50 overflow-y-auto">
       <div className="flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0">
-        <div
-          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75"
+        {/* Overlay button for closing modal - accessible */}
+        <button
+          type="button"
+          className="fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75 cursor-default"
           onClick={onClose}
-        ></div>
+          aria-label="Cerrar modal"
+          tabIndex={-1}
+        />
 
         <div
-          className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full ${sizeClasses[size]}`}
+          className={`inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full ${sizeClasses[size]} relative z-10`}
         >
           {title && (
-            <div className="px-6 py-4 border-b border-gray-200">
+            <div className="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
               <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+              <button
+                type="button"
+                className="text-gray-400 hover:text-gray-500 focus:outline-none focus:ring-2 focus:ring-blue-500 rounded"
+                onClick={onClose}
+                aria-label="Cerrar modal"
+              >
+                <svg
+                  className="h-6 w-6"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M6 18L18 6M6 6l12 12"
+                  />
+                </svg>
+              </button>
             </div>
           )}
           <div className="px-6 py-4">{children}</div>

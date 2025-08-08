@@ -1212,6 +1212,19 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@facturacion/validation@workspace:packages/validation":
+  version: 0.0.0-use.local
+  resolution: "@facturacion/validation@workspace:packages/validation"
+  dependencies:
+    "@types/jest": "npm:^29.5.14"
+    "@types/node": "npm:^22.0.0"
+    eslint: "npm:^9.15.0"
+    jest: "npm:^29.7.0"
+    typescript: "npm:^5.5.4"
+    zod: "npm:^3.23.8"
+  languageName: unknown
+  linkType: soft
+
 "@facturacion/web@workspace:apps/web":
   version: 0.0.0-use.local
   resolution: "@facturacion/web@workspace:apps/web"
@@ -3505,7 +3518,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/node@npm:^22.10.1":
+"@types/node@npm:^22.0.0, @types/node@npm:^22.10.1":
   version: 22.16.5
   resolution: "@types/node@npm:22.16.5"
   dependencies:
@@ -6750,7 +6763,7 @@ __metadata:
     tailwindcss: "npm:^4.1.11"
     tailwindcss-animate: "npm:^1.0.7"
     tesseract.js: "npm:^6.0.1"
-    turbo: "npm:^2.3.3"
+    turbo: "npm:^2.5.5"
     typescript: "npm:^5.7.2"
     uuid: "npm:^11.1.0"
     xml-crypto: "npm:^6.1.2"
@@ -12700,7 +12713,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"turbo@npm:^2.3.3":
+"turbo@npm:^2.5.5":
   version: 2.5.5
   resolution: "turbo@npm:2.5.5"
   dependencies:
@@ -12833,7 +12846,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@npm:^5.1.6, typescript@npm:^5.3.0, typescript@npm:^5.7.2":
+"typescript@npm:^5.1.6, typescript@npm:^5.3.0, typescript@npm:^5.5.4, typescript@npm:^5.7.2":
   version: 5.8.3
   resolution: "typescript@npm:5.8.3"
   bin:
@@ -12843,7 +12856,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"typescript@patch:typescript@npm%3A^5.1.6#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.3.0#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.7.2#optional!builtin<compat/typescript>":
+"typescript@patch:typescript@npm%3A^5.1.6#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.3.0#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.5.4#optional!builtin<compat/typescript>, typescript@patch:typescript@npm%3A^5.7.2#optional!builtin<compat/typescript>":
   version: 5.8.3
   resolution: "typescript@patch:typescript@npm%3A5.8.3#optional!builtin<compat/typescript>::version=5.8.3&hash=5786d5"
   bin:

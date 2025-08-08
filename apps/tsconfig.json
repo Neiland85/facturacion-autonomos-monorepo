@@ -9,15 +9,20 @@
     "baseUrl": "./",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./*"
       ]
     }
   },
   "include": [
-    "src/**/*",
-    "__tests__/**/*"
+    "*/src/**/*",
+    "*/__tests__/**/*",
+    "*/scripts/**/*"
   ],
   "exclude": [
-    "node_modules"
+    "node_modules",
+    "**/node_modules",
+    "**/dist",
+    "**/.next",
+    "**/.swc"
   ]
 }
