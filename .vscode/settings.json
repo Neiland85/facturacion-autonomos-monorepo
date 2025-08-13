@@ -44,5 +44,20 @@
   "git.postCommitCommand": "sync",
   "npm.packageManager": "pnpm",
   "pnpm.enablePnp": true,
-  "pnpm.workspaceRoot": true
+  "pnpm.workspaceRoot": true,
+  "cSpell.words": [
+    "abierto",
+    "autonomos",
+    "cerrar",
+    "Componente",
+    "componentes",
+    "cuando",
+    "está",
+    "Exportar",
+    "facturacion",
+    "Manejo",
+    "Prevenir",
+    "tecla",
+    "Tipos"
+  ]
 }
