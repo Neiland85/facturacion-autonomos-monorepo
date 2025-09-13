@@ -1,4 +1,4 @@
-name: 🚀 Simplified CI/CD
+name: ✅ Basic Checks Only
 
 on:
   push:
@@ -11,8 +11,8 @@ on:
       - develop
 
 jobs:
-  basic-check:
-    name: 🔍 Basic Check
+  basic-validation:
+    name: 🔍 Basic Validation
     runs-on: ubuntu-latest
 
     steps:
@@ -45,4 +45,4 @@ jobs:
         run: pnpm build
 
       - name: 🎉 Success notification
-        run: echo "✅ All checks passed successfully!"
+        run: echo "✅ All basic checks passed successfully!"
