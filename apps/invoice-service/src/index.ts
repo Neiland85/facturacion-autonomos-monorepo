@@ -6,6 +6,9 @@ import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
 
+// Importar extensiones de números llamables
+import './types/number-callable';
+
 // Configurar documentación API
 const { setupSwagger } = require(
   path.join(__dirname, '../../config/invoice-service-swagger')

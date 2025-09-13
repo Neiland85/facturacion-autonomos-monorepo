@@ -9,7 +9,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest",
-    "test:service": "jest --config jest.service.config.js",
+    "test:service": "jest --config jest.config.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "clean": "rm -rf dist"
