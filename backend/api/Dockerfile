@@ -1,5 +1,5 @@
 # Dockerfile para el backend
-FROM node:18
+FROM node:20
 
 # Crear directorio de trabajo
 WORKDIR /usr/src/app

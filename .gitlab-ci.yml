@@ -13,31 +13,31 @@ stages:
 variables:
   # Configuración de Docker
   DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: "/certs"
+  DOCKER_TLS_CERTDIR: '/certs'
   DOCKER_BUILDKIT: 1
-  
+
   # Configuración de registry
   REGISTRY: registry.gitlab.com
   REGISTRY_USER: $CI_REGISTRY_USER
   REGISTRY_PASSWORD: $CI_REGISTRY_PASSWORD
-  
+
   # Configuración de Kubernetes
   KUBE_NAMESPACE_STAGING: facturacion-staging
   KUBE_NAMESPACE_PRODUCTION: facturacion-production
-  
+
   # Configuración de aplicaciones
   API_FACTURAS_IMAGE: $CI_REGISTRY_IMAGE/api-facturas
   API_TAX_CALCULATOR_IMAGE: $CI_REGISTRY_IMAGE/api-tax-calculator
   WEB_IMAGE: $CI_REGISTRY_IMAGE/web
-  
+
   # Configuración de base de datos
-  POSTGRES_VERSION: "15"
-  REDIS_VERSION: "7-alpine"
+  POSTGRES_VERSION: '15'
+  REDIS_VERSION: '7-alpine'
 
 # Plantilla para caché de Node.js
 .node_cache_template: &node_cache
   cache:
-    key: "$CI_COMMIT_REF_SLUG-node"
+    key: '$CI_COMMIT_REF_SLUG-node'
     paths:
       - .yarn/cache/
       - node_modules/
@@ -46,14 +46,14 @@ variables:
 # Plantilla para caché de Docker
 .docker_cache_template: &docker_cache
   cache:
-    key: "$CI_COMMIT_REF_SLUG-docker"
+    key: '$CI_COMMIT_REF_SLUG-docker'
     paths:
       - .docker/
     policy: pull-push
 
 # Plantilla base para trabajos con Node.js
 .node_template: &node_template
-  image: node:18-alpine
+  image: node:20-alpine
   before_script:
     - apk add --no-cache git
     - corepack enable
@@ -132,7 +132,7 @@ test:api-integration:
     POSTGRES_PASSWORD: postgres
     POSTGRES_HOST: postgres
     REDIS_HOST: redis
-    DATABASE_URL: "postgresql://postgres:postgres@postgres:5432/facturacion_test"
+    DATABASE_URL: 'postgresql://postgres:postgres@postgres:5432/facturacion_test'
   script:
     - echo "🧪 Running API integration tests..."
     - cd apps/api-facturas
@@ -215,26 +215,26 @@ deploy:staging:
   script:
     - echo "🚀 Deploying to staging environment..."
     - kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-    
+
     # Aplicar ConfigMaps y Secrets
     - envsubst < k8s/configmap.yaml | kubectl apply -f -
     - envsubst < k8s/secret.yaml | kubectl apply -f -
-    
+
     # Aplicar servicios y deployments
     - envsubst < k8s/postgres.yaml | kubectl apply -f -
     - envsubst < k8s/redis.yaml | kubectl apply -f -
     - envsubst < k8s/api-facturas.yaml | kubectl apply -f -
     - envsubst < k8s/api-tax-calculator.yaml | kubectl apply -f -
     - envsubst < k8s/web.yaml | kubectl apply -f -
-    
+
     # Aplicar Ingress
     - envsubst < k8s/ingress.yaml | kubectl apply -f -
-    
+
     # Verificar deployments
     - kubectl rollout status deployment/api-facturas -n $KUBE_NAMESPACE
     - kubectl rollout status deployment/api-tax-calculator -n $KUBE_NAMESPACE
     - kubectl rollout status deployment/web -n $KUBE_NAMESPACE
-    
+
     - echo "✅ Staging deployment completed successfully"
   only:
     - develop
@@ -260,26 +260,26 @@ deploy:production:
   script:
     - echo "🚀 Deploying to production environment..."
     - kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
-    
+
     # Aplicar ConfigMaps y Secrets
     - envsubst < k8s/configmap.yaml | kubectl apply -f -
     - envsubst < k8s/secret.yaml | kubectl apply -f -
-    
+
     # Aplicar servicios y deployments
     - envsubst < k8s/postgres.yaml | kubectl apply -f -
     - envsubst < k8s/redis.yaml | kubectl apply -f -
     - envsubst < k8s/api-facturas.yaml | kubectl apply -f -
     - envsubst < k8s/api-tax-calculator.yaml | kubectl apply -f -
     - envsubst < k8s/web.yaml | kubectl apply -f -
-    
+
     # Aplicar Ingress
     - envsubst < k8s/ingress.yaml | kubectl apply -f -
-    
+
     # Verificar deployments
     - kubectl rollout status deployment/api-facturas -n $KUBE_NAMESPACE
     - kubectl rollout status deployment/api-tax-calculator -n $KUBE_NAMESPACE
     - kubectl rollout status deployment/web -n $KUBE_NAMESPACE
-    
+
     - echo "✅ Production deployment completed successfully"
   when: manual
   only:
