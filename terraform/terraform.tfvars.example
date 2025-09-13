@@ -1,0 +1,16 @@
+# AWS Configuration
+aws_region = "us-east-1"
+environment = "production"
+
+# Network Configuration
+vpc_cidr = "10.0.0.0/16"
+availability_zones = ["us-east-1a", "us-east-1b", "us-east-1c"]
+
+# Database Configuration
+database_password = "your-secure-password-here"
+
+# SSL Certificate
+certificate_arn = "arn:aws:acm:us-east-1:123456789012:certificate/your-cert-id"
+
+# Domain Configuration
+domain_name = "tributariapp.com"

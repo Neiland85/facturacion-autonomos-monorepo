@@ -1,0 +1,342 @@
+name: Deploy TributariApp
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  # Tests y validación
+  test:
+    name: Test and Validate
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: facturacion_test
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+        ports:
+          - 5432:5432
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: ⚙️ Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@8.15.0 --activate
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Run linter
+        run: pnpm lint
+
+      - name: Run type check
+        run: pnpm type-check
+
+      - name: Setup test database
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/facturacion_test
+        run: |
+          pnpm --filter @facturacion/database db:push
+
+      - name: Run tests
+        env:
+          DATABASE_URL: postgresql://test:test@localhost:5432/facturacion_test
+          NODE_ENV: test
+          JWT_SECRET: test-secret
+        run: pnpm test --coverage
+
+      - name: Upload coverage
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          flags: all
+
+  # Build y push de imágenes Docker
+  build:
+    name: Build and Push Docker Images
+    runs-on: ubuntu-latest
+    needs: test
+    if: github.event_name == 'push'
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=ref,event=branch
+            type=ref,event=pr
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=sha,prefix={{branch}}-
+
+      # Build API Facturas
+      - name: Build and push API Facturas
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/api-facturas/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api-facturas:${{ steps.meta.outputs.version }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production
+
+      # Build API Tax Calculator
+      - name: Build and push API Tax Calculator
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/api-tax-calculator/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api-tax-calculator:${{ steps.meta.outputs.version }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production
+
+      # Build Frontend
+      - name: Build and push Frontend
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: ./apps/web/Dockerfile
+          push: true
+          tags: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:${{ steps.meta.outputs.version }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+          build-args: |
+            NODE_ENV=production
+
+  # Escaneo de seguridad
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: build
+    if: github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        with:
+          image-ref: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api-facturas:${{ github.sha }}
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@v3
+        with:
+          sarif_file: 'trivy-results.sarif'
+
+  # Despliegue a Staging
+  deploy-staging:
+    name: Deploy to Staging
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/develop'
+    environment: staging
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl for staging
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_STAGING }}" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+
+      - name: Deploy to Kubernetes Staging
+        run: |
+          # Deploy API Facturas
+          kubectl set image deployment/api-facturas \
+            api-facturas=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api-facturas:develop-${{ github.sha }} \
+            -n tributariapp-staging
+          kubectl rollout status deployment/api-facturas -n tributariapp-staging
+
+          # Deploy API Tax Calculator
+          kubectl set image deployment/api-tax-calculator \
+            api-tax-calculator=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api-tax-calculator:develop-${{ github.sha }} \
+            -n tributariapp-staging
+          kubectl rollout status deployment/api-tax-calculator -n tributariapp-staging
+
+          # Deploy Frontend
+          kubectl set image deployment/frontend \
+            frontend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:develop-${{ github.sha }} \
+            -n tributariapp-staging
+          kubectl rollout status deployment/frontend -n tributariapp-staging
+
+      - name: Run smoke tests staging
+        run: |
+          # Wait for services to be ready
+          sleep 30
+
+          # Test API Facturas
+          API_URL=$(kubectl get svc api-facturas -n tributariapp-staging -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          curl -f http://$API_URL/health || exit 1
+
+          # Test API Tax Calculator
+          TAX_URL=$(kubectl get svc api-tax-calculator -n tributariapp-staging -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          curl -f http://$TAX_URL/health || exit 1
+
+  # Despliegue a Producción
+  deploy-production:
+    name: Deploy to Production
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/main'
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'latest'
+
+      - name: Configure kubectl for production
+        run: |
+          echo "${{ secrets.KUBE_CONFIG_PRODUCTION }}" | base64 -d > kubeconfig
+          export KUBECONFIG=kubeconfig
+
+      - name: Deploy to Kubernetes Production
+        run: |
+          # Deploy API Facturas
+          kubectl set image deployment/api-facturas \
+            api-facturas=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api-facturas:main-${{ github.sha }} \
+            -n tributariapp
+          kubectl rollout status deployment/api-facturas -n tributariapp
+
+          # Deploy API Tax Calculator
+          kubectl set image deployment/api-tax-calculator \
+            api-tax-calculator=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/api-tax-calculator:main-${{ github.sha }} \
+            -n tributariapp
+          kubectl rollout status deployment/api-tax-calculator -n tributariapp
+
+          # Deploy Frontend
+          kubectl set image deployment/frontend \
+            frontend=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}/frontend:main-${{ github.sha }} \
+            -n tributariapp
+          kubectl rollout status deployment/frontend -n tributariapp
+
+      - name: Run smoke tests production
+        run: |
+          # Wait for services to be ready
+          sleep 30
+
+          # Test API Facturas
+          API_URL=$(kubectl get svc api-facturas -n tributariapp -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          curl -f https://$API_URL/health || exit 1
+
+          # Test API Tax Calculator
+          TAX_URL=$(kubectl get svc api-tax-calculator -n tributariapp -o jsonpath='{.status.loadBalancer.ingress[0].ip}')
+          curl -f https://$TAX_URL/health || exit 1
+
+      - name: Notify deployment success
+        uses: 8398a7/action-slack@v3
+        with:
+          status: success
+          text: '✅ TributariApp deployed to production successfully!'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
+        if: success()
+
+  # Despliegue con Terraform (opcional)
+  deploy-infrastructure:
+    name: Deploy Infrastructure with Terraform
+    runs-on: ubuntu-latest
+    needs: [build, security-scan]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+        with:
+          terraform_version: '1.5.0'
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Terraform Init
+        run: |
+          cd terraform
+          terraform init
+
+      - name: Terraform Plan
+        run: |
+          cd terraform
+          terraform plan -var-file=terraform.tfvars
+
+      - name: Terraform Apply
+        run: |
+          cd terraform
+          terraform apply -var-file=terraform.tfvars -auto-approve
+        if: github.ref == 'refs/heads/main'
+
+  # Notificación de fallo
+  notify-failure:
+    name: Notify Deployment Failure
+    runs-on: ubuntu-latest
+    if: failure()
+
+    steps:
+      - name: Notify failure
+        uses: 8398a7/action-slack@v3
+        with:
+          status: failure
+          text: '❌ TributariApp deployment failed! Check the logs for details.'
+          webhook_url: ${{ secrets.SLACK_WEBHOOK }}
