@@ -39,10 +39,10 @@
   "include": [
     "**/*.ts",
     "**/*.tsx",
+    "__tests__/**/*",
+    "jest.setup.js",
     ".next/types/**/*.ts",
-    "next-env.d.ts",
-    "src/lib/**/*.ts",
-    "out/types/**/*.ts"
+    "src/lib/**/*.ts"
   ],
   "exclude": [
     "node_modules"
