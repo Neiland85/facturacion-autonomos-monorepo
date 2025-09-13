@@ -1,8 +1,6 @@
 // Implementación de números llamables
 // Este archivo proporciona la implementación real de las signaturas de llamada
 
-import './types/number-extensions';
-
 // Extender el prototipo Number con funcionalidades de llamada
 declare global {
   interface Number {

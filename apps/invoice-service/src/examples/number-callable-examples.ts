@@ -1,7 +1,7 @@
 // Ejemplo de uso de números llamables
 // Este archivo demuestra cómo usar las signaturas de llamada al tipo Number
 
-import './types/number-callable';
+import '../types/number-callable';
 
 // Ejemplos de uso básico
 console.log('=== Ejemplos de Números Llamables ===');
