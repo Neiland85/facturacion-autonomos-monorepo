@@ -6,7 +6,15 @@
 set -e
 
 # Default DATABASE_URL if not provided
-DATABASE_URL=${1:-${DATABASE_URL:-"postgresql://postgres:${POSTGRES_DEV_PASSWORD:-secure_dev_pass}@localhost:5432/facturacion_dev"}}
+if [ -z "$DATABASE_URL" ]; then
+    # Use CI/CD environment variables if available
+    if [ -n "$POSTGRES_PASSWORD" ] && [ -n "$POSTGRES_DB" ]; then
+        DATABASE_URL="postgresql://postgres:$POSTGRES_PASSWORD@localhost:5432/$POSTGRES_DB"
+    else
+        # Fallback to development defaults
+        DATABASE_URL="postgresql://postgres:${POSTGRES_DEV_PASSWORD:-secure_dev_pass}@localhost:5432/facturacion_dev"
+    fi
+fi
 
 echo "🗄️  Running database migrations..."
 echo "📍 Database URL: ${DATABASE_URL}"

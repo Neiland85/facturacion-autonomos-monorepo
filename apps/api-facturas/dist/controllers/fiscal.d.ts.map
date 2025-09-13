@@ -1,1 +1,0 @@
-{"version":3,"file":"fiscal.d.ts","sourceRoot":"","sources":["../../src/controllers/fiscal.ts"],"names":[],"mappings":"AACA,OAAO,EAAE,OAAO,EAAE,QAAQ,EAAE,MAAM,SAAS,CAAC;AAG5C,qBAAa,gBAAgB;IACrB,QAAQ,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ;IAmCpC,WAAW,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ;IAuBvC,UAAU,CAAC,GAAG,EAAE,OAAO,EAAE,GAAG,EAAE,QAAQ;CA4C7C"}

@@ -1,0 +1,144 @@
+name: 🔍 Code Audit & GitHub Pages (Robust)
+
+on:
+  push:
+    branches: ['main', 'develop']
+  pull_request:
+    branches: ['main', 'develop']
+  schedule:
+    - cron: '17 */12 * * *' # cada 12h
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+env:
+  NODE_VERSION: '20'
+  PNPM_VERSION: '8'
+
+jobs:
+  # ✅ Job crítico - debe pasar siempre
+  critical-checks:
+    name: 🔍 Critical Quality Checks
+    runs-on: ubuntu-latest
+    outputs:
+      build-success: ${{ steps.build.outcome }}
+      type-check-success: ${{ steps.type-check.outcome }}
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📦 Install dependencies
+        id: install
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build all packages
+        id: build
+        run: pnpm run build
+
+      - name: 🔍 Type check all packages
+        id: type-check
+        run: pnpm run type-check
+
+      - name: 🧹 Lint all packages
+        id: lint
+        run: pnpm run lint
+
+  # ⚠️ Job opcional - puede fallar sin detener todo
+  optional-checks:
+    name: 📊 Optional Metrics & Coverage
+    runs-on: ubuntu-latest
+    needs: critical-checks
+    if: always() && needs.critical-checks.result == 'success'
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🟢 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - name: 📦 Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🧪 Test all packages
+        id: tests
+        run: pnpm run test
+        continue-on-error: true
+
+      - name: 📊 Generate coverage report
+        id: coverage
+        run: |
+          echo "Generating coverage report..."
+          pnpm --filter @facturacion/web test --coverage --passWithNoTests || true
+          if [ -f "apps/web/coverage/coverage-final.json" ]; then
+            mkdir -p coverage
+            cp apps/web/coverage/coverage-final.json coverage/
+            echo "Coverage report generated"
+          else
+            echo "No coverage found, creating empty report"
+            mkdir -p coverage
+            echo '{"total": 0, "covered": 0, "percentage": 0}' > coverage/coverage-final.json
+          fi
+        continue-on-error: true
+
+      - name: 📈 Generate git metrics
+        id: metrics
+        run: |
+          echo "Generating git metrics..."
+          if [ -f "scripts/metrics_git.py" ]; then
+            python3 scripts/metrics_git.py --window-days 90 --out metrics.json || echo '{"error": "metrics_script_failed"}' > metrics.json
+          else
+            echo "Metrics script not found, creating default"
+            echo '{"commits": 0, "contributors": 0, "lines_added": 0, "lines_deleted": 0}' > metrics.json
+          fi
+        continue-on-error: true
+
+      - name: 📄 Prepare static site
+        id: prepare-site
+        run: |
+          echo "Preparing static site..."
+          mkdir -p public/data
+          cp metrics.json public/data/ 2>/dev/null || echo "Failed to copy metrics"
+          if [ -f "coverage/coverage-final.json" ]; then
+            cp coverage/coverage-final.json public/data/ 2>/dev/null || echo "Failed to copy coverage"
+          fi
+          echo "Site preparation completed"
+
+      - name: 📤 Upload Pages artifact
+        id: upload-artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./public
+        continue-on-error: true
+
+  # 🚀 Deploy - solo si las checks críticas pasaron
+  deploy:
+    if: github.event_name != 'pull_request' && needs.critical-checks.result == 'success'
+    needs: [critical-checks, optional-checks]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🚀 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

@@ -1,12 +1,6 @@
 {
-<<<<<<< HEAD
   "buildStage": "static-generation",
   "buildOptions": {
     "useBuildWorker": "false"
-=======
-  "buildStage": "compile",
-  "buildOptions": {
-    "useBuildWorker": "true"
->>>>>>> develop
   }
 }

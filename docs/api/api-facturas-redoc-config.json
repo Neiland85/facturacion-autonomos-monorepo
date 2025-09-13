@@ -1,0 +1,24 @@
+{
+  "title": "api-facturas API Documentation",
+  "version": "1.0.0",
+  "spec": {
+    "url": "/api-docs.json"
+  },
+  "theme": {
+    "colors": {
+      "primary": {
+        "main": "#007bff"
+      }
+    },
+    "typography": {
+      "fontSize": "14px",
+      "fontFamily": "Inter, sans-serif"
+    }
+  },
+  "hideDownloadButton": false,
+  "hideHostname": false,
+  "expandResponses": "200,201",
+  "requiredPropsFirst": true,
+  "sortPropsAlphabetically": true,
+  "showExtensions": true
+}

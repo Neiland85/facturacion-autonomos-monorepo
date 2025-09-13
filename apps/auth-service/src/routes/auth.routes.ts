@@ -2,9 +2,13 @@ import express from 'express';
 import { AuthController } from '../controllers/auth.controller';
 import { asyncHandler } from '../middleware/async-handler.middleware';
 import { authenticateToken } from '../middleware/auth.middleware';
-import { validateLogin, validateRefresh, validateRegister } from '../middleware/validation.middleware';
+import {
+  validateLogin,
+  validateRefreshToken,
+  validateRegister,
+} from '../middleware/validation.middleware';
 
-const router = express.Router();
+const router: express.Router = express.Router();
 const authController = new AuthController();
 
 /**
@@ -53,7 +57,11 @@ const authController = new AuthController();
  *                 user:
  *                   type: object
  */
-router.post('/register', validateRegister, asyncHandler(authController.register));
+router.post(
+  '/register',
+  validateRegister,
+  asyncHandler(authController.register)
+);
 
 /**
  * @swagger
@@ -137,7 +145,11 @@ router.post('/logout', asyncHandler(authController.logout));
  *           Set-Cookie:
  *             description: Nuevo JWT token
  */
-router.post('/refresh', validateRefresh, asyncHandler(authController.refresh));
+router.post(
+  '/refresh',
+  validateRefreshToken,
+  asyncHandler(authController.refresh)
+);
 
 /**
  * @swagger
@@ -165,7 +177,11 @@ router.get('/me', authenticateToken, asyncHandler(authController.me));
  *       200:
  *         description: QR code para configurar 2FA
  */
-router.post('/2fa/setup', authenticateToken, asyncHandler(authController.setup2FA));
+router.post(
+  '/2fa/setup',
+  authenticateToken,
+  asyncHandler(authController.setup2FA)
+);
 
 /**
  * @swagger
@@ -191,7 +207,11 @@ router.post('/2fa/setup', authenticateToken, asyncHandler(authController.setup2F
  *       200:
  *         description: 2FA verificado exitosamente
  */
-router.post('/2fa/verify', authenticateToken, asyncHandler(authController.verify2FA));
+router.post(
+  '/2fa/verify',
+  authenticateToken,
+  asyncHandler(authController.verify2FA)
+);
 
 /**
  * @swagger
@@ -205,7 +225,11 @@ router.post('/2fa/verify', authenticateToken, asyncHandler(authController.verify
  *       200:
  *         description: 2FA deshabilitado
  */
-router.post('/2fa/disable', authenticateToken, asyncHandler(authController.disable2FA));
+router.post(
+  '/2fa/disable',
+  authenticateToken,
+  asyncHandler(authController.disable2FA)
+);
 
 /**
  * @swagger
@@ -234,6 +258,10 @@ router.post('/2fa/disable', authenticateToken, asyncHandler(authController.disab
  *       200:
  *         description: Contraseña cambiada exitosamente
  */
-router.post('/change-password', authenticateToken, asyncHandler(authController.changePassword));
+router.post(
+  '/change-password',
+  authenticateToken,
+  asyncHandler(authController.changePassword)
+);
 
 export { router as authRoutes };

@@ -1,11 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuración optimizada para Netlify
+  // Configuración optimizada para Vercel
   output: 'standalone',
+  trailingSlash: false,
 
-  // Configuración de imágenes para Netlify
+  // Configuración de imágenes optimizada para Vercel
   images: {
-    unoptimized: true, // Netlify maneja la optimización de imágenes
+    domains: ['localhost'],
+    unoptimized: false, // Vercel optimiza automáticamente
   },
 
   // Variables de entorno públicas
@@ -18,7 +20,7 @@ const nextConfig = {
 
   // Configuración de webpack personalizada
   webpack: (config, { dev, isServer }) => {
-    // Optimizaciones para Netlify
+    // Optimizaciones para Vercel
     if (!dev && !isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,
