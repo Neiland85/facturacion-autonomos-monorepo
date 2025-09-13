@@ -41,15 +41,30 @@ jobs:
       - name: ⚙️ Enable Corepack
         run: |
           corepack enable
-          corepack prepare pnpm@8.6.4 --activate
+          corepack prepare pnpm@8.15.0 --activate
 
       - name: 📦 Install dependencies
         run: pnpm install --frozen-lockfile
 
       - name: 🗄️ Run database migrations
-        run: ./db/run-migrations.sh
+        run: |
+          echo "⏳ Waiting for PostgreSQL to be ready..."
+          for i in {1..30}; do
+            if pg_isready -h localhost -p 5432 -U postgres; then
+              echo "✅ PostgreSQL is ready!"
+              break
+            fi
+            echo "⏳ Waiting... ($i/30)"
+            sleep 2
+          done
+
+          echo "🗄️ Running database migrations..."
+          ./db/run-migrations.sh
         env:
           DATABASE_URL: postgresql://postgres:postgres_test@localhost:5432/facturacion_test
+          POSTGRES_PASSWORD: postgres_test
+          POSTGRES_DB: facturacion_test
+          POSTGRES_DEV_PASSWORD: postgres_test
 
       - name: 🔍 Type check
         run: pnpm type-check
