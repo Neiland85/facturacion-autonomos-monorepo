@@ -13,6 +13,12 @@
 - **[TASK_ORDER.md](./tasks/TASK_ORDER.md)** - Orden prioritario de tareas técnicas
 - **[NEXT_TASKS_FORECAST.md](./tasks/NEXT_TASKS_FORECAST.md)** - Previsión y planificación de próximas tareas
 
+### 👥 Colaboración y Gestión de Equipo
+
+- **[COLABORADORES_REPOSITORIO.md](./COLABORADORES_REPOSITORIO.md)** - Guía completa para gestionar colaboradores
+- **[GUIA_RAPIDA_COLABORADORES.md](./GUIA_RAPIDA_COLABORADORES.md)** - Referencia rápida para añadir colaboradores
+- **[CONTRIBUTING.md](../CONTRIBUTING.md)** - Guía de contribución al proyecto
+
 ## 🏛️ Architecture Decision Records (ADRs)
 
 ### Decisiones Arquitectónicas Implementadas
@@ -109,6 +115,7 @@ docs/
 - **Desarrollo**: DEV_README, COPILOT_CONTEXT, TASK_ORDER
 - **Planificación**: TASK_ORDER, NEXT_TASKS_FORECAST
 - **Setup**: DEV_README, .copilot-instructions
+- **Colaboración**: COLABORADORES_REPOSITORIO, GUIA_RAPIDA_COLABORADORES, CONTRIBUTING
 
 ### Por Urgencia
 
