@@ -37,6 +37,11 @@ const baseConfig = {
 const nodeConfig = {
   ...baseConfig,
   preset: 'ts-jest',
+  globals: {
+    'ts-jest': {
+      tsconfig: '<rootDir>/tsconfig.json',
+    },
+  },
 };
 
 // Configuración específica para proyectos ESM
@@ -47,6 +52,7 @@ const esmConfig = {
   globals: {
     'ts-jest': {
       useESM: true,
+      tsconfig: '<rootDir>/tsconfig.json',
     },
   },
   transform: {
@@ -78,7 +84,7 @@ const nextConfig = {
   },
   globals: {
     'ts-jest': {
-      tsconfig: 'tsconfig.json',
+      tsconfig: '<rootDir>/tsconfig.json',
     },
   },
 };

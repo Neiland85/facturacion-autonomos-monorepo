@@ -9,7 +9,7 @@
     "build": "tsc",
     "start": "node dist/index.js",
     "test": "jest",
-    "test:service": "jest --config jest.service.config.js",
+    "test:service": "jest --config jest.config.js",
     "type-check": "tsc --noEmit",
     "lint": "eslint src --ext .ts",
     "clean": "rm -rf dist"
@@ -37,6 +37,7 @@
     "jest": "^29.7.0",
     "prisma": "^6.11.1",
     "supertest": "^7.0.0",
+    "ts-jest": "^29.4.1",
     "tsx": "^4.19.2",
     "typescript": "^5.7.2"
   },
