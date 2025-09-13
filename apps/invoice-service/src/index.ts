@@ -7,7 +7,9 @@ import morgan from 'morgan';
 import path from 'path';
 
 // Importar extensiones de números llamables
-import './types/number-callable';
+if (process.env.NODE_ENV !== 'test') {
+  import('./types/number-callable.prod');
+}
 
 // Configurar documentación API
 const { setupSwagger } = require(
@@ -15,13 +17,13 @@ const { setupSwagger } = require(
 );
 
 const app: express.Application = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT ?? 3001;
 
 // Middleware de seguridad
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || [
+    origin: process.env.ALLOWED_ORIGINS?.split(',') ?? [
       'http://localhost:3000',
     ],
     credentials: true,
@@ -52,7 +54,7 @@ app.get('/health', (req: express.Request, res: express.Response) => {
     status: 'ok',
     service: 'invoice-service',
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0',
+    version: process.env.npm_package_version ?? '1.0.0',
   });
 });
 
@@ -82,10 +84,10 @@ app.use('*', (req: express.Request, res: express.Response) => {
 // Error handler
 app.use(
   (
-    err: any,
+    err: Error,
     req: express.Request,
     res: express.Response,
-    next: express.NextFunction
+    _next: express.NextFunction
   ) => {
     console.error('Error:', err);
     res.status(500).json({
@@ -96,14 +98,14 @@ app.use(
 );
 
 app.listen(PORT, () => {
-  console.log(`📄 Invoice Service running on port ${PORT}`);
-  console.log(
+  console.info(`📄 Invoice Service running on port ${PORT}`);
+  console.info(
     `📖 API Documentation available at: http://localhost:${PORT}/api-docs`
   );
-  console.log(`🔒 Security features enabled:`);
-  console.log(`   ✅ Helmet security headers`);
-  console.log(`   ✅ CORS protection`);
-  console.log(`   ✅ Rate limiting`);
+  console.info(`🔒 Security features enabled:`);
+  console.info(`   ✅ Helmet security headers`);
+  console.info(`   ✅ CORS protection`);
+  console.info(`   ✅ Rate limiting`);
 });
 
 export default app;

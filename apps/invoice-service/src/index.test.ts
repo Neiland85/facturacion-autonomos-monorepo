@@ -2,8 +2,8 @@
 import './types/number-callable';
 
 // Mock del módulo principal del servicio usando objetos simples
-const createMockResponse = (data: any) => ({
-  status: (code: number) => ({
+const createMockResponse = (_data: any) => ({
+  status: (_code: number) => ({
     json: (body: any) => body,
   }),
 });
@@ -25,7 +25,7 @@ const mockApp = {
 };
 
 // Usar mockApp directamente para evitar conflictos con Jest
-const app = mockApp;
+const _app = mockApp;
 
 // Configuración global para tests
 beforeAll(() => {

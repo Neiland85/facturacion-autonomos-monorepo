@@ -9,7 +9,7 @@ declare global {
       stringify(): string;
       parse(): number;
       toObject(): { value: number; type: 'number' };
-      fromObject(obj: { value: number; type: string }): number;
+      fromObject(obj: { value: number; type: 'number' }): number;
     };
 
     // Métodos adicionales para JSON
@@ -17,23 +17,23 @@ declare global {
     fromJSON(jsonString: string): number;
 
     // Métodos de función para números
-    call(this: Number, ...args: any[]): number;
-    apply(this: Number, thisArg: any, args?: any[]): number;
+    call(this: Number, ...args: unknown[]): number;
+    apply(this: Number, thisArg: unknown, args?: unknown[]): number;
     bind(
       this: Number,
-      thisArg: any,
-      ...args: any[]
-    ): (...args: any[]) => number;
+      thisArg: unknown,
+      ...args: unknown[]
+    ): (...args: unknown[]) => number;
 
     // Utilidades adicionales
-    toCallable(): (...args: any[]) => number;
-    invoke(...args: any[]): number;
+    toCallable(): (...args: unknown[]) => number;
+    invoke(...args: unknown[]): number;
   }
 
   // Extender NumberConstructor
   interface NumberConstructor {
-    callable(value: number): Number & ((...args: any[]) => number);
-    fromCallable(callable: (...args: any[]) => number): number;
+    callable(value: number): Number & ((...args: unknown[]) => number);
+    fromCallable(callable: (...args: unknown[]) => number): number;
   }
 }
 

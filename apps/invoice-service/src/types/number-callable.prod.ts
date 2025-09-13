@@ -1,7 +1,15 @@
-// Jest setup file for invoice-service
-// Add any global test setup here
+// Extensiones de Number para producción
+// Este archivo se carga solo en entornos de producción
 
-// Mock de extensiones de Number para tests
+// Extender el prototipo Number con funcionalidades de llamada
+declare global {
+  interface Number {
+    toCallable(): (...args: unknown[]) => number;
+    invoke(...args: unknown[]): number;
+  }
+}
+
+// Implementación de métodos para producción
 Object.defineProperty(Number.prototype, 'toCallable', {
   value: function (this: Number): (...args: unknown[]) => number {
     const numValue: number = this.valueOf();
@@ -12,7 +20,7 @@ Object.defineProperty(Number.prototype, 'toCallable', {
 });
 
 Object.defineProperty(Number.prototype, 'invoke', {
-  value: function (this: Number, ...args: unknown[]): number {
+  value: function (this: Number, ..._args: unknown[]): number {
     return this.valueOf();
   },
   writable: false,
@@ -60,14 +68,4 @@ Object.defineProperty(Number, 'fromCallable', {
   configurable: false,
 });
 
-// Example: Global test timeout
-// jest.setTimeout(10000);
-
-// Example: Global before/after hooks
-// beforeAll(async () => {
-//   // Setup code
-// });
-
-// afterAll(async () => {
-//   // Cleanup code
-// });
+export {};
