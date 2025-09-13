@@ -1,47 +1,27 @@
-import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
-import rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
-import { CronJobManager } from './cron/cron-manager';
-import { errorHandler } from './middleware/error.middleware';
-import { requestLogger } from './middleware/logger.middleware';
-import { configuracionFiscalRoutes } from './routes/configuracion-fiscal.routes';
-import { quarterClosureRoutes } from './routes/quarter-closure.routes';
-import { taxRoutes } from './routes/tax.routes';
-import { webhookRoutes } from './routes/webhook.routes';
+import path from 'path';
 
-const app = express();
-const PORT = process.env.PORT || 3002;
-
-// Inicializar cron jobs
-const cronManager = new CronJobManager();
-
-// Middleware de seguridad
-app.use(helmet());
-app.use(
-  cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || [
-      'http://localhost:3000',
-    ],
-    credentials: true,
-  })
+// Configurar documentación API
+const { setupSwagger } = require(
+  path.join(__dirname, '../../config/api-tax-calculator-swagger')
 );
 
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // máximo 100 requests por ventana
-  message: {
-    error: 'Demasiadas solicitudes, inténtalo de nuevo más tarde.',
-  },
-});
-app.use(limiter);
+const app: express.Application = express();
+const PORT = process.env.PORT || 3003;
 
-// Middleware general
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true }));
-app.use(requestLogger);
+// TODO: Crear middlewares faltantes
+// import { errorHandler } from './middleware/errorHandler';
+// import { requestLogger } from './middleware/logger.middleware';
+
+// TODO: Verificar rutas existentes
+// import { configuracionFiscalRoutes } from './routes/configuracion-fiscal.routes';
+// import { quarterClosureRoutes } from './routes/quarter-closure.routes';
+// import { taxRoutes } from './routes/tax.routes';
+// import { webhookRoutes } from './routes/webhook.routes';
+
+// Configurar documentación API
+setupSwagger(app);
 
 // Health check
 app.get('/health', (_req, res) => {
@@ -54,38 +34,46 @@ app.get('/health', (_req, res) => {
 });
 
 // Rutas
-app.use('/api/tax', taxRoutes);
-app.use('/api/quarter-closure', quarterClosureRoutes);
-app.use('/api/configuracion-fiscal', configuracionFiscalRoutes);
-app.use('/api/webhooks', webhookRoutes);
+// TODO: Crear rutas faltantes
+// app.use('/api/tax', taxRoutes);
+// app.use('/api/quarter-closure', quarterClosureRoutes);
+// app.use('/api/configuracion-fiscal', configuracionFiscalRoutes);
+// app.use('/api/webhooks', webhookRoutes);
 
-// 404 handler
-app.use('*', (req, res) => {
-  res.status(404).json({
-    error: 'Endpoint no encontrado',
-    path: req.originalUrl,
-    method: req.method,
-  });
-});
-
-// Error handler
-app.use(errorHandler);
+// Error handler básico
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error('Error:', err);
+    res.status(500).json({
+      error: 'Internal server error',
+      timestamp: new Date().toISOString(),
+    });
+  }
+);
 
 // Iniciar servidor
 const server = app.listen(PORT, () => {
-  console.log(`Tax Calculator API corriendo en puerto ${PORT}`);
+  console.log(`🧾 Tax Calculator API running on port ${PORT}`);
+  console.log(
+    `📖 API Documentation available at: http://localhost:${PORT}/api-docs`
+  );
   console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
 
-  // Iniciar cron jobs
-  cronManager.startCronJobs();
+  // TODO: Habilitar cron jobs cuando estén disponibles
+  // cronManager.startCronJobs();
 });
 
 // Manejo de señales de cierre
 process.on('SIGTERM', async () => {
   console.log('Señal SIGTERM recibida, cerrando servidor...');
 
-  // Detener cron jobs
-  await cronManager.shutdown();
+  // TODO: Habilitar cuando cron jobs estén disponibles
+  // await cronManager.shutdown();
 
   // Cerrar servidor
   server.close(() => {
@@ -97,8 +85,8 @@ process.on('SIGTERM', async () => {
 process.on('SIGINT', async () => {
   console.log('Señal SIGINT recibida, cerrando servidor...');
 
-  // Detener cron jobs
-  await cronManager.shutdown();
+  // TODO: Habilitar cuando cron jobs estén disponibles
+  // await cronManager.shutdown();
 
   // Cerrar servidor
   server.close(() => {

@@ -59,7 +59,12 @@
     "apis": [
       "./openapi/*.yaml",
       "./apps/*/src/**/*.ts",
-      "./packages/*/src/**/*.ts"
+      "./packages/*/src/**/*.ts",
+      "./openapi/unified-api.openapi.yaml",
+      "./openapi/auth-service.openapi.yaml",
+      "./openapi/invoice-service.openapi.yaml",
+      "./openapi/tax-calculator.openapi.yaml",
+      "./openapi/facturas.openapi.yaml"
     ]
   },
   "apis": {

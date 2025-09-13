@@ -1,10 +1,10 @@
 import { apiClient } from '@/lib/api-client';
 import type {
-    ApiResponse,
-    Invoice,
-    InvoiceFilters,
-    InvoiceStats,
-    PaginatedResponse,
+  ApiResponse,
+  Invoice,
+  InvoiceFilters,
+  InvoiceStats,
+  PaginatedResponse,
 } from '@/types';
 
 export class InvoiceService {

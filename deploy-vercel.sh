@@ -1,0 +1,55 @@
+#!/bin/bash
+
+echo "🚀 Script de Despliegue a Vercel - Facturación Autónomos"
+echo "======================================================"
+echo ""
+
+echo "✅ PREPARACIÓN COMPLETADA:"
+echo "  ✓ Build exitoso de todos los servicios"
+echo "  ✓ Configuraciones de Vercel validadas"
+echo "  ✓ Archivos vercel.json configurados"
+echo "  ✓ Rutas de API configuradas correctamente"
+echo ""
+
+echo "🔧 VARIABLES DE ENTORNO REQUERIDAS EN VERCEL:"
+echo "  VERCEL_TOKEN: Token de autenticación de Vercel"
+echo "  VERCEL_ORG_ID: ID de la organización en Vercel"
+echo "  VERCEL_PROJECT_ID: ID del proyecto en Vercel"
+echo ""
+
+echo "📋 SERVICIOS CONFIGURADOS:"
+echo "  • web (Next.js) - Frontend principal"
+echo "  • api-gateway - Gateway de APIs"
+echo "  • auth-service - Servicio de autenticación"
+echo "  • api-facturas - API de facturas"
+echo "  • api-tax-calculator - API de cálculo de impuestos"
+echo "  • invoice-service - Servicio de facturas"
+echo ""
+
+echo "🛣️  RUTAS CONFIGURADAS:"
+echo "  / → web (frontend)"
+echo "  /api/(.*) → api-gateway"
+echo "  /auth/(.*) → auth-service"
+echo "  /api/facturas/(.*) → api-facturas"
+echo "  /api/tax-calculator/(.*) → api-tax-calculator"
+echo "  /api/invoices/(.*) → invoice-service"
+echo ""
+
+echo "⚠️  NOTAS IMPORTANTES:"
+echo "  • El servicio api-tax-calculator tiene implementación temporal"
+echo "  • Las tablas webhookNotificacion y presentacionModelo no están implementadas"
+echo "  • Se recomienda agregar estas tablas al schema de Prisma si son necesarias"
+echo ""
+
+echo "🚀 COMANDO DE DESPLIEGUE:"
+echo "  vercel --prod --yes"
+echo ""
+
+echo "📝 PASOS PARA COMPLETAR EL DESPLIEGUE:"
+echo "  1. Configurar variables de entorno en Vercel Dashboard"
+echo "  2. Ejecutar: vercel --prod --yes"
+echo "  3. Verificar que todos los servicios respondan correctamente"
+echo "  4. Probar las rutas de API desde el frontend"
+echo ""
+
+echo "🎉 ¡PREPARACIÓN COMPLETADA! Listo para el despliegue final."

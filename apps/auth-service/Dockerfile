@@ -5,10 +5,10 @@ FROM node:20
 WORKDIR /usr/src/app
 
 # Copia los archivos necesarios para instalar dependencias
-COPY package.json yarn.lock ./
+COPY package.json pnpm-lock.yaml ./
 
 # Instala las dependencias
-RUN yarn install
+RUN pnpm install
 
 # Copia el resto de los archivos del proyecto
 COPY . .

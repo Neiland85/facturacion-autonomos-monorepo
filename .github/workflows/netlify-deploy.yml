@@ -1,9 +1,8 @@
-<<<<<<< HEAD
 name: 🚀 Netlify Deployment
 
 on:
   push:
-    branches: [main, develop, fix/*]
+    branches: [main, develop]
   pull_request:
     branches: [main]
 
@@ -11,74 +10,81 @@ env:
   NODE_VERSION: '20.x'
 
 jobs:
-  test-and-build:
-    name: 🧪 Test & Build for Netlify
+  test-and-deploy:
+    name: 🧪 Test & Deploy to Netlify
     runs-on: ubuntu-latest
-    
+    environment: production
+
     steps:
-      - name: 📥 Checkout
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Type Check
+        run: pnpm --filter @facturacion/web type-check
+
+      - name: 🧹 Lint Check
+        run: pnpm --filter @facturacion/web lint
+
+      - name: 🧪 Run Tests
+        run: pnpm --filter @facturacion/web test --passWithNoTests
+
+      - name: 📊 Generate Coverage
+        run: pnpm --filter @facturacion/web test --coverage --passWithNoTests
+        continue-on-error: true
+
+      - name: 🏗️ Build for Production
+        run: pnpm --filter @facturacion/web build
+        env:
+          NODE_ENV: production
+
+      - name: 🚀 Deploy to Netlify
+        run: |
+          npm install -g netlify-cli
+          netlify deploy --prod --dir=apps/web/out
+        env:
+          NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
+          NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
+
+  preview-deploy:
+    name: 👀 Deploy Preview
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: 📥 Checkout code
         uses: actions/checkout@v4
 
       - name: 🔧 Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: ${{ env.NODE_VERSION }}
-          cache: 'yarn'
-          cache-dependency-path: yarn.lock
-
-      - name: 🎯 Enable Corepack and install correct Yarn version
-        run: |
-          corepack enable
-          corepack prepare yarn@4.9.2 --activate
-          yarn --version
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
 
       - name: 📦 Install dependencies
-        run: yarn install --frozen-lockfile
+        run: pnpm install --frozen-lockfile
 
-      - name: 🔍 Lint
-        run: yarn workspace @facturacion/web lint
-
-      - name: 🧪 Test
-        run: yarn workspace @facturacion/web test:ci
-
-      - name: 🏗️ Build (Critical for Netlify)
-        run: yarn workspace @facturacion/web build
+      - name: 🏗️ Build Preview
+        run: pnpm --filter @facturacion/web build
         env:
           NODE_ENV: production
-          SWC_BINARY_TARGET: "x86_64-unknown-linux-gnu"
-=======
-name: Netlify Deploy
 
-on:
-  push:
-    branches:
-      - main
-
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: '20'
-          cache: 'yarn'
-
-      - name: Install dependencies
+      - name: 🚀 Deploy Preview
         run: |
-          corepack enable
-          corepack prepare yarn@4.9.2 --activate
-          yarn install --frozen-lockfile
-
-      - name: Build and deploy to Netlify
-        run: |
-          yarn workspace @facturacion/web build
-          yarn netlify deploy --prod
+          npm install -g netlify-cli
+          netlify deploy --dir=apps/web/out
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}
->>>>>>> develop

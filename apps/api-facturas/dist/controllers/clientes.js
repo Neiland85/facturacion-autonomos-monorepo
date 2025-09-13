@@ -12,6 +12,7 @@ class ClienteController {
             const limit = parseInt(req.query.limit) || 20;
             const buscar = req.query.buscar;
             const skip = (page - 1) * limit;
+            // Construir filtros
             const where = {};
             if (buscar) {
                 where.OR = [
@@ -20,6 +21,7 @@ class ClienteController {
                     { email: { contains: buscar, mode: 'insensitive' } }
                 ];
             }
+            // Obtener clientes con paginación
             const [clientes, total] = await Promise.all([
                 prisma.cliente.findMany({
                     where,
@@ -94,6 +96,7 @@ class ClienteController {
     async createCliente(req, res) {
         try {
             const { nombre, nif, email, telefono, direccion, codigoPostal, ciudad, provincia, pais = 'España' } = req.body;
+            // Validar NIF
             if (!(0, fiscal_1.validarNIF)(nif)) {
                 return res.status(422).json({
                     error: 'VALIDATION_ERROR',
@@ -107,6 +110,7 @@ class ClienteController {
                     path: req.path
                 });
             }
+            // Verificar que el NIF no existe
             const clienteExistente = await prisma.cliente.findFirst({
                 where: { nif }
             });
@@ -118,6 +122,7 @@ class ClienteController {
                     path: req.path
                 });
             }
+            // Crear cliente
             const cliente = await prisma.cliente.create({
                 data: {
                     id: (0, uuid_1.v4)(),
@@ -152,6 +157,7 @@ class ClienteController {
         try {
             const { id } = req.params;
             const updateData = req.body;
+            // Verificar que el cliente existe
             const clienteExistente = await prisma.cliente.findUnique({
                 where: { id }
             });
@@ -163,6 +169,7 @@ class ClienteController {
                     path: req.path
                 });
             }
+            // Validar NIF si se está actualizando
             if (updateData.nif && updateData.nif !== clienteExistente.nif) {
                 if (!(0, fiscal_1.validarNIF)(updateData.nif)) {
                     return res.status(422).json({
@@ -177,6 +184,7 @@ class ClienteController {
                         path: req.path
                     });
                 }
+                // Verificar que el NIF no existe
                 const clienteConNIF = await prisma.cliente.findFirst({
                     where: {
                         nif: updateData.nif,
@@ -192,6 +200,7 @@ class ClienteController {
                     });
                 }
             }
+            // Actualizar cliente
             const cliente = await prisma.cliente.update({
                 where: { id },
                 data: {
@@ -217,6 +226,7 @@ class ClienteController {
     async deleteCliente(req, res) {
         try {
             const { id } = req.params;
+            // Verificar que el cliente existe
             const cliente = await prisma.cliente.findUnique({
                 where: { id },
                 include: {
@@ -231,6 +241,7 @@ class ClienteController {
                     path: req.path
                 });
             }
+            // Verificar que no tiene facturas
             if (cliente.facturas.length > 0) {
                 return res.status(409).json({
                     error: 'CONFLICT',
@@ -239,6 +250,7 @@ class ClienteController {
                     path: req.path
                 });
             }
+            // Eliminar cliente
             await prisma.cliente.delete({
                 where: { id }
             });
@@ -256,4 +268,3 @@ class ClienteController {
     }
 }
 exports.ClienteController = ClienteController;
-//# sourceMappingURL=clientes.js.map
