@@ -6,6 +6,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.trimestreQuerySchema = exports.dateRangeQuerySchema = exports.paginationQuerySchema = exports.idParamSchema = exports.validateParams = exports.validateQuery = exports.validateCliente = exports.validateFacturaUpdate = exports.validateFactura = void 0;
 const joi_1 = __importDefault(require("joi"));
 const fiscal_1 = require("../utils/fiscal");
+// Esquema de validación para facturas
 const facturaSchema = joi_1.default.object({
     fecha: joi_1.default.date().required().messages({
         'date.base': 'La fecha debe ser una fecha válida',
@@ -51,6 +52,7 @@ const facturaSchema = joi_1.default.object({
         descuento: joi_1.default.number().min(0).max(100).precision(2).optional().default(0)
     })).optional()
 });
+// Esquema de validación para actualización de facturas
 const facturaUpdateSchema = joi_1.default.object({
     fecha: joi_1.default.date().optional(),
     fechaVencimiento: joi_1.default.date().optional().allow(null),
@@ -68,6 +70,7 @@ const facturaUpdateSchema = joi_1.default.object({
         descuento: joi_1.default.number().min(0).max(100).precision(2).optional()
     })).optional()
 });
+// Esquema de validación para clientes
 const clienteSchema = joi_1.default.object({
     nombre: joi_1.default.string().min(1).max(200).required().messages({
         'string.min': 'El nombre debe tener al menos 1 carácter',
@@ -94,6 +97,7 @@ const clienteSchema = joi_1.default.object({
     provincia: joi_1.default.string().optional().allow(''),
     pais: joi_1.default.string().optional().default('España')
 });
+// Middleware de validación genérico
 function validarEsquema(schema) {
     return (req, res, next) => {
         const { error, value } = schema.validate(req.body, {
@@ -114,13 +118,16 @@ function validarEsquema(schema) {
                 path: req.path
             });
         }
+        // Reemplazar el body con los datos validados
         req.body = value;
         next();
     };
 }
+// Middleware específicos
 exports.validateFactura = validarEsquema(facturaSchema);
 exports.validateFacturaUpdate = validarEsquema(facturaUpdateSchema);
 exports.validateCliente = validarEsquema(clienteSchema);
+// Middleware para validar parámetros de consulta
 const validateQuery = (schema) => {
     return (req, res, next) => {
         const { error, value } = schema.validate(req.query, {
@@ -146,6 +153,7 @@ const validateQuery = (schema) => {
     };
 };
 exports.validateQuery = validateQuery;
+// Middleware para validar parámetros de ruta
 const validateParams = (schema) => {
     return (req, res, next) => {
         const { error, value } = schema.validate(req.params, {
@@ -171,6 +179,7 @@ const validateParams = (schema) => {
     };
 };
 exports.validateParams = validateParams;
+// Esquemas comunes para parámetros
 exports.idParamSchema = joi_1.default.object({
     id: joi_1.default.string().uuid().required().messages({
         'string.guid': 'El ID debe ser un UUID válido',
@@ -207,4 +216,3 @@ exports.trimestreQuerySchema = joi_1.default.object({
         'any.required': 'El año es requerido'
     })
 });
-//# sourceMappingURL=validation.js.map

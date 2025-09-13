@@ -284,23 +284,23 @@ export const INVOICE_STATUS = {
   SENT: 'sent',
   PAID: 'paid',
   OVERDUE: 'overdue',
-  CANCELLED: 'cancelled'
+  CANCELLED: 'cancelled',
 } as const;
 
 export const USER_ROLES = {
   ADMIN: 'admin',
-  USER: 'user'
+  USER: 'user',
 } as const;
 
 export const TAXPAYER_TYPES = {
   INDIVIDUAL: 'individual',
-  COMPANY: 'company'
+  COMPANY: 'company',
 } as const;
 
 export const VAT_RATES = {
   GENERAL: 0.21,
-  REDUCED: 0.10,
-  SUPER_REDUCED: 0.04
+  REDUCED: 0.1,
+  SUPER_REDUCED: 0.04,
 } as const;
 
 // Tipos de utilidades
@@ -317,5 +317,5 @@ export default {
   INVOICE_STATUS,
   USER_ROLES,
   TAXPAYER_TYPES,
-  VAT_RATES
+  VAT_RATES,
 };

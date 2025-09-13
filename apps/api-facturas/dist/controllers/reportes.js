@@ -16,6 +16,7 @@ class ReportesController {
                     path: req.path
                 });
             }
+            // Calcular fechas del trimestre
             const mesesTrimestre = [
                 [1, 2, 3],
                 [4, 5, 6],
@@ -25,6 +26,7 @@ class ReportesController {
             const meses = mesesTrimestre[trimestre - 1];
             const fechaInicio = new Date(año, meses[0] - 1, 1);
             const fechaFin = new Date(año, meses[2], 0);
+            // Obtener facturas del trimestre
             const facturas = await prisma.factura.findMany({
                 where: {
                     fecha: {
@@ -41,6 +43,7 @@ class ReportesController {
                     total: true
                 }
             });
+            // Procesar datos
             const facturasEmitidas = facturas.filter(f => f.tipo === 'emitida');
             const facturasRecibidas = facturas.filter(f => f.tipo === 'recibida');
             const resumen = {
@@ -59,6 +62,7 @@ class ReportesController {
                     total: facturasRecibidas.reduce((sum, f) => sum + f.total, 0)
                 }
             };
+            // Detalles por mes
             const detalles = meses.map(mes => {
                 const facturasMes = facturas.filter(f => f.fecha.getMonth() + 1 === mes);
                 const emitidas = facturasMes.filter(f => f.tipo === 'emitida');
@@ -102,6 +106,7 @@ class ReportesController {
             }
             const fechaInicio = new Date(año, 0, 1);
             const fechaFin = new Date(año, 11, 31);
+            // Obtener facturas del año
             const facturas = await prisma.factura.findMany({
                 where: {
                     fecha: {
@@ -118,6 +123,7 @@ class ReportesController {
                     total: true
                 }
             });
+            // Procesar datos por trimestre
             const trimestres = [1, 2, 3, 4].map(trimestre => {
                 const mesesTrimestre = [
                     [1, 2, 3],
@@ -274,11 +280,13 @@ class ReportesController {
                     path: req.path
                 });
             }
+            // Implementar exportación según el formato
             res.json({
                 tipo,
                 formato: req.body.formato || 'json',
                 mensaje: 'Funcionalidad de exportación en desarrollo'
             });
+            // Por ahora, devolver placeholder
             const nombreArchivo = `reporte-${tipo}-${Date.now()}.${formato}`;
             res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
             switch (formato) {
@@ -308,4 +316,3 @@ class ReportesController {
     }
 }
 exports.ReportesController = ReportesController;
-//# sourceMappingURL=reportes.js.map

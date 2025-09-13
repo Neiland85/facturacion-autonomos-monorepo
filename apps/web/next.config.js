@@ -1,12 +1,13 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  // Configuración optimizada para producción
+  // Configuración optimizada para Vercel
   output: 'standalone',
+  trailingSlash: false,
 
-  // Configuración de imágenes optimizada
+  // Configuración de imágenes optimizada para Vercel
   images: {
-    domains: ['localhost', 'via.placeholder.com'],
-    formats: ['image/webp', 'image/avif'],
+    domains: ['localhost'],
+    unoptimized: false, // Vercel optimiza automáticamente
   },
 
   // Variables de entorno públicas
@@ -19,7 +20,7 @@ const nextConfig = {
 
   // Configuración de webpack personalizada
   webpack: (config, { dev, isServer }) => {
-    // Optimizaciones para producción
+    // Optimizaciones para Vercel
     if (!dev && !isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,
@@ -27,29 +28,6 @@ const nextConfig = {
       };
     }
     return config;
-  },
-
-  // Configuración de seguridad
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          {
-            key: 'X-Frame-Options',
-            value: 'DENY',
-          },
-          {
-            key: 'X-Content-Type-Options',
-            value: 'nosniff',
-          },
-          {
-            key: 'Referrer-Policy',
-            value: 'origin-when-cross-origin',
-          },
-        ],
-      },
-    ];
   },
 };
 

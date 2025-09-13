@@ -1,14 +1,20 @@
-import express from 'express';
+import { prisma } from '@facturacion/database';
+import compression from 'compression';
 import cors from 'cors';
+import express from 'express';
+import { rateLimit } from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
-import compression from 'compression';
-import { prisma } from '@facturacion/database';
-import { rateLimit } from 'express-rate-limit';
+import path from 'path';
 import facturasRoutes from './routes/facturas-simple';
 
-const app = express();
-const PORT = process.env.PORT || 3001;
+// Configurar documentación API
+const { setupSwagger } = require(
+  path.join(__dirname, '../../config/api-facturas-swagger')
+);
+
+const app: express.Application = express();
+const PORT = process.env.PORT || 3004;
 
 // Middleware de seguridad
 app.use(helmet());
@@ -20,7 +26,7 @@ app.use(morgan('combined'));
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // máximo 100 requests por ventana
-  message: 'Too many requests from this IP, please try again later.'
+  message: 'Too many requests from this IP, please try again later.',
 });
 app.use('/api/', limiter);
 
@@ -28,13 +34,16 @@ app.use('/api/', limiter);
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
+// Configurar documentación API
+setupSwagger(app);
+
 // Ruta de health check
 app.get('/health', (req: express.Request, res: express.Response) => {
   res.json({
     status: 'OK',
     service: 'API Facturas',
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
+    version: '1.0.0',
   });
 });
 
@@ -45,22 +54,32 @@ app.use('/api/facturas', facturasRoutes);
 app.use('*', (req: express.Request, res: express.Response) => {
   res.status(404).json({
     error: 'Ruta no encontrada',
-    path: req.originalUrl
+    path: req.originalUrl,
   });
 });
 
 // Manejo global de errores
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', err);
-  res.status(500).json({
-    error: 'Error interno del servidor',
-    details: process.env.NODE_ENV === 'development' ? err.message : undefined
-  });
-});
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error('Error:', err);
+    res.status(500).json({
+      error: 'Error interno del servidor',
+      details: process.env.NODE_ENV === 'development' ? err.message : undefined,
+    });
+  }
+);
 
 // Iniciar servidor
 app.listen(PORT, () => {
   console.log(`🚀 API de Facturas ejecutándose en puerto ${PORT}`);
+  console.log(
+    `📖 API Documentation available at: http://localhost:${PORT}/api-docs`
+  );
   console.log(`📍 Health check: http://localhost:${PORT}/health`);
 });
 

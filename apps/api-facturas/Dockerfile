@@ -16,7 +16,7 @@ WORKDIR /app
 RUN corepack enable
 
 # Copiar archivos de configuración del workspace
-COPY package.json yarn.lock .yarnrc.yml ./
+COPY package.json pnpm-lock.yaml .yarnrc.yml ./
 COPY .yarn ./.yarn
 
 # Etapa de dependencias

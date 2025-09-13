@@ -1,0 +1,321 @@
+openapi: 3.0.3
+info:
+  title: Facturación Autónomos - API Unificada
+  description: |
+    # Sistema Completo de Facturación para Autónomos
+
+    Esta documentación unificada incluye todas las APIs del sistema de facturación:
+
+    ## 🏗️ Arquitectura del Sistema
+
+    ### Microservicios Disponibles:
+    - **Auth Service** - Autenticación y autorización
+    - **Invoice Service** - Gestión de facturas
+    - **API Facturas** - API REST de facturas
+    - **Tax Calculator** - Cálculos fiscales
+    - **API Gateway** - Enrutamiento unificado
+
+    ### Características Principales:
+    - 🔐 Autenticación JWT con refresh tokens
+    - 📊 Gestión completa de facturas
+    - 🧮 Cálculos fiscales automatizados
+    - 📈 Reportes y estadísticas
+    - 🔄 Integración con AEAT/SII
+    - 📱 API RESTful con documentación completa
+
+    ## 🚀 Inicio Rápido
+
+    ### 1. Autenticación
+    POST /api/auth/login
+    Content-Type: application/json
+
+    ### 2. Crear Factura
+    POST /api/invoices
+    Authorization: Bearer YOUR_JWT_TOKEN
+    Content-Type: application/json
+
+    ### 3. Calcular Impuestos
+    POST /api/tax/calculate
+    Authorization: Bearer YOUR_JWT_TOKEN
+    Content-Type: application/json
+  version: 1.0.0
+  contact:
+    name: Equipo de Desarrollo
+    email: dev@facturacion-autonomos.com
+    url: https://github.com/Neiland85/facturacion-autonomos-monorepo
+  license:
+    name: MIT
+    url: https://opensource.org/licenses/MIT
+  termsOfService: https://facturacion-autonomos.com/terms
+
+servers:
+  - url: https://api.facturacion-autonomos.com/v1
+    description: 🌐 Producción - API Principal
+  - url: https://staging-api.facturacion-autonomos.com/v1
+    description: 🧪 Staging - Ambiente de pruebas
+  - url: http://localhost:3000/v1
+    description: 💻 Desarrollo - API Gateway Local
+  - url: http://localhost:3001/v1
+    description: 📄 Desarrollo - Invoice Service
+  - url: http://localhost:3002/v1
+    description: 🧮 Desarrollo - Tax Calculator
+  - url: http://localhost:3003/v1
+    description: 🔐 Desarrollo - Auth Service
+
+security:
+  - bearerAuth: []
+  - apiKey: []
+
+tags:
+  - name: 🔐 Autenticación
+    description: Endpoints de login, registro y gestión de sesiones
+  - name: 📄 Facturas
+    description: Gestión completa de facturas emitidas y recibidas
+  - name: 👥 Clientes
+    description: Administración de clientes y proveedores
+  - name: 🧮 Cálculos Fiscales
+    description: Cálculos de IVA, IRPF y tributos
+  - name: 📊 Reportes
+    description: Estadísticas y reportes del sistema
+  - name: ⚙️ Sistema
+    description: Endpoints de salud y configuración del sistema
+
+paths:
+  # Importar rutas de autenticación
+  /auth/login:
+    $ref: './auth-service.openapi.yaml#/paths/~1auth~1login'
+  /auth/register:
+    $ref: './auth-service.openapi.yaml#/paths/~1auth~1register'
+  /auth/refresh:
+    $ref: './auth-service.openapi.yaml#/paths/~1auth~1refresh'
+  /auth/logout:
+    $ref: './auth-service.openapi.yaml#/paths/~1auth~1logout'
+  /auth/me:
+    $ref: './auth-service.openapi.yaml#/paths/~1auth~1me'
+
+  # Importar rutas de facturas
+  /invoices:
+    $ref: './facturas.openapi.yaml#/paths/~1facturas'
+  /invoices/{id}:
+    $ref: './facturas.openapi.yaml#/paths/~1facturas~1{id}'
+  /invoices/{id}/pdf:
+    $ref: './facturas.openapi.yaml#/paths/~1facturas~1{id}~1pdf'
+
+  # Importar rutas de clientes
+  /clients:
+    $ref: './facturas.openapi.yaml#/paths/~1clientes'
+  /clients/{id}:
+    $ref: './facturas.openapi.yaml#/paths/~1clientes~1{id}'
+
+  # Importar rutas de cálculos fiscales
+  /tax/calculate:
+    $ref: './tax-calculator.openapi.yaml#/paths/~1calcular~1iva'
+  /tax/simulate:
+    $ref: './tax-calculator.openapi.yaml#/paths/~1simular~1tributos'
+
+  # Importar rutas de reportes
+  /reports/invoices:
+    $ref: './facturas.openapi.yaml#/paths/~1reportes~1facturas'
+  /reports/tax:
+    $ref: './facturas.openapi.yaml#/paths/~1reportes~1tributarios'
+
+  # Endpoints de sistema
+  /health:
+    get:
+      summary: ✅ Verificar salud del sistema
+      description: Verifica el estado de todos los servicios del sistema
+      tags: [⚙️ Sistema]
+      responses:
+        200:
+          description: Sistema operativo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: 'healthy'
+                  services:
+                    type: object
+                    properties:
+                      auth:
+                        type: string
+                        example: 'up'
+                      invoices:
+                        type: string
+                        example: 'up'
+                      tax:
+                        type: string
+                        example: 'up'
+                  timestamp:
+                    type: string
+                    format: date-time
+        503:
+          description: Uno o más servicios no disponibles
+
+  /api/v1/health:
+    get:
+      summary: 🔍 Health check detallado
+      description: Verificación detallada de la salud de cada microservicio
+      tags: [⚙️ Sistema]
+      responses:
+        200:
+          description: Estado detallado de servicios
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  overall:
+                    type: string
+                    enum: [healthy, degraded, unhealthy]
+                  services:
+                    type: object
+                    additionalProperties:
+                      type: object
+                      properties:
+                        status:
+                          type: string
+                          enum: [up, down, degraded]
+                        responseTime:
+                          type: number
+                        lastCheck:
+                          type: string
+                          format: date-time
+                        version:
+                          type: string
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+      description: |
+        Token JWT obtenido del endpoint `/auth/login`
+
+        **Ejemplo de uso:**
+        ```
+        Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
+        ```
+    apiKey:
+      type: apiKey
+      in: header
+      name: X-API-Key
+      description: |
+        Clave API para acceso directo (solo para integraciones)
+
+        **Ejemplo de uso:**
+        ```
+        X-API-Key: your-api-key-here
+        ```
+
+  schemas:
+    # Esquemas comunes
+    Error:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          type: object
+          properties:
+            code:
+              type: string
+              example: 'VALIDATION_ERROR'
+            message:
+              type: string
+              example: 'Los datos proporcionados no son válidos'
+            details:
+              type: object
+              additionalProperties: true
+        timestamp:
+          type: string
+          format: date-time
+
+    Success:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        data:
+          type: object
+          additionalProperties: true
+        message:
+          type: string
+          example: 'Operación completada exitosamente'
+        timestamp:
+          type: string
+          format: date-time
+
+    Pagination:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          example: 1
+        limit:
+          type: integer
+          minimum: 1
+          maximum: 100
+          example: 20
+        total:
+          type: integer
+          minimum: 0
+          example: 150
+        totalPages:
+          type: integer
+          minimum: 1
+          example: 8
+
+  responses:
+    UnauthorizedError:
+      description: No autorizado - Token inválido o expirado
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: 'UNAUTHORIZED'
+              message: 'Token de acceso inválido'
+            timestamp: '2024-01-15T10:30:00Z'
+
+    ValidationError:
+      description: Datos de entrada inválidos
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: 'VALIDATION_ERROR'
+              message: 'Los datos proporcionados no cumplen con los requisitos'
+              details:
+                email: 'Formato de email inválido'
+                password: 'La contraseña debe tener al menos 8 caracteres'
+            timestamp: '2024-01-15T10:30:00Z'
+
+    ServerError:
+      description: Error interno del servidor
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            success: false
+            error:
+              code: 'INTERNAL_ERROR'
+              message: 'Ha ocurrido un error interno del servidor'
+            timestamp: '2024-01-15T10:30:00Z'
+
+# Importar componentes de archivos específicos
+externalDocs:
+  description: Documentación completa del proyecto
+  url: https://github.com/Neiland85/facturacion-autonomos-monorepo#readme

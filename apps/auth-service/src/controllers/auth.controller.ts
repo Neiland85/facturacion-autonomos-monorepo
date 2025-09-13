@@ -1,7 +1,6 @@
 import bcrypt from 'bcryptjs';
 import { Request, Response } from 'express';
 import jwt from 'jsonwebtoken';
-import qrcode from 'qrcode';
 import { AuthService } from '../services/auth.service';
 import { JWTService } from '../services/jwt.service';
 import { TwoFactorService } from '../services/two-factor.service';
@@ -54,7 +53,7 @@ export class AuthController {
         res.status(400).json({
           success: false,
           error: 'El usuario ya existe',
-          code: 'USER_EXISTS'
+          code: 'USER_EXISTS',
         });
         return;
       }
@@ -63,7 +62,7 @@ export class AuthController {
       const user = await this.authService.createUser({
         email,
         password,
-        name
+        name,
       });
 
       // Configurar sesión
@@ -74,7 +73,7 @@ export class AuthController {
       const accessToken = this.jwtService.generateAccessToken({
         userId: user.id,
         email: user.email,
-        role: user.role
+        role: user.role,
       });
 
       const refreshToken = this.jwtService.generateRefreshToken(user.id);
@@ -93,16 +92,15 @@ export class AuthController {
           email: user.email,
           name: user.name,
           role: user.role,
-          twoFactorEnabled: false
-        }
+          twoFactorEnabled: false,
+        },
       });
-
     } catch (error) {
       console.error('Error en registro:', error);
       res.status(500).json({
         success: false,
         error: 'Error interno del servidor',
-        code: 'INTERNAL_ERROR'
+        code: 'INTERNAL_ERROR',
       });
     }
   };
@@ -121,12 +119,14 @@ export class AuthController {
       const now = Date.now();
 
       // Rate limiting por sesión (adicional al middleware global)
-      if (attempts >= 3 && (now - lastAttempt) < 15 * 60 * 1000) { // 15 minutos
+      if (attempts >= 3 && now - lastAttempt < 15 * 60 * 1000) {
+        // 15 minutos
         res.status(429).json({
           success: false,
-          error: 'Demasiados intentos de login. Intenta de nuevo en 15 minutos.',
+          error:
+            'Demasiados intentos de login. Intenta de nuevo en 15 minutos.',
           code: 'TOO_MANY_ATTEMPTS',
-          retryAfter: Math.ceil((15 * 60 * 1000 - (now - lastAttempt)) / 1000)
+          retryAfter: Math.ceil((15 * 60 * 1000 - (now - lastAttempt)) / 1000),
         });
         return;
       }
@@ -138,7 +138,7 @@ export class AuthController {
         res.status(401).json({
           success: false,
           error: 'Credenciales inválidas',
-          code: 'INVALID_CREDENTIALS'
+          code: 'INVALID_CREDENTIALS',
         });
         return;
       }
@@ -150,7 +150,7 @@ export class AuthController {
         res.status(401).json({
           success: false,
           error: 'Credenciales inválidas',
-          code: 'INVALID_CREDENTIALS'
+          code: 'INVALID_CREDENTIALS',
         });
         return;
       }
@@ -162,7 +162,7 @@ export class AuthController {
         res.json({
           success: true,
           message: 'Se requiere verificación de dos factores',
-          requiresTwoFactor: true
+          requiresTwoFactor: true,
         });
         return;
       }
@@ -170,14 +170,14 @@ export class AuthController {
       // Login exitoso - limpiar intentos fallidos
       this.handleSuccessfulLogin(req, user, remember);
 
-      // Generar tokens JWT
-      const accessToken = this.jwtService.generateAccessToken({
+      // Generar JWT usando el método correcto
+      const tokenPair = await this.jwtService.generateTokenPair({
         userId: user.id,
         email: user.email,
-        role: user.role
+        role: user.role,
       });
 
-      const refreshToken = this.jwtService.generateRefreshToken(user.id);
+      const { accessToken, refreshToken } = tokenPair;
 
       // Almacenar refresh token
       await this.jwtService.storeRefreshToken(user.id, refreshToken);
@@ -193,17 +193,16 @@ export class AuthController {
           email: user.email,
           name: user.name,
           role: user.role,
-          twoFactorEnabled: user.twoFactorEnabled
+          twoFactorEnabled: user.twoFactorEnabled,
         },
-        requiresTwoFactor: false
+        requiresTwoFactor: false,
       });
-
     } catch (error) {
       console.error('Error en login:', error);
       res.status(500).json({
         success: false,
         error: 'Error interno del servidor',
-        code: 'INTERNAL_ERROR'
+        code: 'INTERNAL_ERROR',
       });
     }
   };
@@ -218,7 +217,10 @@ export class AuthController {
       // Invalidar refresh token en Redis si existe
       if (refreshToken) {
         try {
-          const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as { userId: string };
+          const decoded = jwt.verify(
+            refreshToken,
+            process.env.JWT_REFRESH_SECRET!
+          ) as { userId: string };
           await this.jwtService.revokeRefreshToken(decoded.userId);
         } catch (error) {
           console.error('Error invalidating refresh token:', error);
@@ -226,7 +228,7 @@ export class AuthController {
       }
 
       // Destruir sesión
-      req.session.destroy((err) => {
+      req.session.destroy(err => {
         if (err) {
           console.error('Error destroying session:', err);
         }
@@ -237,14 +239,13 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: 'Logout exitoso'
+        message: 'Logout exitoso',
       });
-
     } catch (error) {
       console.error('Error en logout:', error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
       });
     }
   };
@@ -260,21 +261,25 @@ export class AuthController {
         res.status(401).json({
           success: false,
           error: 'Refresh token requerido',
-          code: 'MISSING_REFRESH_TOKEN'
+          code: 'MISSING_REFRESH_TOKEN',
         });
         return;
       }
 
       try {
-        const decoded = jwt.verify(refreshToken, process.env.JWT_REFRESH_SECRET!) as { userId: string };
-        
+        const decoded = jwt.verify(
+          refreshToken,
+          process.env.JWT_REFRESH_SECRET!
+        ) as { userId: string };
+
         // Verificar que el token existe en Redis
-        const isValidRefreshToken = await this.jwtService.verifyRefreshToken(decoded.userId, refreshToken);
+        const isValidRefreshToken =
+          await this.jwtService.verifyRefreshToken(refreshToken);
         if (!isValidRefreshToken) {
           res.status(401).json({
             success: false,
             error: 'Refresh token inválido',
-            code: 'INVALID_REFRESH_TOKEN'
+            code: 'INVALID_REFRESH_TOKEN',
           });
           return;
         }
@@ -285,17 +290,14 @@ export class AuthController {
           res.status(401).json({
             success: false,
             error: 'Usuario no encontrado',
-            code: 'USER_NOT_FOUND'
+            code: 'USER_NOT_FOUND',
           });
           return;
         }
 
-        // Generar nuevo access token
-        const accessToken = this.jwtService.generateAccessToken({
-          userId: user.id,
-          email: user.email,
-          role: user.role
-        });
+        // Generar nuevo access token usando refresh token
+        const accessToken =
+          await this.jwtService.refreshAccessToken(refreshToken);
 
         // Actualizar cookie
         res.cookie('accessToken', accessToken, {
@@ -303,27 +305,25 @@ export class AuthController {
           secure: process.env.NODE_ENV === 'production',
           sameSite: 'strict',
           maxAge: 15 * 60 * 1000, // 15 minutos
-          domain: process.env.COOKIE_DOMAIN
+          domain: process.env.COOKIE_DOMAIN,
         });
 
         res.json({
           success: true,
-          message: 'Token renovado exitosamente'
+          message: 'Token renovado exitosamente',
         });
-
       } catch (error) {
         res.status(401).json({
           success: false,
           error: 'Refresh token inválido',
-          code: 'INVALID_REFRESH_TOKEN'
+          code: 'INVALID_REFRESH_TOKEN',
         });
       }
-
     } catch (error) {
       console.error('Error en refresh:', error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
       });
     }
   };
@@ -337,7 +337,7 @@ export class AuthController {
       if (!user) {
         res.status(401).json({
           success: false,
-          error: 'Usuario no autenticado'
+          error: 'Usuario no autenticado',
         });
         return;
       }
@@ -348,15 +348,14 @@ export class AuthController {
           id: user.id,
           email: user.email,
           role: user.role,
-          twoFactorEnabled: user.twoFactorEnabled
-        }
+          twoFactorEnabled: user.twoFactorEnabled,
+        },
       });
-
     } catch (error) {
       console.error('Error en me:', error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
       });
     }
   };
@@ -372,21 +371,29 @@ export class AuthController {
         return;
       }
 
-      const secret = await this.twoFactorService.generateSecret(userId);
-      const qrCodeUrl = await qrcode.toDataURL(secret.otpauth_url!);
+      const user = req.user;
+      if (!user) {
+        res.status(401).json({ success: false, error: 'No autenticado' });
+        return;
+      }
+
+      const secret = await this.twoFactorService.generateTwoFactorSecret(
+        user.id,
+        user.email
+      );
 
       res.json({
         success: true,
-        secret: secret.base32,
-        qrCode: qrCodeUrl,
-        manualEntryKey: secret.base32
+        secret: secret.secret,
+        qrCode: secret.qrCodeUrl,
+        manualEntryKey: secret.secret,
+        backupCodes: secret.backupCodes,
       });
-
     } catch (error) {
       console.error('Error en setup2FA:', error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
       });
     }
   };
@@ -404,12 +411,12 @@ export class AuthController {
         return;
       }
 
-      const isValid = await this.twoFactorService.verifyToken(userId, token);
+      const isValid = await this.twoFactorService.verifyCode(userId, token);
       if (!isValid) {
         res.status(400).json({
           success: false,
           error: 'Código 2FA inválido',
-          code: 'INVALID_2FA_TOKEN'
+          code: 'INVALID_2FA_TOKEN',
         });
         return;
       }
@@ -419,14 +426,13 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: 'Autenticación de dos factores habilitada exitosamente'
+        message: 'Autenticación de dos factores habilitada exitosamente',
       });
-
     } catch (error) {
       console.error('Error en verify2FA:', error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
       });
     }
   };
@@ -446,14 +452,13 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: 'Autenticación de dos factores deshabilitada'
+        message: 'Autenticación de dos factores deshabilitada',
       });
-
     } catch (error) {
       console.error('Error en disable2FA:', error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
       });
     }
   };
@@ -473,17 +478,22 @@ export class AuthController {
 
       const user = await this.authService.findUserById(userId);
       if (!user) {
-        res.status(404).json({ success: false, error: 'Usuario no encontrado' });
+        res
+          .status(404)
+          .json({ success: false, error: 'Usuario no encontrado' });
         return;
       }
 
       // Verificar contraseña actual
-      const isValidPassword = await bcrypt.compare(currentPassword, user.password);
+      const isValidPassword = await bcrypt.compare(
+        currentPassword,
+        user.password
+      );
       if (!isValidPassword) {
         res.status(400).json({
           success: false,
           error: 'Contraseña actual incorrecta',
-          code: 'INVALID_CURRENT_PASSWORD'
+          code: 'INVALID_CURRENT_PASSWORD',
         });
         return;
       }
@@ -492,22 +502,24 @@ export class AuthController {
       await this.authService.changePassword(userId, newPassword);
 
       // Regenerar sesión por seguridad
-      req.session.regenerate((err) => {
+      req.session.regenerate(err => {
         if (err) {
-          console.error('Error regenerating session after password change:', err);
+          console.error(
+            'Error regenerating session after password change:',
+            err
+          );
         }
       });
 
       res.json({
         success: true,
-        message: 'Contraseña cambiada exitosamente'
+        message: 'Contraseña cambiada exitosamente',
       });
-
     } catch (error) {
       console.error('Error en changePassword:', error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor'
+        error: 'Error interno del servidor',
       });
     }
   };
@@ -515,24 +527,29 @@ export class AuthController {
   /**
    * Configurar cookies seguras con JWT
    */
-  private setSecureCookies(res: Response, accessToken: string, refreshToken: string, remember = false): void {
+  private setSecureCookies(
+    res: Response,
+    accessToken: string,
+    refreshToken: string,
+    remember = false
+  ): void {
     const cookieOptions = {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict' as const,
-      domain: process.env.COOKIE_DOMAIN
+      domain: process.env.COOKIE_DOMAIN,
     };
 
     // Access token (15 minutos)
     res.cookie('accessToken', accessToken, {
       ...cookieOptions,
-      maxAge: 15 * 60 * 1000
+      maxAge: 15 * 60 * 1000,
     });
 
     // Refresh token (7 días o 30 días si remember=true)
     res.cookie('refreshToken', refreshToken, {
       ...cookieOptions,
-      maxAge: remember ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000
+      maxAge: remember ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000,
     });
   }
 
@@ -544,7 +561,7 @@ export class AuthController {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'strict' as const,
-      domain: process.env.COOKIE_DOMAIN
+      domain: process.env.COOKIE_DOMAIN,
     };
 
     res.clearCookie('accessToken', cookieOptions);
@@ -562,7 +579,11 @@ export class AuthController {
   /**
    * Manejar login exitoso
    */
-  private handleSuccessfulLogin(req: Request, user: any, remember: boolean): void {
+  private handleSuccessfulLogin(
+    req: Request,
+    user: any,
+    remember: boolean
+  ): void {
     req.session.userId = user.id;
     req.session.isAuthenticated = true;
     req.session.loginAttempts = 0;
