@@ -1,87 +1,158 @@
 "use strict";
+var __createBinding = (this && this.__createBinding) || (Object.create ? (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    var desc = Object.getOwnPropertyDescriptor(m, k);
+    if (!desc || ("get" in desc ? !m.__esModule : desc.writable || desc.configurable)) {
+      desc = { enumerable: true, get: function() { return m[k]; } };
+    }
+    Object.defineProperty(o, k2, desc);
+}) : (function(o, m, k, k2) {
+    if (k2 === undefined) k2 = k;
+    o[k2] = m[k];
+}));
+var __exportStar = (this && this.__exportStar) || function(m, exports) {
+    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
+};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.Alert = exports.LoadingSpinner = exports.Modal = exports.Card = exports.Input = exports.Button = void 0;
-const jsx_runtime_1 = require("react/jsx-runtime");
-const Button = ({ children, variant = 'primary', size = 'md', disabled = false, loading = false, onClick, type = 'button', className = '', }) => {
-    const baseClasses = 'inline-flex items-center justify-center font-medium rounded-md transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2';
-    const variantClasses = {
-        primary: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-        secondary: 'bg-gray-200 text-gray-900 hover:bg-gray-300 focus:ring-gray-500',
-        danger: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500',
-        success: 'bg-green-600 text-white hover:bg-green-700 focus:ring-green-500',
-    };
-    const sizeClasses = {
-        sm: 'px-3 py-1.5 text-sm',
-        md: 'px-4 py-2 text-base',
-        lg: 'px-6 py-3 text-lg',
-    };
-    const disabledClasses = 'opacity-50 cursor-not-allowed';
-    const classes = [
-        baseClasses,
-        variantClasses[variant],
-        sizeClasses[size],
-        disabled || loading ? disabledClasses : '',
-        className,
-    ].join(' ');
-    return ((0, jsx_runtime_1.jsxs)("button", { type: type, className: classes, onClick: onClick, disabled: disabled || loading, children: [loading && ((0, jsx_runtime_1.jsxs)("svg", { className: "animate-spin -ml-1 mr-2 h-4 w-4 text-white", xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", children: [(0, jsx_runtime_1.jsx)("circle", { className: "opacity-25", cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "4" }), (0, jsx_runtime_1.jsx)("path", { className: "opacity-75", fill: "currentColor", d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" })] })), children] }));
-};
-exports.Button = Button;
-const Input = ({ label, placeholder, value, onChange, error, disabled = false, required = false, type = 'text', className = '', }) => {
-    const baseClasses = 'block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm';
-    const errorClasses = 'border-red-300 focus:border-red-500 focus:ring-red-500';
-    const disabledClasses = 'bg-gray-50 text-gray-500 cursor-not-allowed';
-    const inputClasses = [
-        baseClasses,
-        error ? errorClasses : '',
-        disabled ? disabledClasses : '',
-        className,
-    ].join(' ');
-    return ((0, jsx_runtime_1.jsxs)("div", { className: "space-y-1", children: [label && ((0, jsx_runtime_1.jsxs)("label", { className: "block text-sm font-medium text-gray-700", children: [label, required && (0, jsx_runtime_1.jsx)("span", { className: "text-red-500 ml-1", children: "*" })] })), (0, jsx_runtime_1.jsx)("input", { type: type, className: inputClasses, placeholder: placeholder, value: value, onChange: e => onChange?.(e.target.value), disabled: disabled, required: required }), error && (0, jsx_runtime_1.jsx)("p", { className: "text-sm text-red-600", children: error })] }));
-};
-exports.Input = Input;
-const Card = ({ children, title, className = '', }) => {
-    const baseClasses = 'bg-white rounded-lg shadow-md border border-gray-200';
-    const classes = [baseClasses, className].join(' ');
-    return ((0, jsx_runtime_1.jsxs)("div", { className: classes, children: [title && ((0, jsx_runtime_1.jsx)("div", { className: "px-6 py-4 border-b border-gray-200", children: (0, jsx_runtime_1.jsx)("h3", { className: "text-lg font-medium text-gray-900", children: title }) })), (0, jsx_runtime_1.jsx)("div", { className: "px-6 py-4", children: children })] }));
-};
-exports.Card = Card;
-const Modal = ({ isOpen, onClose, title, children, size = 'md', }) => {
-    if (!isOpen)
-        return null;
-    const sizeClasses = {
-        sm: 'max-w-sm',
-        md: 'max-w-md',
-        lg: 'max-w-lg',
-        xl: 'max-w-xl',
-    };
-    return ((0, jsx_runtime_1.jsx)("div", { className: "fixed inset-0 z-50 overflow-y-auto", children: (0, jsx_runtime_1.jsxs)("div", { className: "flex items-center justify-center min-h-screen px-4 pt-4 pb-20 text-center sm:block sm:p-0", children: [(0, jsx_runtime_1.jsx)("div", { className: "fixed inset-0 transition-opacity bg-gray-500 bg-opacity-75", onClick: onClose }), (0, jsx_runtime_1.jsxs)("div", { className: `inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:w-full ${sizeClasses[size]}`, children: [title && ((0, jsx_runtime_1.jsx)("div", { className: "px-6 py-4 border-b border-gray-200", children: (0, jsx_runtime_1.jsx)("h3", { className: "text-lg font-medium text-gray-900", children: title }) })), (0, jsx_runtime_1.jsx)("div", { className: "px-6 py-4", children: children })] })] }) }));
-};
-exports.Modal = Modal;
-const LoadingSpinner = ({ size = 'md', }) => {
-    const sizeClasses = {
-        sm: 'h-4 w-4',
-        md: 'h-8 w-8',
-        lg: 'h-12 w-12',
-    };
-    return ((0, jsx_runtime_1.jsx)("div", { className: "flex justify-center items-center", children: (0, jsx_runtime_1.jsxs)("svg", { className: `animate-spin ${sizeClasses[size]} text-blue-600`, xmlns: "http://www.w3.org/2000/svg", fill: "none", viewBox: "0 0 24 24", children: [(0, jsx_runtime_1.jsx)("circle", { className: "opacity-25", cx: "12", cy: "12", r: "10", stroke: "currentColor", strokeWidth: "4" }), (0, jsx_runtime_1.jsx)("path", { className: "opacity-75", fill: "currentColor", d: "M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" })] }) }));
-};
-exports.LoadingSpinner = LoadingSpinner;
-const Alert = ({ type, title, message, onClose, }) => {
-    const typeClasses = {
-        info: 'bg-blue-50 border-blue-200 text-blue-800',
-        success: 'bg-green-50 border-green-200 text-green-800',
-        warning: 'bg-yellow-50 border-yellow-200 text-yellow-800',
-        error: 'bg-red-50 border-red-200 text-red-800',
-    };
-    return ((0, jsx_runtime_1.jsx)("div", { className: `rounded-md border p-4 ${typeClasses[type]}`, children: (0, jsx_runtime_1.jsxs)("div", { className: "flex", children: [(0, jsx_runtime_1.jsxs)("div", { className: "flex-1", children: [title && (0, jsx_runtime_1.jsx)("h3", { className: "text-sm font-medium mb-1", children: title }), (0, jsx_runtime_1.jsx)("p", { className: "text-sm", children: message })] }), onClose && ((0, jsx_runtime_1.jsx)("button", { onClick: onClose, className: "ml-4 text-sm font-medium underline hover:no-underline", children: "Cerrar" }))] }) }));
-};
-exports.Alert = Alert;
-exports.default = {
-    Button: exports.Button,
-    Input: exports.Input,
-    Card: exports.Card,
-    Modal: exports.Modal,
-    LoadingSpinner: exports.LoadingSpinner,
-    Alert: exports.Alert,
-};
-//# sourceMappingURL=index.js.map
+exports.SelectScrollDownButton = exports.SelectLabel = exports.SelectItem = exports.SelectGroup = exports.SelectContent = exports.Select = exports.Progress = exports.LoadingSpinner = exports.Loader2 = exports.Label = exports.Input = exports.Info = exports.DialogTrigger = exports.DialogTitle = exports.DialogPortal = exports.DialogOverlay = exports.DialogHeader = exports.DialogFooter = exports.DialogDescription = exports.DialogContent = exports.DialogClose = exports.Dialog = exports.CollapsibleTrigger = exports.CollapsibleContent = exports.Collapsible = exports.Checkbox = exports.CardTitle = exports.CardHeader = exports.CardFooter = exports.CardDescription = exports.CardContent = exports.Card = exports.Button = exports.BreadcrumbSeparator = exports.BreadcrumbPage = exports.BreadcrumbList = exports.BreadcrumbLink = exports.BreadcrumbItem = exports.BreadcrumbEllipsis = exports.Breadcrumb = exports.badgeVariants = exports.Badge = exports.AvatarImage = exports.AvatarFallback = exports.Avatar = exports.AspectRatio = exports.AlertTriangle = exports.AlertTitle = exports.AlertDescription = exports.Alert = void 0;
+exports.uiVersion = exports.cn = exports.useVoiceRecognition = exports.VoiceInvoiceModal = exports.VoiceInvoiceButton = exports.VoiceIntegrationExample = exports.VoiceHeader = exports.VoiceDemoPage = exports.TributariAppLogo = exports.ThemeProvider = exports.GlobalVoiceCommandModal = exports.GlobalVoiceCommandButton = exports.TooltipTrigger = exports.TooltipProvider = exports.TooltipContent = exports.Tooltip = exports.Textarea = exports.TabsTrigger = exports.TabsList = exports.TabsContent = exports.Tabs = exports.TableRow = exports.TableHeader = exports.TableHead = exports.TableFooter = exports.TableCell = exports.TableCaption = exports.TableBody = exports.Table = exports.Switch = exports.Slider = exports.Skeleton = exports.Separator = exports.SelectValue = exports.SelectTrigger = exports.SelectSeparator = exports.SelectScrollUpButton = void 0;
+// UI Components Library
+var alert_1 = require("./components/ui/alert");
+Object.defineProperty(exports, "Alert", { enumerable: true, get: function () { return alert_1.Alert; } });
+Object.defineProperty(exports, "AlertDescription", { enumerable: true, get: function () { return alert_1.AlertDescription; } });
+Object.defineProperty(exports, "AlertTitle", { enumerable: true, get: function () { return alert_1.AlertTitle; } });
+var alert_triangle_1 = require("./components/ui/alert-triangle");
+Object.defineProperty(exports, "AlertTriangle", { enumerable: true, get: function () { return alert_triangle_1.AlertTriangle; } });
+var aspect_ratio_1 = require("./components/ui/aspect-ratio");
+Object.defineProperty(exports, "AspectRatio", { enumerable: true, get: function () { return aspect_ratio_1.AspectRatio; } });
+var avatar_1 = require("./components/ui/avatar");
+Object.defineProperty(exports, "Avatar", { enumerable: true, get: function () { return avatar_1.Avatar; } });
+Object.defineProperty(exports, "AvatarFallback", { enumerable: true, get: function () { return avatar_1.AvatarFallback; } });
+Object.defineProperty(exports, "AvatarImage", { enumerable: true, get: function () { return avatar_1.AvatarImage; } });
+var badge_1 = require("./components/ui/badge");
+Object.defineProperty(exports, "Badge", { enumerable: true, get: function () { return badge_1.Badge; } });
+Object.defineProperty(exports, "badgeVariants", { enumerable: true, get: function () { return badge_1.badgeVariants; } });
+var breadcrumb_1 = require("./components/ui/breadcrumb");
+Object.defineProperty(exports, "Breadcrumb", { enumerable: true, get: function () { return breadcrumb_1.Breadcrumb; } });
+Object.defineProperty(exports, "BreadcrumbEllipsis", { enumerable: true, get: function () { return breadcrumb_1.BreadcrumbEllipsis; } });
+Object.defineProperty(exports, "BreadcrumbItem", { enumerable: true, get: function () { return breadcrumb_1.BreadcrumbItem; } });
+Object.defineProperty(exports, "BreadcrumbLink", { enumerable: true, get: function () { return breadcrumb_1.BreadcrumbLink; } });
+Object.defineProperty(exports, "BreadcrumbList", { enumerable: true, get: function () { return breadcrumb_1.BreadcrumbList; } });
+Object.defineProperty(exports, "BreadcrumbPage", { enumerable: true, get: function () { return breadcrumb_1.BreadcrumbPage; } });
+Object.defineProperty(exports, "BreadcrumbSeparator", { enumerable: true, get: function () { return breadcrumb_1.BreadcrumbSeparator; } });
+var button_1 = require("./components/ui/button");
+Object.defineProperty(exports, "Button", { enumerable: true, get: function () { return button_1.Button; } });
+var card_1 = require("./components/ui/card");
+Object.defineProperty(exports, "Card", { enumerable: true, get: function () { return card_1.Card; } });
+Object.defineProperty(exports, "CardContent", { enumerable: true, get: function () { return card_1.CardContent; } });
+Object.defineProperty(exports, "CardDescription", { enumerable: true, get: function () { return card_1.CardDescription; } });
+Object.defineProperty(exports, "CardFooter", { enumerable: true, get: function () { return card_1.CardFooter; } });
+Object.defineProperty(exports, "CardHeader", { enumerable: true, get: function () { return card_1.CardHeader; } });
+Object.defineProperty(exports, "CardTitle", { enumerable: true, get: function () { return card_1.CardTitle; } });
+var checkbox_1 = require("./components/ui/checkbox");
+Object.defineProperty(exports, "Checkbox", { enumerable: true, get: function () { return checkbox_1.Checkbox; } });
+var collapsible_1 = require("./components/ui/collapsible");
+Object.defineProperty(exports, "Collapsible", { enumerable: true, get: function () { return collapsible_1.Collapsible; } });
+Object.defineProperty(exports, "CollapsibleContent", { enumerable: true, get: function () { return collapsible_1.CollapsibleContent; } });
+Object.defineProperty(exports, "CollapsibleTrigger", { enumerable: true, get: function () { return collapsible_1.CollapsibleTrigger; } });
+var dialog_1 = require("./components/ui/dialog");
+Object.defineProperty(exports, "Dialog", { enumerable: true, get: function () { return dialog_1.Dialog; } });
+Object.defineProperty(exports, "DialogClose", { enumerable: true, get: function () { return dialog_1.DialogClose; } });
+Object.defineProperty(exports, "DialogContent", { enumerable: true, get: function () { return dialog_1.DialogContent; } });
+Object.defineProperty(exports, "DialogDescription", { enumerable: true, get: function () { return dialog_1.DialogDescription; } });
+Object.defineProperty(exports, "DialogFooter", { enumerable: true, get: function () { return dialog_1.DialogFooter; } });
+Object.defineProperty(exports, "DialogHeader", { enumerable: true, get: function () { return dialog_1.DialogHeader; } });
+Object.defineProperty(exports, "DialogOverlay", { enumerable: true, get: function () { return dialog_1.DialogOverlay; } });
+Object.defineProperty(exports, "DialogPortal", { enumerable: true, get: function () { return dialog_1.DialogPortal; } });
+Object.defineProperty(exports, "DialogTitle", { enumerable: true, get: function () { return dialog_1.DialogTitle; } });
+Object.defineProperty(exports, "DialogTrigger", { enumerable: true, get: function () { return dialog_1.DialogTrigger; } });
+var info_1 = require("./components/ui/info");
+Object.defineProperty(exports, "Info", { enumerable: true, get: function () { return info_1.Info; } });
+var input_1 = require("./components/ui/input");
+Object.defineProperty(exports, "Input", { enumerable: true, get: function () { return input_1.Input; } });
+var label_1 = require("./components/ui/label");
+Object.defineProperty(exports, "Label", { enumerable: true, get: function () { return label_1.Label; } });
+var loading_spinner_1 = require("./components/ui/loading-spinner");
+Object.defineProperty(exports, "Loader2", { enumerable: true, get: function () { return loading_spinner_1.Loader2; } });
+Object.defineProperty(exports, "LoadingSpinner", { enumerable: true, get: function () { return loading_spinner_1.LoadingSpinner; } });
+var progress_1 = require("./components/ui/progress");
+Object.defineProperty(exports, "Progress", { enumerable: true, get: function () { return progress_1.Progress; } });
+var select_1 = require("./components/ui/select");
+Object.defineProperty(exports, "Select", { enumerable: true, get: function () { return select_1.Select; } });
+Object.defineProperty(exports, "SelectContent", { enumerable: true, get: function () { return select_1.SelectContent; } });
+Object.defineProperty(exports, "SelectGroup", { enumerable: true, get: function () { return select_1.SelectGroup; } });
+Object.defineProperty(exports, "SelectItem", { enumerable: true, get: function () { return select_1.SelectItem; } });
+Object.defineProperty(exports, "SelectLabel", { enumerable: true, get: function () { return select_1.SelectLabel; } });
+Object.defineProperty(exports, "SelectScrollDownButton", { enumerable: true, get: function () { return select_1.SelectScrollDownButton; } });
+Object.defineProperty(exports, "SelectScrollUpButton", { enumerable: true, get: function () { return select_1.SelectScrollUpButton; } });
+Object.defineProperty(exports, "SelectSeparator", { enumerable: true, get: function () { return select_1.SelectSeparator; } });
+Object.defineProperty(exports, "SelectTrigger", { enumerable: true, get: function () { return select_1.SelectTrigger; } });
+Object.defineProperty(exports, "SelectValue", { enumerable: true, get: function () { return select_1.SelectValue; } });
+var separator_1 = require("./components/ui/separator");
+Object.defineProperty(exports, "Separator", { enumerable: true, get: function () { return separator_1.Separator; } });
+var skeleton_1 = require("./components/ui/skeleton");
+Object.defineProperty(exports, "Skeleton", { enumerable: true, get: function () { return skeleton_1.Skeleton; } });
+var slider_1 = require("./components/ui/slider");
+Object.defineProperty(exports, "Slider", { enumerable: true, get: function () { return slider_1.Slider; } });
+var switch_1 = require("./components/ui/switch");
+Object.defineProperty(exports, "Switch", { enumerable: true, get: function () { return switch_1.Switch; } });
+var table_1 = require("./components/ui/table");
+Object.defineProperty(exports, "Table", { enumerable: true, get: function () { return table_1.Table; } });
+Object.defineProperty(exports, "TableBody", { enumerable: true, get: function () { return table_1.TableBody; } });
+Object.defineProperty(exports, "TableCaption", { enumerable: true, get: function () { return table_1.TableCaption; } });
+Object.defineProperty(exports, "TableCell", { enumerable: true, get: function () { return table_1.TableCell; } });
+Object.defineProperty(exports, "TableFooter", { enumerable: true, get: function () { return table_1.TableFooter; } });
+Object.defineProperty(exports, "TableHead", { enumerable: true, get: function () { return table_1.TableHead; } });
+Object.defineProperty(exports, "TableHeader", { enumerable: true, get: function () { return table_1.TableHeader; } });
+Object.defineProperty(exports, "TableRow", { enumerable: true, get: function () { return table_1.TableRow; } });
+var tabs_1 = require("./components/ui/tabs");
+Object.defineProperty(exports, "Tabs", { enumerable: true, get: function () { return tabs_1.Tabs; } });
+Object.defineProperty(exports, "TabsContent", { enumerable: true, get: function () { return tabs_1.TabsContent; } });
+Object.defineProperty(exports, "TabsList", { enumerable: true, get: function () { return tabs_1.TabsList; } });
+Object.defineProperty(exports, "TabsTrigger", { enumerable: true, get: function () { return tabs_1.TabsTrigger; } });
+var textarea_1 = require("./components/ui/textarea");
+Object.defineProperty(exports, "Textarea", { enumerable: true, get: function () { return textarea_1.Textarea; } });
+var tooltip_1 = require("./components/ui/tooltip");
+Object.defineProperty(exports, "Tooltip", { enumerable: true, get: function () { return tooltip_1.Tooltip; } });
+Object.defineProperty(exports, "TooltipContent", { enumerable: true, get: function () { return tooltip_1.TooltipContent; } });
+Object.defineProperty(exports, "TooltipProvider", { enumerable: true, get: function () { return tooltip_1.TooltipProvider; } });
+Object.defineProperty(exports, "TooltipTrigger", { enumerable: true, get: function () { return tooltip_1.TooltipTrigger; } });
+// Specialized Components
+var global_voice_command_button_1 = require("./components/global-voice-command-button");
+Object.defineProperty(exports, "GlobalVoiceCommandButton", { enumerable: true, get: function () { return global_voice_command_button_1.default; } });
+var global_voice_command_modal_1 = require("./components/global-voice-command-modal");
+Object.defineProperty(exports, "GlobalVoiceCommandModal", { enumerable: true, get: function () { return global_voice_command_modal_1.default; } });
+var theme_provider_1 = require("./components/theme-provider");
+Object.defineProperty(exports, "ThemeProvider", { enumerable: true, get: function () { return theme_provider_1.ThemeProvider; } });
+var tributariapp_logo_1 = require("./components/tributariapp-logo");
+Object.defineProperty(exports, "TributariAppLogo", { enumerable: true, get: function () { return tributariapp_logo_1.default; } });
+var voice_demo_page_1 = require("./components/voice-demo-page");
+Object.defineProperty(exports, "VoiceDemoPage", { enumerable: true, get: function () { return voice_demo_page_1.default; } });
+var voice_header_1 = require("./components/voice-header");
+Object.defineProperty(exports, "VoiceHeader", { enumerable: true, get: function () { return voice_header_1.default; } });
+var voice_integration_example_1 = require("./components/voice-integration-example");
+Object.defineProperty(exports, "VoiceIntegrationExample", { enumerable: true, get: function () { return voice_integration_example_1.default; } });
+var voice_invoice_button_1 = require("./components/voice-invoice-button");
+Object.defineProperty(exports, "VoiceInvoiceButton", { enumerable: true, get: function () { return voice_invoice_button_1.default; } });
+var voice_invoice_modal_1 = require("./components/voice-invoice-modal");
+Object.defineProperty(exports, "VoiceInvoiceModal", { enumerable: true, get: function () { return voice_invoice_modal_1.default; } });
+// Organized Component Categories
+__exportStar(require("./components/data-display"), exports);
+__exportStar(require("./components/feedback"), exports);
+__exportStar(require("./components/forms"), exports);
+__exportStar(require("./components/layout"), exports);
+__exportStar(require("./components/navigation"), exports);
+__exportStar(require("./components/voice"), exports);
+// Business Components (Facturación y gestión empresarial)
+__exportStar(require("./components/business"), exports);
+// Charts Components (Gráficos y visualización de datos)
+__exportStar(require("./components/charts"), exports);
+// Overlays Components (Modales, tooltips, drawers)
+__exportStar(require("./components/overlays"), exports);
+// Re-export utilities
+var use_voice_recognition_1 = require("./hooks/use-voice-recognition");
+Object.defineProperty(exports, "useVoiceRecognition", { enumerable: true, get: function () { return use_voice_recognition_1.useVoiceRecognition; } });
+var utils_1 = require("./lib/utils");
+Object.defineProperty(exports, "cn", { enumerable: true, get: function () { return utils_1.cn; } });
+// Version info
+exports.uiVersion = '1.0.0';
