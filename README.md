@@ -658,11 +658,20 @@ El proyecto está optimizado para GitHub Copilot Agent con tareas predefinidas:
 
 ## 🤝 Contribuir
 
+### Para Contribuidores Externos
+
 1. **Fork** el proyecto
 2. **Crear** una rama feature (`git checkout -b feature/AmazingFeature`)
 3. **Commit** cambios (`git commit -m 'Add some AmazingFeature'`)
 4. **Push** a la rama (`git push origin feature/AmazingFeature`)
 5. **Abrir** un Pull Request
+
+### Para Colaboradores del Equipo
+
+Si eres propietario del repositorio y necesitas añadir colaboradores:
+
+📚 **[Guía Rápida: Añadir Colaboradores](./docs/GUIA_RAPIDA_COLABORADORES.md)**
+📖 **[Gestión Completa de Colaboradores](./docs/COLABORADORES_REPOSITORIO.md)**
 
 ### Flujo de Desarrollo
 
