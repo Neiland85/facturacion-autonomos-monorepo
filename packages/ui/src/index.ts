@@ -1,2 +1,116 @@
-// Placeholder for UI components
+// UI Components Library
+export { Alert, AlertDescription, AlertTitle } from './components/ui/alert';
+export { AlertTriangle } from './components/ui/alert-triangle';
+export { AspectRatio } from './components/ui/aspect-ratio';
+export { Avatar, AvatarFallback, AvatarImage } from './components/ui/avatar';
+export { Badge, badgeVariants } from './components/ui/badge';
+export {
+  Breadcrumb,
+  BreadcrumbEllipsis,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from './components/ui/breadcrumb';
+export { Button } from './components/ui/button';
+export {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from './components/ui/card';
+export { Checkbox } from './components/ui/checkbox';
+export {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from './components/ui/collapsible';
+export {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogOverlay,
+  DialogPortal,
+  DialogTitle,
+  DialogTrigger,
+} from './components/ui/dialog';
+export { Info } from './components/ui/info';
+export { Input } from './components/ui/input';
+export { Label } from './components/ui/label';
+export { Loader2, LoadingSpinner } from './components/ui/loading-spinner';
+export { Progress } from './components/ui/progress';
+export {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectScrollDownButton,
+  SelectScrollUpButton,
+  SelectSeparator,
+  SelectTrigger,
+  SelectValue,
+} from './components/ui/select';
+export { Separator } from './components/ui/separator';
+export { Skeleton } from './components/ui/skeleton';
+export { Slider } from './components/ui/slider';
+export { Switch } from './components/ui/switch';
+export {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableFooter,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from './components/ui/table';
+export { Tabs, TabsContent, TabsList, TabsTrigger } from './components/ui/tabs';
+export { Textarea } from './components/ui/textarea';
+export {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from './components/ui/tooltip';
+
+// Specialized Components
+export { default as GlobalVoiceCommandButton } from './components/global-voice-command-button';
+export { default as GlobalVoiceCommandModal } from './components/global-voice-command-modal';
+export { ThemeProvider } from './components/theme-provider';
+export { default as TributariAppLogo } from './components/tributariapp-logo';
+export { default as VoiceDemoPage } from './components/voice-demo-page';
+export { default as VoiceHeader } from './components/voice-header';
+export { default as VoiceIntegrationExample } from './components/voice-integration-example';
+export { default as VoiceInvoiceButton } from './components/voice-invoice-button';
+export { default as VoiceInvoiceModal } from './components/voice-invoice-modal';
+
+// Organized Component Categories
+export * from './components/data-display';
+export * from './components/feedback';
+export * from './components/forms';
+export * from './components/layout';
+export * from './components/navigation';
+export * from './components/voice';
+
+// Business Components (Facturación y gestión empresarial)
+export * from './components/business';
+
+// Charts Components (Gráficos y visualización de datos)
+export * from './components/charts';
+
+// Overlays Components (Modales, tooltips, drawers)
+export * from './components/overlays';
+
+// Re-export utilities
+export { useVoiceRecognition } from './hooks/use-voice-recognition';
+export { cn } from './lib/utils';
+
+// Version info
 export const uiVersion = '1.0.0';

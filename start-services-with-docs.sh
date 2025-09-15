@@ -15,51 +15,41 @@ start_service() {
     cd "$service_path" || exit 1
 
     # Iniciar en background
-    if [ "$service_name" = "invoice-service" ]; then
-        pnpm dev > /dev/null 2>&1 &
-    else
-        pnpm dev > /dev/null 2>&1 &
-    fi
+    pnpm dev > /dev/null 2>&1 &
 
     # Esperar un momento para que el servicio inicie
-    sleep 3
+    sleep 5
 
-    # Verificar que esté ejecutándose
-    if curl -s "http://localhost:$port/health" > /dev/null; then
+    # Verificar que esté ejecutándose usando el endpoint correcto
+    if curl -s "http://localhost:$port/api/health" > /dev/null 2>&1; then
         echo "   ✅ $service_name iniciado correctamente"
         echo "   📖 Documentación: http://localhost:$port/api-docs"
     else
         echo "   ❌ Error al iniciar $service_name"
+        echo "   💡 Verificando proceso..."
+        if pgrep -f "$service_name" > /dev/null; then
+            echo "   ⚠️  Proceso ejecutándose pero no responde al health check"
+        else
+            echo "   ❌ Proceso no encontrado"
+        fi
     fi
 
     echo ""
     cd - > /dev/null
 }
 
-# Iniciar servicios
-start_service "auth-service" "apps/auth-service" "3003"
-start_service "invoice-service" "apps/invoice-service" "3001"
-start_service "api-tax-calculator" "apps/api-tax-calculator" "3002"
-start_service "api-facturas" "apps/api-facturas" "3001"
+# Iniciar servicios uno por uno con verificación
+echo "🔄 Iniciando servicios en secuencia..."
 
-echo "🎉 Todos los servicios han sido iniciados!"
+start_service "auth-service" "apps/auth-service" "3003"
+start_service "invoice-service" "apps/invoice-service" "3002"
+start_service "api-tax-calculator" "apps/api-tax-calculator" "3004"
+
+echo "🎉 Proceso de inicio completado!"
 echo ""
 echo "📋 Servicios disponibles:"
 echo "   🔐 Auth Service:         http://localhost:3003/api-docs"
-echo "   📄 Invoice Service:      http://localhost:3001/api-docs"
-echo "   🧾 Tax Calculator:       http://localhost:3002/api-docs"
-echo "   📊 API Facturas:         http://localhost:3001/api-docs"
+echo "   📄 Invoice Service:      http://localhost:3002/api-docs"
+echo "   🧾 Tax Calculator:       http://localhost:3004/api-docs"
 echo ""
-echo "📖 Documentación unificada: http://localhost:3000/docs/api/index.html"
-echo ""
-echo "🧪 Para probar todos los servicios: node scripts/test-api-docs-integration.js"
-echo ""
-echo "Para detener todos los servicios: pkill -f 'pnpm dev'"
-
-# Mantener el script ejecutándose para que los procesos en background continúen
-echo ""
-echo "Presiona Ctrl+C para detener todos los servicios..."
-trap 'echo ""; echo "🛑 Deteniendo servicios..."; pkill -f "pnpm dev"; exit 0' INT
-while true; do
-    sleep 1
-done
+echo "🔍 Ejecuta './mvp-100-verification.sh' para verificar el estado"

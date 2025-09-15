@@ -42,7 +42,10 @@ const numeroParaJson = 42;
 console.log('Número original:', numeroParaJson);
 console.log('JSON stringify:', numeroParaJson.json.stringify());
 console.log('JSON toObject:', numeroParaJson.json.toObject());
-const objetoJson = { value: 99, type: 'number' };
+const objetoJson = {
+    value: 99,
+    type: 'number',
+};
 const numeroDesdeObjeto = numeroParaJson.json.fromObject(objetoJson);
 console.log('Número desde objeto:', numeroDesdeObjeto);
 // 9. Demostración de signaturas tipadas
