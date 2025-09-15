@@ -164,7 +164,6 @@ prisma/migrations/
 
 # Package managers
 package-lock.json
-pnpm-lock.yaml
 bun.lockb
 
 # Terraform
