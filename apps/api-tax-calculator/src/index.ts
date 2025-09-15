@@ -1,10 +1,10 @@
-import 'dotenv/config';
-import express from 'express';
-import path from 'path';
+import "dotenv/config";
+import express from "express";
+import path from "path";
 
 // Configurar documentación API
 const { setupSwagger } = require(
-  path.join(__dirname, '../../config/api-tax-calculator-swagger')
+  path.join(__dirname, "../../config/api-tax-calculator-swagger")
 );
 
 const app: express.Application = express();
@@ -19,19 +19,13 @@ const PORT = process.env.PORT || 3003;
 // import { quarterClosureRoutes } from './routes/quarter-closure.routes';
 // import { taxRoutes } from './routes/tax.routes';
 // import { webhookRoutes } from './routes/webhook.routes';
+import healthRoutes from "./routes/health.routes";
 
 // Configurar documentación API
 setupSwagger(app);
 
 // Health check
-app.get('/health', (_req, res) => {
-  res.json({
-    status: 'ok',
-    service: 'tax-calculator',
-    timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0',
-  });
-});
+app.use("/api/health", healthRoutes);
 
 // Rutas
 // TODO: Crear rutas faltantes
@@ -48,9 +42,9 @@ app.use(
     res: express.Response,
     next: express.NextFunction
   ) => {
-    console.error('Error:', err);
+    console.error("Error:", err);
     res.status(500).json({
-      error: 'Internal server error',
+      error: "Internal server error",
       timestamp: new Date().toISOString(),
     });
   }
@@ -62,35 +56,35 @@ const server = app.listen(PORT, () => {
   console.log(
     `📖 API Documentation available at: http://localhost:${PORT}/api-docs`
   );
-  console.log(`Entorno: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`Entorno: ${process.env.NODE_ENV || "development"}`);
 
   // TODO: Habilitar cron jobs cuando estén disponibles
   // cronManager.startCronJobs();
 });
 
 // Manejo de señales de cierre
-process.on('SIGTERM', async () => {
-  console.log('Señal SIGTERM recibida, cerrando servidor...');
+process.on("SIGTERM", async () => {
+  console.log("Señal SIGTERM recibida, cerrando servidor...");
 
   // TODO: Habilitar cuando cron jobs estén disponibles
   // await cronManager.shutdown();
 
   // Cerrar servidor
   server.close(() => {
-    console.log('Servidor cerrado correctamente');
+    console.log("Servidor cerrado correctamente");
     process.exit(0);
   });
 });
 
-process.on('SIGINT', async () => {
-  console.log('Señal SIGINT recibida, cerrando servidor...');
+process.on("SIGINT", async () => {
+  console.log("Señal SIGINT recibida, cerrando servidor...");
 
   // TODO: Habilitar cuando cron jobs estén disponibles
   // await cronManager.shutdown();
 
   // Cerrar servidor
   server.close(() => {
-    console.log('Servidor cerrado correctamente');
+    console.log("Servidor cerrado correctamente");
     process.exit(0);
   });
 });

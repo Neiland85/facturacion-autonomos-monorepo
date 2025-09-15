@@ -6,7 +6,7 @@ const router: express.Router = express.Router();
  * @swagger
  * /api/health:
  *   get:
- *     summary: Verificar estado del servicio de facturas
+ *     summary: Verificar estado del servicio de cálculo de impuestos
  *     tags: [Health]
  *     responses:
  *       200:
@@ -24,30 +24,21 @@ const router: express.Router = express.Router();
  *                   example: "healthy"
  *                 message:
  *                   type: string
- *                   example: "Invoice Service is healthy"
+ *                   example: "Tax Calculator Service is healthy"
  *                 service:
  *                   type: string
- *                   example: "invoice-service"
+ *                   example: "tax-calculator"
  *                 version:
  *                   type: string
  *                   example: "1.0.0"
  *                 timestamp:
  *                   type: string
  *                   format: date-time
- *                 checks:
- *                   type: object
- *                   properties:
- *                     database:
- *                       type: string
- *                       example: "up"
- *                     fileSystem:
- *                       type: string
- *                       example: "up"
  */
 router.get("/", async (req: express.Request, res: express.Response) => {
   const checks = {
     database: false,
-    fileSystem: false,
+    aeat: false,
     overall: false,
   };
 
@@ -56,25 +47,13 @@ router.get("/", async (req: express.Request, res: express.Response) => {
     // TODO: Implementar verificación real de Prisma
     checks.database = true;
 
-    // Verificar sistema de archivos
-    try {
-      const fs = require("fs").promises;
-      const uploadPath = process.env.UPLOAD_PATH || "./uploads";
+    // Verificar configuración AEAT
+    const aeatPublicKey = process.env.AEAT_PUBLIC_KEY;
+    const webhookSecret = process.env.WEBHOOK_SECRET;
 
-      // Crear directorio si no existe
-      await fs.mkdir(uploadPath, { recursive: true });
+    checks.aeat = !!(aeatPublicKey && webhookSecret);
 
-      // Verificar permisos de escritura
-      const testFile = `${uploadPath}/.health-check`;
-      await fs.writeFile(testFile, "test");
-      await fs.unlink(testFile);
-
-      checks.fileSystem = true;
-    } catch (error) {
-      console.warn("File system health check failed:", error);
-    }
-
-    checks.overall = checks.database && checks.fileSystem;
+    checks.overall = checks.database && checks.aeat;
 
     const statusCode = checks.overall ? 200 : 503;
     const status = checks.overall ? "healthy" : "unhealthy";
@@ -83,22 +62,22 @@ router.get("/", async (req: express.Request, res: express.Response) => {
       success: checks.overall,
       status,
       message: checks.overall
-        ? "Invoice Service is healthy"
-        : "Invoice Service has issues",
-      service: "invoice-service",
+        ? "Tax Calculator Service is healthy"
+        : "Tax Calculator Service has issues",
+      service: "tax-calculator",
       version: process.env.npm_package_version || "1.0.0",
       timestamp: new Date().toISOString(),
       checks: {
         database: checks.database ? "up" : "down",
-        fileSystem: checks.fileSystem ? "up" : "down",
+        aeat: checks.aeat ? "configured" : "not configured",
       },
     });
   } catch (error) {
     res.status(503).json({
       success: false,
       status: "error",
-      message: "Invoice Service health check failed",
-      service: "invoice-service",
+      message: "Tax Calculator Service health check failed",
+      service: "tax-calculator",
       timestamp: new Date().toISOString(),
       error:
         process.env.NODE_ENV === "development"
@@ -113,7 +92,7 @@ router.get("/ping", (req: express.Request, res: express.Response) => {
   res.json({
     success: true,
     message: "pong",
-    service: "invoice-service",
+    service: "tax-calculator",
     timestamp: new Date().toISOString(),
   });
 });

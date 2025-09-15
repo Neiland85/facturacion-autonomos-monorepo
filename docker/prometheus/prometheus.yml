@@ -1,4 +1,4 @@
-# Configuración de Prometheus para desarrollo local
+# Configuración de Prometheus para TributariApp
 global:
   scrape_interval: 15s
   evaluation_interval: 15s
@@ -15,28 +15,60 @@ rule_files: []
 # Configuración de scraping
 scrape_configs:
   # Métricas de Prometheus
-  - job_name: 'prometheus'
+  - job_name: "prometheus"
     static_configs:
-      - targets: ['localhost:9090']
+      - targets: ["localhost:9090"]
 
-  # API de Facturas
-  - job_name: 'api-facturas'
+  # API Gateway
+  - job_name: "api-gateway"
     static_configs:
-      - targets: ['host.docker.internal:3000']
-    metrics_path: '/metrics'
+      - targets: ["api-gateway:3001"]
+    metrics_path: "/api/metrics"
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Auth Service
+  - job_name: "auth-service"
+    static_configs:
+      - targets: ["auth-service:3003"]
+    metrics_path: "/api/metrics"
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Invoice Service
+  - job_name: "invoice-service"
+    static_configs:
+      - targets: ["invoice-service:3002"]
+    metrics_path: "/api/metrics"
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Tax Calculator Service
+  - job_name: "tax-calculator-service"
+    static_configs:
+      - targets: ["tax-calculator-service:3004"]
+    metrics_path: "/api/metrics"
+    scrape_interval: 10s
+    scrape_timeout: 5s
+
+  # Web Application
+  - job_name: "web-app"
+    static_configs:
+      - targets: ["web:3000"]
+    metrics_path: "/api/metrics"
+    scrape_interval: 15s
+    scrape_timeout: 5s
+
+  # PostgreSQL Database
+  - job_name: "postgres"
+    static_configs:
+      - targets: ["postgres:5432"]
     scrape_interval: 30s
     scrape_timeout: 10s
 
-  # API Tax Calculator
-  - job_name: 'api-tax-calculator'
+  # Redis Cache
+  - job_name: "redis"
     static_configs:
-      - targets: ['host.docker.internal:3001']
-    metrics_path: '/metrics'
+      - targets: ["redis:6379"]
     scrape_interval: 30s
     scrape_timeout: 10s
-
-  # Métricas del sistema (opcional)
-  - job_name: 'node-exporter'
-    static_configs:
-      - targets: ['host.docker.internal:9100']
-    scrape_interval: 30s
