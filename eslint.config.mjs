@@ -15,7 +15,7 @@ export default [
           './tsconfig.json',
           './apps/*/tsconfig.json',
           './packages/*/tsconfig.json',
-          '../frontend/tsconfig.json',
+          './frontend/tsconfig.json',
         ],
       },
     },

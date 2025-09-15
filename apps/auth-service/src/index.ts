@@ -10,16 +10,133 @@ import session from 'express-session';
 import helmet from 'helmet';
 import Redis from 'ioredis';
 import morgan from 'morgan';
-const path = require('path');
-
-// Configurar documentación API
-const { setupSwagger } = require(
-  path.join(__dirname, '../../../config/auth-service-swagger')
-);
-
+import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerUi from 'swagger-ui-express';
 import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/logger.middleware';
 import { authRoutes } from './routes/auth.routes';
+import healthRoutes from './routes/health.routes';
+import userRoutes from './routes/user.routes';
+const path = require('path');
+
+// Configurar documentación API
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'Auth Service API - TributariApp',
+      version: '1.0.0',
+      description:
+        'API de autenticación y autorización para autónomos - Sistema TributariApp',
+      contact: {
+        name: 'TributariApp Support',
+        email: 'support@tributariapp.com',
+      },
+      license: {
+        name: 'Apache 2.0',
+        url: 'https://www.apache.org/licenses/LICENSE-2.0.html',
+      },
+    },
+    servers: [
+      {
+        url: 'http://localhost:3003',
+        description: 'Development server',
+      },
+      {
+        url: 'https://auth.tributariapp.com',
+        description: 'Production server',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        cookieAuth: {
+          type: 'apiKey',
+          in: 'cookie',
+          name: 'accessToken',
+          description: 'JWT token almacenado en cookie httpOnly',
+        },
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+          description: 'JWT token en header Authorization',
+        },
+      },
+      schemas: {
+        User: {
+          type: 'object',
+          properties: {
+            id: {
+              type: 'string',
+              format: 'uuid',
+              description: 'ID único del usuario',
+            },
+            email: {
+              type: 'string',
+              format: 'email',
+              description: 'Correo electrónico del usuario',
+            },
+            name: { type: 'string', description: 'Nombre completo del usuario' },
+            role: {
+              type: 'string',
+              enum: ['user', 'admin'],
+              default: 'user',
+            },
+            isActive: { type: 'boolean', default: true },
+            createdAt: { type: 'string', format: 'date-time' },
+            updatedAt: { type: 'string', format: 'date-time' },
+          },
+          required: ['id', 'email', 'name'],
+        },
+        ApiResponse: {
+          type: 'object',
+          properties: {
+            success: { type: 'boolean' },
+            message: { type: 'string' },
+            data: { type: 'object' },
+            timestamp: { type: 'string', format: 'date-time' },
+          },
+          required: ['success', 'message', 'timestamp'],
+        },
+      },
+    },
+    security: [{ cookieAuth: [] }],
+    tags: [
+      { name: 'Auth', description: 'Endpoints de autenticación y registro' },
+      { name: 'Users', description: 'Gestión de usuarios' },
+      { name: 'Health', description: 'Verificación de estado del servicio' },
+    ],
+  },
+  apis: ['./src/routes/*.ts', './src/routes/*.js'],
+};
+
+const specs = swaggerJsdoc(swaggerOptions);
+
+const setupSwagger = (app: any) => {
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+  app.get('/swagger.json', (req: any, res: any) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(specs);
+  });
+};
+
+// Middleware de seguridad
+const helmetConfig = helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      scriptSrc: ["'self'"],
+      imgSrc: ["'self'", 'data:', 'https:'],
+      connectSrc: ["'self'"],
+      fontSrc: ["'self'"],
+      objectSrc: ["'none'"],
+      mediaSrc: ["'self'"],
+      frameSrc: ["'none'"],
+    },
+  },
+  crossOriginEmbedderPolicy: false,
+});
 
 const app = express();
 const PORT = process.env.PORT || 3003;
@@ -39,24 +156,7 @@ const redisStore = new RedisStore({
 });
 
 // Middleware de seguridad
-app.use(
-  helmet({
-    contentSecurityPolicy: {
-      directives: {
-        defaultSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        scriptSrc: ["'self'"],
-        imgSrc: ["'self'", 'data:', 'https:'],
-        connectSrc: ["'self'"],
-        fontSrc: ["'self'"],
-        objectSrc: ["'none'"],
-        mediaSrc: ["'self'"],
-        frameSrc: ["'none'"],
-      },
-    },
-    crossOriginEmbedderPolicy: false,
-  })
-);
+app.use(helmetConfig);
 
 app.use(
   cors({
@@ -180,6 +280,8 @@ app.get('/health', (req, res) => {
 
 // Rutas
 app.use('/api/auth', authRoutes);
+app.use('/api/health', healthRoutes);
+app.use('/api/users', userRoutes);
 
 // 404 handler
 app.use('*', (req, res) => {
