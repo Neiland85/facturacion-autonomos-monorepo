@@ -15,7 +15,7 @@ Los archivos `.env*` en este repositorio contienen **plantillas y ejemplos**. Pa
 
 2. **Producción:**
    - Usar variables de entorno del sistema
-   - Configurar en el dashboard de Netlify/Vercel
+   - Configurar en el dashboard de Railway
    - Usar servicios de gestión de secretos (AWS Secrets Manager, Azure Key Vault)
 
 ### 🛡️ Passwords de Base de Datos
