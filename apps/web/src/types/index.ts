@@ -90,9 +90,20 @@ export interface PaginatedResponse<T> {
 
 export interface InvoiceStats {
   totalInvoices: number;
-  totalAmount: number;
-  paidAmount: number;
-  pendingAmount: number;
-  overdueAmount: number;
-  statusBreakdown: Record<string, number>;
+  monthlyRevenue: number;
+  pendingInvoices: number;
+  activeClients: number;
+  revenueChange: string;
+  invoicesChange: string;
+}
+
+export interface Client {
+  id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  address?: string;
+  taxId?: string;
+  createdAt: string;
+  updatedAt: string;
 }

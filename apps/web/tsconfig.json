@@ -42,7 +42,9 @@
     "__tests__/**/*",
     "jest.setup.js",
     ".next/types/**/*.ts",
-    "src/lib/**/*.ts"
+    "lib/**/*.ts",
+    "components/**/*.ts",
+    "app/**/*.ts"
   ],
   "exclude": [
     "node_modules"

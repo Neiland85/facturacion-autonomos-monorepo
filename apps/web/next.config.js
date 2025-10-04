@@ -24,7 +24,7 @@ const nextConfig = {
     if (!dev && !isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@': require('path').resolve(__dirname, './'),
+        '@': require('path').resolve(__dirname, './src'),
       };
     }
     return config;
