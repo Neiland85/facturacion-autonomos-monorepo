@@ -1,0 +1,58 @@
+version: 2
+
+# GitGuardian configuration to exclude false positives
+# This file tells GitGuardian to ignore certain patterns that are not real secrets
+
+# Exclude patterns that are commonly used as placeholders in example files
+exclude:
+  # Exclude .env.example files entirely since they contain placeholders
+  paths:
+    - "**/.env.example"
+    - "**/*.env.example"
+    - "**/example.*"
+    - "**/*example*"
+
+  # Exclude patterns that match common placeholder formats
+  patterns:
+    # Generic placeholders
+    - "your_.*_here"
+    - "your-.*-here"
+    - "your_.*_secret"
+    - "your-.*-secret"
+    - "your_.*_key"
+    - "your-.*-key"
+    - "your_.*_password"
+    - "your-.*-password"
+    - "your_.*_token"
+    - "your-.*-token"
+
+    # Specific patterns for this project
+    - "your_nextauth_secret_here"
+    - "your_nextauth_secret_here_minimum_32_characters_long"
+    - "your_jwt_access_secret_here"
+    - "your_jwt_refresh_secret_here"
+    - "your_session_secret_here"
+    - "your_webhook_secret_here"
+    - "your_api_key_secret_here"
+    - "your_gateway_jwt_secret_here"
+    - "your_aeat_public_key_here"
+    - "your_aeat_private_key_here"
+    - "your_app_password"
+    - "your_email@gmail.com"
+
+    # Legacy patterns from old commits
+    - "your-super-secret-jwt-key-change-this-in-production"
+    - "your-super-secret-session-key-change-this-in-production"
+    - "your-aeat-api-key"
+    - "your-email@gmail.com"
+    - "iilz.weqh.zwuz.ficl"
+    - "theia3impact@gmail.com"
+
+# Include patterns (if needed for specific cases)
+include:
+  # Include actual secrets that might be missed
+  patterns:
+    - "sk-[a-zA-Z0-9]{48}"  # OpenAI API keys
+    - "xoxb-[0-9]{10,12}-[0-9]{10,12}-[a-zA-Z0-9]{24}"  # Slack bot tokens
+    - "ghp_[a-zA-Z0-9]{36}"  # GitHub personal access tokens
+    - "AKIA[0-9A-Z]{16}"  # AWS access keys
