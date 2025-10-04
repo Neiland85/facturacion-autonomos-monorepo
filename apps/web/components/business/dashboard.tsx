@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { motion } from 'framer-motion';
-import { Badge } from '../ui/badge';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
-import { Progress } from '../ui/progress';
+import { motion } from "framer-motion";
+import { Badge } from "../ui/badge";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
+import { Progress } from "../ui/progress";
 
 // Iconos personalizados
 const TrendingUpIcon = ({ className }: { className?: string }) => (
@@ -119,7 +119,7 @@ function MetricCard({
   icon,
   color,
   bgColor,
-  className = '',
+  className = "",
 }: MetricCardProps) {
   return (
     <motion.div
@@ -131,23 +131,23 @@ function MetricCard({
         <CardContent className="p-6">
           <div className="flex items-center justify-between">
             <div>
-              <p className="text-sm font-medium text-muted-foreground mb-1">
+              <p className="text-muted-foreground mb-1 text-sm font-medium">
                 {title}
               </p>
               <p className={`text-3xl font-bold ${color}`}>{value}</p>
               {change && (
-                <div className="flex items-center mt-2">
+                <div className="mt-2 flex items-center">
                   {change.isPositive ? (
-                    <TrendingUpIcon className="w-4 h-4 text-green-600 mr-1" />
+                    <TrendingUpIcon className="mr-1 h-4 w-4 text-green-600" />
                   ) : (
-                    <TrendingDownIcon className="w-4 h-4 text-red-600 mr-1" />
+                    <TrendingDownIcon className="mr-1 h-4 w-4 text-red-600" />
                   )}
                   <span
                     className={`text-sm font-medium ${
-                      change.isPositive ? 'text-green-600' : 'text-red-600'
+                      change.isPositive ? "text-green-600" : "text-red-600"
                     }`}
                   >
-                    {change.value > 0 ? '+' : ''}
+                    {change.value > 0 ? "+" : ""}
                     {change.value}% {change.label}
                   </span>
                 </div>
@@ -177,12 +177,12 @@ interface BusinessDashboardProps {
 
 export function BusinessDashboard({
   metrics,
-  className = '',
+  className = "",
 }: BusinessDashboardProps) {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR',
+    return new Intl.NumberFormat("es-ES", {
+      style: "currency",
+      currency: "EUR",
     }).format(amount);
   };
 
@@ -193,16 +193,16 @@ export function BusinessDashboard({
   return (
     <div className={`space-y-6 ${className}`}>
       {/* Métricas principales */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
         <MetricCard
           title="Ingresos Totales"
           value={formatCurrency(metrics.totalRevenue)}
           change={{
             value: 12.5,
-            label: 'vs mes anterior',
+            label: "vs mes anterior",
             isPositive: true,
           }}
-          icon={<DollarIcon className="w-8 h-8" />}
+          icon={<DollarIcon className="h-8 w-8" />}
           color="text-green-600"
           bgColor="bg-green-50"
         />
@@ -212,10 +212,10 @@ export function BusinessDashboard({
           value={formatCurrency(metrics.monthlyRevenue)}
           change={{
             value: 8.2,
-            label: 'vs mes anterior',
+            label: "vs mes anterior",
             isPositive: true,
           }}
-          icon={<TrendingUpIcon className="w-8 h-8" />}
+          icon={<TrendingUpIcon className="h-8 w-8" />}
           color="text-blue-600"
           bgColor="bg-blue-50"
         />
@@ -225,10 +225,10 @@ export function BusinessDashboard({
           value={metrics.totalClients}
           change={{
             value: 5.1,
-            label: 'vs mes anterior',
+            label: "vs mes anterior",
             isPositive: true,
           }}
-          icon={<UsersIcon className="w-8 h-8" />}
+          icon={<UsersIcon className="h-8 w-8" />}
           color="text-purple-600"
           bgColor="bg-purple-50"
         />
@@ -238,22 +238,22 @@ export function BusinessDashboard({
           value={metrics.totalInvoices}
           change={{
             value: -2.3,
-            label: 'vs mes anterior',
+            label: "vs mes anterior",
             isPositive: false,
           }}
-          icon={<FileTextIcon className="w-8 h-8" />}
+          icon={<FileTextIcon className="h-8 w-8" />}
           color="text-orange-600"
           bgColor="bg-orange-50"
         />
       </div>
 
       {/* Métricas secundarias y gráficos */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
         {/* Estado de cobros */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
-              <ClockIcon className="w-5 h-5" />
+              <ClockIcon className="h-5 w-5" />
               Estado de Cobros
             </CardTitle>
           </CardHeader>
@@ -262,14 +262,14 @@ export function BusinessDashboard({
               <span className="text-sm font-medium">Facturas Pendientes</span>
               <Badge
                 variant="outline"
-                className="text-orange-600 border-orange-600"
+                className="border-orange-600 text-orange-600"
               >
                 {metrics.pendingInvoices}
               </Badge>
             </div>
             <div className="flex items-center justify-between">
               <span className="text-sm font-medium">Facturas Vencidas</span>
-              <Badge variant="outline" className="text-red-600 border-red-600">
+              <Badge variant="outline" className="border-red-600 text-red-600">
                 {metrics.overdueInvoices}
               </Badge>
             </div>
@@ -296,7 +296,7 @@ export function BusinessDashboard({
                 <p className="text-2xl font-bold text-green-600">
                   {formatCurrency(metrics.averageInvoiceValue)}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Valor Promedio Factura
                 </p>
               </div>
@@ -304,17 +304,17 @@ export function BusinessDashboard({
                 <p className="text-2xl font-bold text-blue-600">
                   {Math.round(metrics.totalInvoices / metrics.totalClients)}
                 </p>
-                <p className="text-sm text-muted-foreground">
+                <p className="text-muted-foreground text-sm">
                   Facturas por Cliente
                 </p>
               </div>
             </div>
 
             <div className="space-y-3">
-              <div className="flex justify-between items-center">
+              <div className="flex items-center justify-between">
                 <span className="text-sm">Objetivo Mensual</span>
                 <span className="text-sm font-medium">
-                  {formatCurrency(metrics.monthlyRevenue)} /{' '}
+                  {formatCurrency(metrics.monthlyRevenue)} /{" "}
                   {formatCurrency(50000)}
                 </span>
               </div>
@@ -322,7 +322,7 @@ export function BusinessDashboard({
                 value={(metrics.monthlyRevenue / 50000) * 100}
                 className="h-2"
               />
-              <p className="text-xs text-muted-foreground text-center">
+              <p className="text-muted-foreground text-center text-xs">
                 {formatPercentage((metrics.monthlyRevenue / 50000) * 100)} del
                 objetivo alcanzado
               </p>
@@ -335,12 +335,12 @@ export function BusinessDashboard({
       <Card className="border-orange-200 bg-orange-50">
         <CardContent className="p-4">
           <div className="flex items-start gap-3">
-            <ClockIcon className="w-5 h-5 text-orange-600 mt-0.5" />
+            <ClockIcon className="mt-0.5 h-5 w-5 text-orange-600" />
             <div>
               <h4 className="font-medium text-orange-900">
                 Recordatorios Importantes
               </h4>
-              <ul className="mt-2 text-sm text-orange-800 space-y-1">
+              <ul className="mt-2 space-y-1 text-sm text-orange-800">
                 <li>
                   • {metrics.overdueInvoices} facturas pendientes de cobro
                 </li>
@@ -368,17 +368,17 @@ interface QuickStatsProps {
   className?: string;
 }
 
-export function QuickStats({ stats, className = '' }: QuickStatsProps) {
+export function QuickStats({ stats, className = "" }: QuickStatsProps) {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR',
-      notation: 'compact',
+    return new Intl.NumberFormat("es-ES", {
+      style: "currency",
+      currency: "EUR",
+      notation: "compact",
     }).format(amount);
   };
 
   return (
-    <div className={`grid grid-cols-2 md:grid-cols-5 gap-4 ${className}`}>
+    <div className={`grid grid-cols-2 gap-4 md:grid-cols-5 ${className}`}>
       <motion.div
         initial={{ opacity: 0, scale: 0.9 }}
         animate={{ opacity: 1, scale: 1 }}
@@ -389,7 +389,7 @@ export function QuickStats({ stats, className = '' }: QuickStatsProps) {
             <p className="text-2xl font-bold text-green-600">
               {formatCurrency(stats.todayRevenue)}
             </p>
-            <p className="text-xs text-muted-foreground">Hoy</p>
+            <p className="text-muted-foreground text-xs">Hoy</p>
           </CardContent>
         </Card>
       </motion.div>
@@ -404,7 +404,7 @@ export function QuickStats({ stats, className = '' }: QuickStatsProps) {
             <p className="text-2xl font-bold text-blue-600">
               {formatCurrency(stats.weekRevenue)}
             </p>
-            <p className="text-xs text-muted-foreground">Esta Semana</p>
+            <p className="text-muted-foreground text-xs">Esta Semana</p>
           </CardContent>
         </Card>
       </motion.div>
@@ -419,7 +419,7 @@ export function QuickStats({ stats, className = '' }: QuickStatsProps) {
             <p className="text-2xl font-bold text-purple-600">
               {formatCurrency(stats.monthRevenue)}
             </p>
-            <p className="text-xs text-muted-foreground">Este Mes</p>
+            <p className="text-muted-foreground text-xs">Este Mes</p>
           </CardContent>
         </Card>
       </motion.div>
@@ -434,7 +434,7 @@ export function QuickStats({ stats, className = '' }: QuickStatsProps) {
             <p className="text-2xl font-bold text-orange-600">
               {stats.pendingPayments}
             </p>
-            <p className="text-xs text-muted-foreground">Pendientes</p>
+            <p className="text-muted-foreground text-xs">Pendientes</p>
           </CardContent>
         </Card>
       </motion.div>
@@ -449,7 +449,7 @@ export function QuickStats({ stats, className = '' }: QuickStatsProps) {
             <p className="text-2xl font-bold text-red-600">
               {stats.overduePayments}
             </p>
-            <p className="text-xs text-muted-foreground">Vencidas</p>
+            <p className="text-muted-foreground text-xs">Vencidas</p>
           </CardContent>
         </Card>
       </motion.div>
