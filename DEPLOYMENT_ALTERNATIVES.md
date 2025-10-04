@@ -1,15 +1,5 @@
 # 🚀 Alternativas de Despliegue - TributariApp
 
-## ❌ Por qué dejar Netlify
-
-Netlify es excelente para sitios estáticos simples, pero para aplicaciones complejas como TributariApp tiene limitaciones:
-
-- **Funciones serverless limitadas** (10s timeout, 1024MB RAM)
-- **Sin soporte para WebSockets**
-- **Limitaciones de base de datos**
-- **Precio alto para aplicaciones complejas**
-- **Menos control sobre la infraestructura**
-
 ## 🏆 Alternativas Recomendadas
 
 ### 1. **Terraform + AWS** ⭐⭐⭐⭐⭐ (Recomendado)
@@ -187,61 +177,10 @@ gcloud run deploy api-facturas \
    - Costos optimizables
    - Integración con servicios empresariales
 
-## 🚀 Migración desde Netlify
-
-### Paso a paso:
-
-1. **Preparar aplicaciones**:
-```bash
-# Asegurar que las apps funcionan en contenedores
-docker build -t tributariapp/api-facturas apps/api-facturas/
-docker run -p 3001:3001 tributariapp/api-facturas
-```
-
-2. **Configurar CI/CD**:
-```yaml
-# .github/workflows/deploy.yml
-name: Deploy to AWS
-on:
-  push:
-    branches: [main]
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v4
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: us-east-1
-      - name: Build and push Docker images
-        run: |
-          docker build -t tributariapp/api-facturas:${{ github.sha }} apps/api-facturas/
-          docker push tributariapp/api-facturas:${{ github.sha }}
-      - name: Deploy to EKS
-        run: |
-          kubectl set image deployment/api-facturas api-facturas=tributariapp/api-facturas:${{ github.sha }} -n tributariapp
-```
-
-3. **Configurar DNS**:
-```bash
-# Apuntar dominio a nuevo servidor
-# Actualizar registros DNS en tu proveedor
-```
-
-4. **Migrar datos**:
-```bash
-# Exportar desde Netlify
-# Importar a nueva base de datos
-```
-
-## 💰 Comparación de Costos
+##  Comparación de Costos
 
 | Plataforma | Desarrollo | Producción | Escalabilidad |
 |------------|------------|------------|---------------|
-| Netlify | $19/mes | $99/mes | Limitada |
 | Railway | $5/mes | $20/mes | Media |
 | Render | $7/mes | $25/mes | Media |
 | DigitalOcean | $12/mes | $48/mes | Alta |
