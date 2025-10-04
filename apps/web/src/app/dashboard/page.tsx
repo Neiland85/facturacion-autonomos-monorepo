@@ -1,12 +1,24 @@
-import { Suspense } from "react"
-import { DashboardSidebar } from "@/components/dashboard-sidebar"
-import { DashboardHeader } from "@/components/dashboard-header"
-import { MetricCard } from "@/components/metric-card"
-import { RevenueChart } from "@/components/revenue-chart"
-import { RecentInvoicesTable } from "@/components/recent-invoices-table"
-import { Button } from "@/components/ui/button"
-import { FileText, DollarSign, Clock, Users, Plus, Download, Eye } from "lucide-react"
-import { fetchInvoiceStats, fetchMonthlyRevenue, fetchRecentInvoices } from "@/lib/api"
+import { Suspense } from "react";
+import { DashboardSidebar } from "@/components/dashboard-sidebar";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { MetricCard } from "@/components/metric-card";
+import { RevenueChart } from "@/components/revenue-chart";
+import { RecentInvoicesTable } from "@/components/recent-invoices-table";
+import { Button } from "@/components/ui/button";
+import {
+  FileText,
+  DollarSign,
+  Clock,
+  Users,
+  Plus,
+  Download,
+  Eye,
+} from "lucide-react";
+import {
+  fetchInvoiceStats,
+  fetchMonthlyRevenue,
+  fetchRecentInvoices,
+} from "@/lib/api";
 
 // Componente para cargar datos del servidor
 async function DashboardContent() {
@@ -15,7 +27,7 @@ async function DashboardContent() {
     fetchInvoiceStats(),
     fetchMonthlyRevenue(),
     fetchRecentInvoices(),
-  ])
+  ]);
 
   // Datos de ejemplo si la API no está disponible
   const exampleMonthlyRevenue =
@@ -34,21 +46,56 @@ async function DashboardContent() {
           { month: "Oct", revenue: 27800 },
           { month: "Nov", revenue: 29200 },
           { month: "Dic", revenue: 31500 },
-        ]
+        ];
 
   const exampleInvoices =
     recentInvoices.length > 0
-      ? recentInvoices.map(invoice => ({
+      ? recentInvoices.map((invoice) => ({
           ...invoice,
-          status: (invoice.status === "pending" ? "sent" : invoice.status) as "paid" | "sent" | "draft" | "overdue" | "cancelled",
+          status: invoice.status as
+            | "paid"
+            | "sent"
+            | "draft"
+            | "overdue"
+            | "cancelled",
         }))
       : [
-          { id: "INV-001", client: "Empresa ABC S.L.", amount: 2450.0, date: "2025-01-15", status: "paid" as const },
-          { id: "INV-002", client: "Comercial XYZ", amount: 1890.5, date: "2025-01-14", status: "sent" as const },
-          { id: "INV-003", client: "Servicios Tech", amount: 3200.0, date: "2025-01-12", status: "paid" as const },
-          { id: "INV-004", client: "Consultoría Pro", amount: 1650.75, date: "2025-01-10", status: "sent" as const },
-          { id: "INV-005", client: "Digital Solutions", amount: 4100.0, date: "2025-01-08", status: "paid" as const },
-        ]
+          {
+            id: "INV-001",
+            client: "Empresa ABC S.L.",
+            amount: 2450.0,
+            date: "2025-01-15",
+            status: "paid" as const,
+          },
+          {
+            id: "INV-002",
+            client: "Comercial XYZ",
+            amount: 1890.5,
+            date: "2025-01-14",
+            status: "sent" as const,
+          },
+          {
+            id: "INV-003",
+            client: "Servicios Tech",
+            amount: 3200.0,
+            date: "2025-01-12",
+            status: "paid" as const,
+          },
+          {
+            id: "INV-004",
+            client: "Consultoría Pro",
+            amount: 1650.75,
+            date: "2025-01-10",
+            status: "sent" as const,
+          },
+          {
+            id: "INV-005",
+            client: "Digital Solutions",
+            amount: 4100.0,
+            date: "2025-01-08",
+            status: "paid" as const,
+          },
+        ];
 
   const displayStats = {
     totalInvoices: stats.totalInvoices || 156,
@@ -57,7 +104,7 @@ async function DashboardContent() {
     activeClients: stats.activeClients || 48,
     revenueChange: stats.revenueChange || "+12.5% vs mes anterior",
     invoicesChange: stats.invoicesChange || "+8 este mes",
-  }
+  };
 
   return (
     <>
@@ -115,7 +162,7 @@ async function DashboardContent() {
       {/* Tabla de facturas recientes */}
       <RecentInvoicesTable invoices={exampleInvoices} />
     </>
-  )
+  );
 }
 
 // Skeleton de carga
@@ -124,14 +171,14 @@ function DashboardSkeleton() {
     <>
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         {[...Array(4)].map((_, i) => (
-          <div key={i} className="h-32 animate-pulse rounded-lg bg-muted" />
+          <div key={i} className="bg-muted h-32 animate-pulse rounded-lg" />
         ))}
       </div>
-      <div className="h-12 w-full animate-pulse rounded-lg bg-muted" />
-      <div className="h-[400px] animate-pulse rounded-lg bg-muted" />
-      <div className="h-[300px] animate-pulse rounded-lg bg-muted" />
+      <div className="bg-muted h-12 w-full animate-pulse rounded-lg" />
+      <div className="bg-muted h-[400px] animate-pulse rounded-lg" />
+      <div className="bg-muted h-[300px] animate-pulse rounded-lg" />
     </>
-  )
+  );
 }
 
 export default function DashboardPage() {
@@ -144,8 +191,12 @@ export default function DashboardPage() {
 
         <main className="space-y-6 p-6">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight text-foreground">Bienvenido de nuevo</h2>
-            <p className="text-muted-foreground">Aquí está el resumen de tu actividad de facturación</p>
+            <h2 className="text-foreground text-3xl font-bold tracking-tight">
+              Bienvenido de nuevo
+            </h2>
+            <p className="text-muted-foreground">
+              Aquí está el resumen de tu actividad de facturación
+            </p>
           </div>
 
           <Suspense fallback={<DashboardSkeleton />}>
@@ -154,5 +205,5 @@ export default function DashboardPage() {
         </main>
       </div>
     </div>
-  )
+  );
 }

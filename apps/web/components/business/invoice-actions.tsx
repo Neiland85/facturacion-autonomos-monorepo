@@ -1,9 +1,9 @@
-'use client';
+"use client";
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
-import { Button } from '../ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import { Button } from "../ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "../ui/card";
 
 // Iconos personalizados
 const PlusIcon = ({ className }: { className?: string }) => (
@@ -145,13 +145,13 @@ export function InvoiceActions({
   onSend,
   onDownload,
   onDuplicate,
-  className = '',
+  className = "",
 }: InvoiceActionsProps) {
   const [isDeleting, setIsDeleting] = useState(false);
   const [showMoreActions, setShowMoreActions] = useState(false);
 
   const handleDelete = async () => {
-    if (window.confirm('¿Estás seguro de que quieres eliminar esta factura?')) {
+    if (window.confirm("¿Estás seguro de que quieres eliminar esta factura?")) {
       setIsDeleting(true);
       try {
         await onDelete?.(invoiceId);
@@ -161,9 +161,9 @@ export function InvoiceActions({
     }
   };
 
-  const canEdit = invoiceStatus === 'draft';
-  const canSend = invoiceStatus === 'draft';
-  const canDelete = invoiceStatus === 'draft';
+  const canEdit = invoiceStatus === "draft";
+  const canSend = invoiceStatus === "draft";
+  const canDelete = invoiceStatus === "draft";
 
   return (
     <div className={`flex items-center gap-2 ${className}`}>
@@ -175,7 +175,7 @@ export function InvoiceActions({
           onClick={() => onView(invoiceId)}
           title="Ver factura"
         >
-          <EyeIcon className="w-4 h-4" />
+          <EyeIcon className="h-4 w-4" />
         </Button>
       )}
 
@@ -186,7 +186,7 @@ export function InvoiceActions({
           onClick={() => onEdit(invoiceId)}
           title="Editar factura"
         >
-          <EditIcon className="w-4 h-4" />
+          <EditIcon className="h-4 w-4" />
         </Button>
       )}
 
@@ -197,7 +197,7 @@ export function InvoiceActions({
           onClick={() => onSend(invoiceId)}
           title="Enviar factura"
         >
-          <SendIcon className="w-4 h-4" />
+          <SendIcon className="h-4 w-4" />
         </Button>
       )}
 
@@ -208,7 +208,7 @@ export function InvoiceActions({
           onClick={() => onDownload(invoiceId)}
           title="Descargar PDF"
         >
-          <DownloadIcon className="w-4 h-4" />
+          <DownloadIcon className="h-4 w-4" />
         </Button>
       )}
 
@@ -221,7 +221,7 @@ export function InvoiceActions({
             onClick={() => setShowMoreActions(!showMoreActions)}
             title="Más acciones"
           >
-            <MoreIcon className="w-4 h-4" />
+            <MoreIcon className="h-4 w-4" />
           </Button>
 
           <AnimatePresence>
@@ -230,7 +230,7 @@ export function InvoiceActions({
                 initial={{ opacity: 0, scale: 0.95, y: -10 }}
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: -10 }}
-                className="absolute right-0 top-full mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-50"
+                className="absolute top-full right-0 z-50 mt-2 w-48 rounded-md border border-gray-200 bg-white shadow-lg"
               >
                 <div className="py-1">
                   {onDuplicate && (
@@ -239,9 +239,9 @@ export function InvoiceActions({
                         onDuplicate(invoiceId);
                         setShowMoreActions(false);
                       }}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      <PlusIcon className="w-4 h-4 mr-2" />
+                      <PlusIcon className="mr-2 h-4 w-4" />
                       Duplicar factura
                     </button>
                   )}
@@ -252,9 +252,9 @@ export function InvoiceActions({
                         onDownload(invoiceId);
                         setShowMoreActions(false);
                       }}
-                      className="flex items-center w-full px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                      className="flex w-full items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                     >
-                      <DownloadIcon className="w-4 h-4 mr-2" />
+                      <DownloadIcon className="mr-2 h-4 w-4" />
                       Descargar PDF
                     </button>
                   )}
@@ -266,10 +266,10 @@ export function InvoiceActions({
                         setShowMoreActions(false);
                       }}
                       disabled={isDeleting}
-                      className="flex items-center w-full px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
+                      className="flex w-full items-center px-4 py-2 text-sm text-red-600 hover:bg-red-50 disabled:opacity-50"
                     >
-                      <TrashIcon className="w-4 h-4 mr-2" />
-                      {isDeleting ? 'Eliminando...' : 'Eliminar'}
+                      <TrashIcon className="mr-2 h-4 w-4" />
+                      {isDeleting ? "Eliminando..." : "Eliminar"}
                     </button>
                   )}
                 </div>
@@ -295,7 +295,7 @@ export function QuickActions({
   onNewClient,
   onImport,
   onExport,
-  className = '',
+  className = "",
 }: QuickActionsProps) {
   return (
     <Card className={className}>
@@ -308,10 +308,10 @@ export function QuickActions({
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 onClick={onNewInvoice}
-                className="w-full h-20 flex-col gap-2"
+                className="h-20 w-full flex-col gap-2"
                 variant="default"
               >
-                <PlusIcon className="w-6 h-6" />
+                <PlusIcon className="h-6 w-6" />
                 Nueva Factura
               </Button>
             </motion.div>
@@ -321,10 +321,10 @@ export function QuickActions({
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 onClick={onNewClient}
-                className="w-full h-20 flex-col gap-2"
+                className="h-20 w-full flex-col gap-2"
                 variant="outline"
               >
-                <PlusIcon className="w-6 h-6" />
+                <PlusIcon className="h-6 w-6" />
                 Nuevo Cliente
               </Button>
             </motion.div>
@@ -334,10 +334,10 @@ export function QuickActions({
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 onClick={onImport}
-                className="w-full h-20 flex-col gap-2"
+                className="h-20 w-full flex-col gap-2"
                 variant="outline"
               >
-                <DownloadIcon className="w-6 h-6" />
+                <DownloadIcon className="h-6 w-6" />
                 Importar
               </Button>
             </motion.div>
@@ -347,10 +347,10 @@ export function QuickActions({
             <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
               <Button
                 onClick={onExport}
-                className="w-full h-20 flex-col gap-2"
+                className="h-20 w-full flex-col gap-2"
                 variant="outline"
               >
-                <SendIcon className="w-6 h-6" />
+                <SendIcon className="h-6 w-6" />
                 Exportar
               </Button>
             </motion.div>
@@ -374,44 +374,44 @@ export function InvoiceStats({
   totalAmount,
   pendingAmount,
   overdueAmount,
-  className = '',
+  className = "",
 }: InvoiceStatsProps) {
   const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('es-ES', {
-      style: 'currency',
-      currency: 'EUR',
+    return new Intl.NumberFormat("es-ES", {
+      style: "currency",
+      currency: "EUR",
     }).format(amount);
   };
 
   const stats = [
     {
-      label: 'Total Facturas',
+      label: "Total Facturas",
       value: totalInvoices.toString(),
-      color: 'text-blue-600',
-      bgColor: 'bg-blue-50',
+      color: "text-blue-600",
+      bgColor: "bg-blue-50",
     },
     {
-      label: 'Ingresos Totales',
+      label: "Ingresos Totales",
       value: formatCurrency(totalAmount),
-      color: 'text-green-600',
-      bgColor: 'bg-green-50',
+      color: "text-green-600",
+      bgColor: "bg-green-50",
     },
     {
-      label: 'Pendiente Cobro',
+      label: "Pendiente Cobro",
       value: formatCurrency(pendingAmount),
-      color: 'text-orange-600',
-      bgColor: 'bg-orange-50',
+      color: "text-orange-600",
+      bgColor: "bg-orange-50",
     },
     {
-      label: 'Facturas Vencidas',
+      label: "Facturas Vencidas",
       value: formatCurrency(overdueAmount),
-      color: 'text-red-600',
-      bgColor: 'bg-red-50',
+      color: "text-red-600",
+      bgColor: "bg-red-50",
     },
   ];
 
   return (
-    <div className={`grid grid-cols-2 md:grid-cols-4 gap-4 ${className}`}>
+    <div className={`grid grid-cols-2 gap-4 md:grid-cols-4 ${className}`}>
       {stats.map((stat, index) => (
         <motion.div
           key={stat.label}
@@ -421,10 +421,10 @@ export function InvoiceStats({
         >
           <Card className={`${stat.bgColor} border-0`}>
             <CardContent className="p-4">
-              <div className="text-2xl font-bold mb-1">
+              <div className="mb-1 text-2xl font-bold">
                 <span className={stat.color}>{stat.value}</span>
               </div>
-              <p className="text-sm text-muted-foreground">{stat.label}</p>
+              <p className="text-muted-foreground text-sm">{stat.label}</p>
             </CardContent>
           </Card>
         </motion.div>

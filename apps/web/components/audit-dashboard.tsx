@@ -1,5 +1,3 @@
-import { Suspense } from "react";
-
 interface AuditMetrics {
   commits_per_week?: number;
   avg_gap_hours?: number;
@@ -83,6 +81,7 @@ async function loadAuditData() {
       eslint: mockEslint,
     };
   } catch (error) {
+    // eslint-disable-next-line no-console
     console.error("Error loading audit data:", error);
     return null;
   }
