@@ -1,6 +1,12 @@
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -8,19 +14,19 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table"
-import { Eye, Download } from "lucide-react"
+} from "@/components/ui/table";
+import { Eye, Download } from "lucide-react";
 
 interface Invoice {
-  id: string
-  client: string
-  amount: number
-  date: string
-  status: "draft" | "sent" | "paid" | "overdue" | "cancelled"
+  id: string;
+  client: string;
+  amount: number;
+  date: string;
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled";
 }
 
 interface RecentInvoicesTableProps {
-  invoices: Invoice[]
+  invoices: Invoice[];
 }
 
 export function RecentInvoicesTable({ invoices }: RecentInvoicesTableProps) {
@@ -28,29 +34,37 @@ export function RecentInvoicesTable({ invoices }: RecentInvoicesTableProps) {
     return new Intl.NumberFormat("es-ES", {
       style: "currency",
       currency: "EUR",
-    }).format(amount)
-  }
+    }).format(amount);
+  };
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString("es-ES", {
       day: "2-digit",
       month: "2-digit",
       year: "numeric",
-    })
-  }
+    });
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
       case "paid":
-        return <Badge variant="default" className="bg-green-500">Pagada</Badge>
-      case "pending":
-        return <Badge variant="secondary">Pendiente</Badge>
+        return (
+          <Badge variant="default" className="bg-green-500">
+            Pagada
+          </Badge>
+        );
+      case "sent":
+        return <Badge variant="secondary">Enviada</Badge>;
+      case "draft":
+        return <Badge variant="outline">Borrador</Badge>;
       case "overdue":
-        return <Badge variant="destructive">Vencida</Badge>
+        return <Badge variant="destructive">Vencida</Badge>;
+      case "cancelled":
+        return <Badge variant="destructive">Cancelada</Badge>;
       default:
-        return <Badge variant="outline">{status}</Badge>
+        return <Badge variant="secondary">{status}</Badge>;
     }
-  }
+  };
 
   return (
     <Card>
@@ -101,5 +115,5 @@ export function RecentInvoicesTable({ invoices }: RecentInvoicesTableProps) {
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -52,7 +52,7 @@ exclude:
 include:
   # Include actual secrets that might be missed
   patterns:
-    - "sk-[a-zA-Z0-9]{48}"  # OpenAI API keys
-    - "xoxb-[0-9]{10,12}-[0-9]{10,12}-[a-zA-Z0-9]{24}"  # Slack bot tokens
-    - "ghp_[a-zA-Z0-9]{36}"  # GitHub personal access tokens
-    - "AKIA[0-9A-Z]{16}"  # AWS access keys
+    - "sk-[a-zA-Z0-9]{48}" # OpenAI API keys
+    - "xoxb-[0-9]{10,12}-[0-9]{10,12}-[a-zA-Z0-9]{24}" # Slack bot tokens
+    - "ghp_[a-zA-Z0-9]{36}" # GitHub personal access tokens
+    - "AKIA[0-9A-Z]{16}" # AWS access keys
