@@ -16,7 +16,7 @@ interface Invoice {
   client: string
   amount: number
   date: string
-  status: "paid" | "pending" | "overdue"
+  status: "draft" | "sent" | "paid" | "overdue" | "cancelled"
 }
 
 interface RecentInvoicesTableProps {

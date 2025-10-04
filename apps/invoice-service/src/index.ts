@@ -1,19 +1,19 @@
-import cors from 'cors';
-import 'dotenv/config';
-import express from 'express';
-import rateLimit from 'express-rate-limit';
-import helmet from 'helmet';
-import morgan from 'morgan';
-import path from 'path';
+import cors from "cors";
+import "dotenv/config";
+import express from "express";
+import rateLimit from "express-rate-limit";
+import helmet from "helmet";
+import morgan from "morgan";
+import path from "path";
 
 // Importar extensiones de números llamables
-if (process.env.NODE_ENV !== 'test') {
-  import('./types/number-callable.prod');
+if (process.env.NODE_ENV !== "test") {
+  import("./types/number-callable.prod");
 }
 
 // Configurar documentación API
 const { setupSwagger } = require(
-  path.join(__dirname, '../../config/invoice-service-swagger')
+  path.join(__dirname, "../../config/invoice-service-swagger")
 );
 
 const app: express.Application = express();
@@ -23,8 +23,8 @@ const PORT = process.env.PORT ?? 3001;
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') ?? [
-      'http://localhost:3000',
+    origin: process.env.ALLOWED_ORIGINS?.split(",") ?? [
+      "http://localhost:3000",
     ],
     credentials: true,
   })
@@ -34,36 +34,42 @@ app.use(
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // 100 requests por ventana
-  message: 'Demasiadas solicitudes, inténtalo de nuevo más tarde.',
+  message: "Demasiadas solicitudes, inténtalo de nuevo más tarde.",
 });
 app.use(limiter);
 
 // Middleware para parsing
-app.use(express.json({ limit: '10mb' }));
+app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
 
 // Logging
-app.use(morgan('combined'));
+app.use(morgan("combined"));
 
 // Configurar documentación API
 setupSwagger(app);
 
+// Importar rutas
+import assistantRoutes from "./routes/assistant.routes";
+
+// Usar rutas
+app.use("/api", assistantRoutes);
+
 // Health check
-app.get('/health', (req: express.Request, res: express.Response) => {
+app.get("/health", (req: express.Request, res: express.Response) => {
   res.json({
-    status: 'ok',
-    service: 'invoice-service',
+    status: "ok",
+    service: "invoice-service",
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version ?? '1.0.0',
+    version: process.env.npm_package_version ?? "1.0.0",
   });
 });
 
 // Rutas principales
 app.get(
-  '/api/invoices/stats',
+  "/api/invoices/stats",
   (req: express.Request, res: express.Response) => {
     res.json({
-      message: 'Invoice service stats endpoint',
+      message: "Invoice service stats endpoint",
       totalInvoices: 0,
       pendingInvoices: 0,
       timestamp: new Date().toISOString(),
@@ -72,9 +78,9 @@ app.get(
 );
 
 // 404 handler
-app.use('*', (req: express.Request, res: express.Response) => {
+app.use("*", (req: express.Request, res: express.Response) => {
   res.status(404).json({
-    error: 'Endpoint not found',
+    error: "Endpoint not found",
     path: req.originalUrl,
     method: req.method,
     timestamp: new Date().toISOString(),
@@ -89,9 +95,9 @@ app.use(
     res: express.Response,
     _next: express.NextFunction
   ) => {
-    console.error('Error:', err);
+    console.error("Error:", err);
     res.status(500).json({
-      error: 'Internal server error',
+      error: "Internal server error",
       timestamp: new Date().toISOString(),
     });
   }

@@ -1,13 +1,5 @@
 // Funciones para integración con el backend
-
-export interface InvoiceStats {
-  totalInvoices: number
-  monthlyRevenue: number
-  pendingInvoices: number
-  activeClients: number
-  revenueChange: string
-  invoicesChange: string
-}
+import type { InvoiceStats } from '../types';
 
 export interface MonthlyRevenue {
   month: string
