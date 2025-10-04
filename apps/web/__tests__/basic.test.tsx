@@ -1,5 +1,4 @@
 import { render, screen } from '@testing-library/react';
-<<<<<<< HEAD
 import userEvent from '@testing-library/user-event';
 
 // Componente de prueba simple
@@ -41,14 +40,3 @@ describe('Basic Tests', () => {
     expect(button).toBeInTheDocument();
   });
 });
-=======
-import '@testing-library/jest-dom';
-import React from 'react';
-import App from '../src/App';
-
-test('renders learn react link', () => {
-  render(<App />);
-  const linkElement = screen.getByText(/learn react/i);
-  expect(linkElement).toBeInTheDocument();
-});
->>>>>>> develop

@@ -38,12 +38,15 @@ async function DashboardContent() {
 
   const exampleInvoices =
     recentInvoices.length > 0
-      ? recentInvoices
+      ? recentInvoices.map(invoice => ({
+          ...invoice,
+          status: (invoice.status === "pending" ? "sent" : invoice.status) as "paid" | "sent" | "draft" | "overdue" | "cancelled",
+        }))
       : [
           { id: "INV-001", client: "Empresa ABC S.L.", amount: 2450.0, date: "2025-01-15", status: "paid" as const },
-          { id: "INV-002", client: "Comercial XYZ", amount: 1890.5, date: "2025-01-14", status: "pending" as const },
+          { id: "INV-002", client: "Comercial XYZ", amount: 1890.5, date: "2025-01-14", status: "sent" as const },
           { id: "INV-003", client: "Servicios Tech", amount: 3200.0, date: "2025-01-12", status: "paid" as const },
-          { id: "INV-004", client: "Consultoría Pro", amount: 1650.75, date: "2025-01-10", status: "pending" as const },
+          { id: "INV-004", client: "Consultoría Pro", amount: 1650.75, date: "2025-01-10", status: "sent" as const },
           { id: "INV-005", client: "Digital Solutions", amount: 4100.0, date: "2025-01-08", status: "paid" as const },
         ]
 
