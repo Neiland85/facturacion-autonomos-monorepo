@@ -1,1 +1,0 @@
-{"version":3,"file":"number-callable.d.ts","sourceRoot":"","sources":["../../src/types/number-callable.ts"],"names":[],"mappings":"AAIA,OAAO,CAAC,MAAM,CAAC;IACb,UAAU,MAAM;QACd,UAAU,IAAI,CAAC,GAAG,IAAI,EAAE,OAAO,EAAE,KAAK,MAAM,CAAC;QAC7C,MAAM,CAAC,GAAG,IAAI,EAAE,OAAO,EAAE,GAAG,MAAM,CAAC;KACpC;CACF;AAED,OAAO,EAAE,CAAC"}
