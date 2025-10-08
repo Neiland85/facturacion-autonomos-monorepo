@@ -1,7 +1,5 @@
-import { PrismaClient } from "@prisma/client";
+import { prisma } from "@facturacion/database";
 import { Request, Response } from "express";
-
-const prisma = new PrismaClient();
 
 // Tipo para el select de facturas en reportes
 type FacturaReporte = {

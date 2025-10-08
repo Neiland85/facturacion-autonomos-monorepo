@@ -3,19 +3,17 @@
   "compilerOptions": {
     "outDir": "./dist",
     "rootDir": "./src",
-    "baseUrl": ".",
-    "paths": {
-      "@/*": [
-        "./src/*"
-      ]
-    }
+    "declaration": true,
+    "declarationMap": true,
+    "composite": true,
+    "allowJs": true,
+    "checkJs": false
   },
-  "include": [
-    "src/**/*",
-    "prisma/**/*"
-  ],
+  "include": ["src/**/*"],
   "exclude": [
     "node_modules",
-    "dist"
+    "dist",
+    "src/generated/**/*",
+    "**/*.test.ts"
   ]
 }

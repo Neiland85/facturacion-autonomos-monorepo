@@ -1,49 +1,22 @@
 {
   "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-    "noEmit": false,
-    "outDir": "dist",
-    "rootDir": "src",
-    "target": "ES2022",
-    "module": "ESNext",
-    "moduleResolution": "bundler",
-    "jsx": "react-jsx",
+    "outDir": "./dist",
+    "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
-    "esModuleInterop": true,
-    "allowSyntheticDefaultImports": true,
-    "resolveJsonModule": true,
+    "jsx": "react-jsx",
+    "composite": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/components/*": [
-        "./src/components/*"
-      ],
-      "@/lib/*": [
-        "./src/lib/*"
-      ],
-      "@/hooks/*": [
-        "./src/hooks/*"
-      ]
-    },
-    "types": [
-      "node",
-      "@testing-library/jest-dom"
-    ]
+      "@/*": ["./src/*"]
+    }
   },
-  "include": [
-    "src/**/*"
-  ],
+  "include": ["src/**/*"],
   "exclude": [
     "node_modules",
     "dist",
     "**/*.test.ts",
-    "**/*.test.tsx",
-    "**/*.spec.ts",
-    "**/*.spec.tsx",
-    "**/*.stories.ts",
-    "**/*.stories.tsx"
+    "**/*.test.tsx"
   ]
 }
