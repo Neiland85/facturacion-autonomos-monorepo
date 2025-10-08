@@ -28,7 +28,6 @@
   },
   "packageManager": "pnpm@8.15.0",
   "workspaces": [
-    "frontend",
     "apps/*",
     "packages/*"
   ],
@@ -82,33 +81,9 @@
     "typescript": "^5.9.2"
   },
   "dependencies": {
-    "@prisma/client": "^6.11.1",
-    "@radix-ui/react-slot": "^1.2.3",
-    "@simplewebauthn/server": "^13.1.1",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0",
-    "ajv": "^8.17.1",
-    "class-variance-authority": "^0.7.0",
-    "compression": "^1.8.1",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "express-rate-limit": "^7.5.1",
-    "helmet": "^8.1.0",
-    "joi": "^17.13.3",
-    "morgan": "^1.10.1",
-    "prisma": "^6.16.1",
-    "qrcode": "^1.5.4",
-    "react-dom": "^19.1.1",
-    "speakeasy": "^2.0.0",
-    "swagger-jsdoc": "^6.2.8",
-    "swagger-ui-express": "^5.0.1",
-    "tailwindcss": "^4.1.13",
-    "tesseract.js": "^6.0.1",
-    "uuid": "^11.1.0",
-    "xml-crypto": "^6.1.2",
-    "xmlbuilder2": "^3.1.1",
-    "yamljs": "^0.3.0"
+    "@testing-library/react": "^16.3.0"
   },
   "lint-staged": {
     "*.{js,ts,tsx}": [
