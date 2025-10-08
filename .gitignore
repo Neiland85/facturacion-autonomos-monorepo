@@ -218,3 +218,8 @@ Thumbs.db
 # �️ ADDITIONAL LOCAL FILES
 # ===========================================
 .early.coverage
+
+# Refactor backups
+.backup-refactor/
+*.backup
+package.json.clean
