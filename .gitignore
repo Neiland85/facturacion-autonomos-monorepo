@@ -223,3 +223,16 @@ Thumbs.db
 .backup-refactor/
 *.backup
 package.json.clean
+
+# Build outputs (apps)
+apps/*/dist/
+apps/*/.next/
+apps/*/build/
+
+# Build outputs (packages)
+packages/*/dist/
+packages/*/build/
+
+# Temporal directories
+facturacion-autonomos-monorepo-*/
+build-test.log
