@@ -52,4 +52,32 @@ export class CalculadorFiscal {
   static validarNIFoCIF(documento: string): boolean {
     return this.validarNIF(documento) || this.validarCIF(documento);
   }
+
+  /**
+   * Calcula todos los impuestos de una factura
+   */
+  static calcularImpuestos(datos: {
+    baseImponible: number;
+    tipoIVA?: number;
+    tipoIRPF?: number;
+    regimenEspecial?: string;
+  }): {
+    baseImponible: number;
+    iva: number;
+    irpf: number;
+    total: number;
+  } {
+    const { baseImponible, tipoIVA = 21, tipoIRPF = 0 } = datos;
+
+    const iva = this.calcularIVA(baseImponible, tipoIVA / 100);
+    const irpf = this.calcularIRPF(baseImponible, tipoIRPF / 100);
+    const total = baseImponible + iva - irpf;
+
+    return {
+      baseImponible,
+      iva,
+      irpf,
+      total,
+    };
+  }
 }

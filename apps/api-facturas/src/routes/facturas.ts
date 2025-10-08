@@ -1,7 +1,11 @@
-import express from "express";
+import express, { Router } from "express";
 import { FacturasController } from "../controllers/facturas";
+import {
+  validateFactura,
+  validateFacturaUpdate,
+} from "../middleware/validation";
 
-const router = express.Router();
+const router: Router = express.Router();
 
 /**
  * @swagger
@@ -50,7 +54,7 @@ const router = express.Router();
  *                 meta:
  *                   $ref: '#/components/schemas/PaginationMeta'
  */
-router.get("/", facturaController.getFacturas);
+router.get("/", FacturasController.getAll);
 
 /**
  * @swagger
@@ -77,7 +81,7 @@ router.get("/", facturaController.getFacturas);
  *                 message:
  *                   type: string
  */
-router.post("/", validateFactura, facturaController.createFactura);
+router.post("/", validateFactura, FacturasController.create);
 
 /**
  * @swagger
@@ -106,7 +110,7 @@ router.post("/", validateFactura, facturaController.createFactura);
  *       404:
  *         description: Factura no encontrada
  */
-router.get("/:id", facturaController.getFacturaById);
+router.get("/:id", FacturasController.getById);
 
 /**
  * @swagger
@@ -135,7 +139,7 @@ router.get("/:id", facturaController.getFacturaById);
  *       422:
  *         description: Error de validación
  */
-router.put("/:id", validateFacturaUpdate, facturaController.updateFactura);
+router.put("/:id", validateFacturaUpdate, FacturasController.update);
 
 /**
  * @swagger
@@ -158,7 +162,7 @@ router.put("/:id", validateFacturaUpdate, facturaController.updateFactura);
  *       409:
  *         description: No se puede eliminar la factura
  */
-router.delete("/:id", facturaController.deleteFactura);
+router.delete("/:id", FacturasController.delete);
 
 /**
  * @swagger
@@ -182,7 +186,7 @@ router.delete("/:id", facturaController.deleteFactura);
  *               type: string
  *               format: binary
  */
-router.get("/:id/pdf", facturaController.generatePDF);
+// router.get("/:id/pdf", facturaController.generatePDF);
 
 /**
  * @swagger
@@ -217,6 +221,6 @@ router.get("/:id/pdf", facturaController.generatePDF);
  *       200:
  *         description: Factura enviada correctamente
  */
-router.post("/:id/enviar", facturaController.enviarFactura);
+// router.post("/:id/enviar", facturaController.enviarFactura);
 
 export default router;

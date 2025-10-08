@@ -1,7 +1,7 @@
-import express from "express";
+import express, { Router } from "express";
 import { ReportesController } from "../controllers/reportes";
 
-const router = express.Router();
+const router: Router = express.Router();
 const reportesController = new ReportesController();
 
 /**

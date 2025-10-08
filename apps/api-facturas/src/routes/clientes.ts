@@ -1,8 +1,8 @@
-import express from "express";
+import express, { Router } from "express";
 import { ClienteController } from "../controllers/clientes";
 import { validateCliente } from "../middleware/validation";
 
-const router = express.Router();
+const router: Router = express.Router();
 const clienteController = new ClienteController();
 
 /**

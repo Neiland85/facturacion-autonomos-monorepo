@@ -1,57 +1,8 @@
 {
   "version": 2,
-  "builds": [
-    {
-      "src": "apps/web/package.json",
-      "use": "@vercel/next"
-    },
-    {
-      "src": "apps/api-gateway/package.json",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "apps/api-facturas/package.json",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "apps/api-tax-calculator/package.json",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "apps/auth-service/package.json",
-      "use": "@vercel/node"
-    },
-    {
-      "src": "apps/invoice-service/package.json",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "/apps/api-gateway/dist/index.js"
-    },
-    {
-      "src": "/auth/(.*)",
-      "dest": "/apps/auth-service/dist/index.js"
-    },
-    {
-      "src": "/api/facturas/(.*)",
-      "dest": "/apps/api-facturas/dist/index.js"
-    },
-    {
-      "src": "/api/tax-calculator/(.*)",
-      "dest": "/apps/api-tax-calculator/dist/index.js"
-    },
-    {
-      "src": "/api/invoices/(.*)",
-      "dest": "/apps/invoice-service/dist/index.js"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/apps/web/$1"
-    }
-  ],
+  "buildCommand": "pnpm run build --continue",
+  "installCommand": "pnpm install --frozen-lockfile",
+  "framework": null,
   "env": {
     "NODE_ENV": "production"
   }

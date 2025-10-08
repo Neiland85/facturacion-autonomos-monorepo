@@ -1,7 +1,7 @@
-import express from "express";
+import express, { Router } from "express";
 import { FacturasController } from "../controllers/facturas";
 
-const router = express.Router();
+const router: Router = express.Router();
 
 // Rutas básicas para facturas
 router.get("/", FacturasController.getAll);

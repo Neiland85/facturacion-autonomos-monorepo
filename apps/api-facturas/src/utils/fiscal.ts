@@ -118,8 +118,8 @@ export const TIPOS_IRPF = {
 /**
  * Validar porcentaje de IVA
  */
-export function validarTipoIVA(tipo: number): boolean {
-  return Object.values(TIPOS_IVA).includes(tipo);
+export function validarTipoIVA(tipo: number): tipo is 0 | 4 | 10 | 21 {
+  return Object.values(TIPOS_IVA).includes(tipo as 0 | 4 | 10 | 21);
 }
 
 /**

@@ -3,6 +3,28 @@ import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
 
+// Tipo para el select de facturas en reportes
+type FacturaReporte = {
+  tipo: string;
+  fecha: Date;
+  baseImponible: number;
+  importeIVA: number;
+  importeIRPF: number;
+  total: number;
+};
+
+// Tipo para facturas completas con includes
+type FacturaCompleta = {
+  tipo: string;
+  fecha: Date;
+  baseImponible: number;
+  importeIVA: number;
+  importeIRPF: number;
+  total: number;
+  cliente?: any;
+  lineas?: any[];
+};
+
 export class ReportesController {
   async getTrimestral(req: Request, res: Response) {
     try {
@@ -27,11 +49,22 @@ export class ReportesController {
       ];
 
       const meses = mesesTrimestre[trimestre - 1];
-      const fechaInicio = new Date(año, meses[0] - 1, 1);
-      const fechaFin = new Date(año, meses[2], 0);
+      if (!meses || meses.length !== 3) {
+        return res.status(400).json({
+          error: "BAD_REQUEST",
+          message: "Trimestre inválido",
+          timestamp: new Date().toISOString(),
+          path: req.path,
+        });
+      }
+
+      // Type assertion: después de la validación, sabemos que meses tiene exactamente 3 elementos
+      const [mesInicio, , mesFin] = meses as [number, number, number];
+      const fechaInicio = new Date(año, mesInicio - 1, 1);
+      const fechaFin = new Date(año, mesFin, 0);
 
       // Obtener facturas del trimestre
-      const facturas = await prisma.factura.findMany({
+      const facturas: FacturaReporte[] = await prisma.factura.findMany({
         where: {
           fecha: {
             gte: fechaInicio,
@@ -49,50 +82,82 @@ export class ReportesController {
       });
 
       // Procesar datos
-      const facturasEmitidas = facturas.filter((f) => f.tipo === "emitida");
-      const facturasRecibidas = facturas.filter((f) => f.tipo === "recibida");
+      const facturasEmitidas = facturas.filter(
+        (f: FacturaReporte) => f.tipo === "emitida"
+      );
+      const facturasRecibidas = facturas.filter(
+        (f: FacturaReporte) => f.tipo === "recibida"
+      );
 
       const resumen = {
         facturasEmitidas: {
           cantidad: facturasEmitidas.length,
           baseImponible: facturasEmitidas.reduce(
-            (sum, f) => sum + f.baseImponible,
+            (sum: number, f: FacturaReporte) => sum + f.baseImponible,
             0
           ),
-          iva: facturasEmitidas.reduce((sum, f) => sum + f.importeIVA, 0),
-          irpf: facturasEmitidas.reduce((sum, f) => sum + f.importeIRPF, 0),
-          total: facturasEmitidas.reduce((sum, f) => sum + f.total, 0),
+          iva: facturasEmitidas.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.importeIVA,
+            0
+          ),
+          irpf: facturasEmitidas.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.importeIRPF,
+            0
+          ),
+          total: facturasEmitidas.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.total,
+            0
+          ),
         },
         facturasRecibidas: {
           cantidad: facturasRecibidas.length,
           baseImponible: facturasRecibidas.reduce(
-            (sum, f) => sum + f.baseImponible,
+            (sum: number, f: FacturaReporte) => sum + f.baseImponible,
             0
           ),
-          iva: facturasRecibidas.reduce((sum, f) => sum + f.importeIVA, 0),
-          irpf: facturasRecibidas.reduce((sum, f) => sum + f.importeIRPF, 0),
-          total: facturasRecibidas.reduce((sum, f) => sum + f.total, 0),
+          iva: facturasRecibidas.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.importeIVA,
+            0
+          ),
+          irpf: facturasRecibidas.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.importeIRPF,
+            0
+          ),
+          total: facturasRecibidas.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.total,
+            0
+          ),
         },
       };
 
       // Detalles por mes
-      const detalles = meses.map((mes) => {
+      const detalles = meses.map((mes: number) => {
         const facturasMes = facturas.filter(
-          (f) => f.fecha.getMonth() + 1 === mes
+          (f: FacturaReporte) => f.fecha.getMonth() + 1 === mes
         );
-        const emitidas = facturasMes.filter((f) => f.tipo === "emitida");
-        const recibidas = facturasMes.filter((f) => f.tipo === "recibida");
+        const emitidas = facturasMes.filter(
+          (f: FacturaReporte) => f.tipo === "emitida"
+        );
+        const recibidas = facturasMes.filter(
+          (f: FacturaReporte) => f.tipo === "recibida"
+        );
 
         return {
           mes,
           facturasEmitidas: emitidas.length,
           facturasRecibidas: recibidas.length,
           baseImponible: facturasMes.reduce(
-            (sum, f) => sum + f.baseImponible,
+            (sum: number, f: FacturaReporte) => sum + f.baseImponible,
             0
           ),
-          iva: facturasMes.reduce((sum, f) => sum + f.importeIVA, 0),
-          irpf: facturasMes.reduce((sum, f) => sum + f.importeIRPF, 0),
+          iva: facturasMes.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.importeIVA,
+            0
+          ),
+          irpf: facturasMes.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.importeIRPF,
+            0
+          ),
         };
       });
 
@@ -130,7 +195,7 @@ export class ReportesController {
       const fechaFin = new Date(año, 11, 31);
 
       // Obtener facturas del año
-      const facturas = await prisma.factura.findMany({
+      const facturas: FacturaReporte[] = await prisma.factura.findMany({
         where: {
           fecha: {
             gte: fechaInicio,
@@ -148,7 +213,7 @@ export class ReportesController {
       });
 
       // Procesar datos por trimestre
-      const trimestres = [1, 2, 3, 4].map((trimestre) => {
+      const trimestres = [1, 2, 3, 4].map((trimestre: number) => {
         const mesesTrimestre = [
           [1, 2, 3],
           [4, 5, 6],
@@ -157,13 +222,19 @@ export class ReportesController {
         ];
 
         const meses = mesesTrimestre[trimestre - 1];
-        const facturasTrimestre = facturas.filter((f) =>
+        if (!meses || meses.length !== 3) {
+          throw new Error(`Trimestre inválido: ${trimestre}`);
+        }
+
+        const facturasTrimestre = facturas.filter((f: FacturaReporte) =>
           meses.includes(f.fecha.getMonth() + 1)
         );
 
-        const emitidas = facturasTrimestre.filter((f) => f.tipo === "emitida");
+        const emitidas = facturasTrimestre.filter(
+          (f: FacturaReporte) => f.tipo === "emitida"
+        );
         const recibidas = facturasTrimestre.filter(
-          (f) => f.tipo === "recibida"
+          (f: FacturaReporte) => f.tipo === "recibida"
         );
 
         return {
@@ -171,23 +242,48 @@ export class ReportesController {
           facturasEmitidas: emitidas.length,
           facturasRecibidas: recibidas.length,
           baseImponible: facturasTrimestre.reduce(
-            (sum, f) => sum + f.baseImponible,
+            (sum: number, f: FacturaReporte) => sum + f.baseImponible,
             0
           ),
-          iva: facturasTrimestre.reduce((sum, f) => sum + f.importeIVA, 0),
-          irpf: facturasTrimestre.reduce((sum, f) => sum + f.importeIRPF, 0),
-          total: facturasTrimestre.reduce((sum, f) => sum + f.total, 0),
+          iva: facturasTrimestre.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.importeIVA,
+            0
+          ),
+          irpf: facturasTrimestre.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.importeIRPF,
+            0
+          ),
+          total: facturasTrimestre.reduce(
+            (sum: number, f: FacturaReporte) => sum + f.total,
+            0
+          ),
         };
       });
 
       const resumen = {
         totalFacturas: facturas.length,
-        totalEmitidas: facturas.filter((f) => f.tipo === "emitida").length,
-        totalRecibidas: facturas.filter((f) => f.tipo === "recibida").length,
-        baseImponible: facturas.reduce((sum, f) => sum + f.baseImponible, 0),
-        iva: facturas.reduce((sum, f) => sum + f.importeIVA, 0),
-        irpf: facturas.reduce((sum, f) => sum + f.importeIRPF, 0),
-        total: facturas.reduce((sum, f) => sum + f.total, 0),
+        totalEmitidas: facturas.filter(
+          (f: FacturaReporte) => f.tipo === "emitida"
+        ).length,
+        totalRecibidas: facturas.filter(
+          (f: FacturaReporte) => f.tipo === "recibida"
+        ).length,
+        baseImponible: facturas.reduce(
+          (sum: number, f: FacturaReporte) => sum + f.baseImponible,
+          0
+        ),
+        iva: facturas.reduce(
+          (sum: number, f: FacturaReporte) => sum + f.importeIVA,
+          0
+        ),
+        irpf: facturas.reduce(
+          (sum: number, f: FacturaReporte) => sum + f.importeIRPF,
+          0
+        ),
+        total: facturas.reduce(
+          (sum: number, f: FacturaReporte) => sum + f.total,
+          0
+        ),
       };
 
       res.json({
@@ -237,10 +333,13 @@ export class ReportesController {
 
       const resumen = {
         totalFacturas: facturas.length,
-        baseImponible: facturas.reduce((sum, f) => sum + f.baseImponible, 0),
-        iva: facturas.reduce((sum, f) => sum + f.importeIVA, 0),
-        irpf: facturas.reduce((sum, f) => sum + f.importeIRPF, 0),
-        total: facturas.reduce((sum, f) => sum + f.total, 0),
+        baseImponible: facturas.reduce(
+          (sum: number, f: any) => sum + f.baseImponible,
+          0
+        ),
+        iva: facturas.reduce((sum: number, f: any) => sum + f.importeIVA, 0),
+        irpf: facturas.reduce((sum: number, f: any) => sum + f.importeIRPF, 0),
+        total: facturas.reduce((sum: number, f: any) => sum + f.total, 0),
       };
 
       res.json({
@@ -273,7 +372,7 @@ export class ReportesController {
         });
       }
 
-      const facturas = await prisma.factura.findMany({
+      const facturas: FacturaCompleta[] = await prisma.factura.findMany({
         where: {
           tipo: "recibida",
           fecha: {
@@ -290,10 +389,22 @@ export class ReportesController {
 
       const resumen = {
         totalFacturas: facturas.length,
-        baseImponible: facturas.reduce((sum, f) => sum + f.baseImponible, 0),
-        iva: facturas.reduce((sum, f) => sum + f.importeIVA, 0),
-        irpf: facturas.reduce((sum, f) => sum + f.importeIRPF, 0),
-        total: facturas.reduce((sum, f) => sum + f.total, 0),
+        baseImponible: facturas.reduce(
+          (sum: number, f: FacturaCompleta) => sum + f.baseImponible,
+          0
+        ),
+        iva: facturas.reduce(
+          (sum: number, f: FacturaCompleta) => sum + f.importeIVA,
+          0
+        ),
+        irpf: facturas.reduce(
+          (sum: number, f: FacturaCompleta) => sum + f.importeIRPF,
+          0
+        ),
+        total: facturas.reduce(
+          (sum: number, f: FacturaCompleta) => sum + f.total,
+          0
+        ),
       };
 
       res.json({
@@ -317,7 +428,7 @@ export class ReportesController {
       const { formato } = req.params;
       const { tipo } = req.body;
 
-      if (!["pdf", "excel", "csv"].includes(formato)) {
+      if (!formato || !["pdf", "excel", "csv"].includes(formato)) {
         return res.status(400).json({
           error: "BAD_REQUEST",
           message: "Formato no válido. Formatos soportados: pdf, excel, csv",

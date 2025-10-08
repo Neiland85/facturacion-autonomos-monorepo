@@ -33,7 +33,7 @@
   ],
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build",
+    "build": "turbo run build --continue",
     "lint": "turbo run lint",
     "lint:check": "turbo run lint:check",
     "lint:fix": "turbo run lint:fix",

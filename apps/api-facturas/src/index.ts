@@ -14,13 +14,7 @@ const { setupSwagger } = require(
 );
 
 const app: express.Application = express();
-const PORT = process.env.PORT || 3004;
-
-// Middleware de seguridad
-app.use(helmet());
-app.use(cors());
-app.use(compression());
-app.use(morgan("combined"));
+const PORT = process.env.PORT ?? 3004;
 
 // Rate limiting
 const limiter = rateLimit({
@@ -28,7 +22,13 @@ const limiter = rateLimit({
   max: 100, // máximo 100 requests por ventana
   message: "Too many requests from this IP, please try again later.",
 });
-app.use("/api/", limiter);
+
+// Middleware de seguridad
+app.use(helmet());
+app.use(cors());
+app.use(compression() as any);
+app.use(morgan("combined"));
+app.use(limiter as any); // Aplicar rate limiting globalmente
 
 // Middleware para parsing JSON
 app.use(express.json({ limit: "10mb" }));

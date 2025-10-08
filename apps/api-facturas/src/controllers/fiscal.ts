@@ -16,12 +16,12 @@ export class FiscalController {
         });
       }
 
-      const calculador = new CalculadorFiscal();
+      const calculador = CalculadorFiscal;
       const resultado = calculador.calcularImpuestos({
         baseImponible,
-        tipoIVA: tipoIVA || 21,
-        tipoIRPF: tipoIRPF || 0,
-        regimenEspecial: regimenEspecial || "general",
+        tipoIVA: tipoIVA ?? 21,
+        tipoIRPF: tipoIRPF ?? 0,
+        regimenEspecial: regimenEspecial ?? "general",
       });
 
       res.json({
