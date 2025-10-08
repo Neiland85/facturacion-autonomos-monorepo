@@ -146,3 +146,102 @@ enum InvoiceStatus {
   
   @@map("invoice_statuses")
 }
+
+// ===========================================
+// 🔄 WEBHOOKS AEAT
+// ===========================================
+
+model WebhookNotificacion {
+  id                String   @id @default(cuid())
+  
+  // Datos del webhook
+  webhookId         String?  // ID único del webhook (generado por nosotros)
+  tipoNotificacion  String   // Tipo de notificación (PRESENTACION_ACEPTADA, PRESENTACION_RECHAZADA, etc.)
+  origen            String   @default("AEAT") // Origen del webhook
+  
+  // Datos de la presentación
+  modeloId          String?  // ID del modelo fiscal
+  numeroJustificante String? // Número de justificante de AEAT
+  estado            WebhookEstado @default(PENDIENTE)
+  
+  // Payload y respuesta
+  payload           Json?    // Payload completo recibido
+  respuesta         Json?    // Respuesta enviada
+  errores           Json?    // Errores si los hay
+  
+  // Verificación de seguridad
+  firmaVerificada   Boolean  @default(false)
+  metodoVerificacion String? // Método usado para verificar (HMAC-SHA256, RSA)
+  
+  // Metadatos de procesamiento
+  fechaRecepcion    DateTime @default(now())
+  fechaProcesamiento DateTime?
+  intentos          Int      @default(0)
+  ultimoIntento     DateTime?
+  ultimoError       String?
+  
+  // Relaciones
+  usuarioId         String?  // Usuario relacionado
+  presentacion      PresentacionModelo?
+  
+  // Auditoría
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@map("webhook_notificaciones")
+}
+
+model PresentacionModelo {
+  id                String   @id @default(cuid())
+  
+  // Datos de la presentación
+  modelo            String   // Tipo de modelo (303, 130, etc.)
+  ejercicio         Int      // Año del ejercicio
+  trimestre         Int?     // Trimestre (1-4) o mes (1-12)
+  periodo           String   // Periodo completo (2024T1, 2024M01, etc.)
+  
+  // Estado de la presentación
+  estado            EstadoPresentacion @default(PENDIENTE)
+  numeroJustificante String? // Número de justificante de AEAT
+  fechaPresentacion DateTime?
+  fechaAceptacion   DateTime?
+  
+  // Datos fiscales
+  importeTotal      Decimal? @db.Decimal(15,2)
+  datosPresentacion Json?    // Datos completos de la presentación
+  
+  // Relaciones
+  usuarioId         String
+  webhookId         String?  @unique
+  webhook           WebhookNotificacion? @relation(fields: [webhookId], references: [id])
+  
+  // Auditoría
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  
+  @@unique([usuarioId, modelo, ejercicio, periodo])
+  @@map("presentaciones_modelo")
+}
+
+// ===========================================
+// 📊 ENUMS ADICIONALES
+// ===========================================
+
+enum WebhookEstado {
+  PENDIENTE
+  PROCESADO
+  ERROR
+  REINTENTANDO
+  
+  @@map("webhook_estados")
+}
+
+enum EstadoPresentacion {
+  PENDIENTE
+  PRESENTADO
+  ACEPTADO
+  RECHAZADO
+  CORREGIDO
+  
+  @@map("estados_presentacion")
+}

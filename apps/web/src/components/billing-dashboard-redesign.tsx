@@ -1,6 +1,10 @@
 import React from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { Progress } from "@/components/ui/progress";
+import { FileText, Users, TrendingUp } from "lucide-react";
 
 export function BillingDashboardRedesign() {
   return (
@@ -10,64 +14,27 @@ export function BillingDashboardRedesign() {
           Dashboard de Facturación
         </h2>
         <div className="flex items-center space-x-2">
-          <Button>
-            Nueva Factura
-          </Button>
+          <Button>Nueva Factura</Button>
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Ingresos Totales
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">$45,231.89</div>
-            <p className="text-xs text-muted-foreground">+20.1% desde el mes pasado</p>
-          </CardContent>
-        </Card>
+      <Tabs defaultValue="overview" className="space-y-4">
+        <TabsList>
+          <TabsTrigger value="overview">Vista General</TabsTrigger>
+          <TabsTrigger value="analytics">Análisis</TabsTrigger>
+          <TabsTrigger value="reports">Reportes</TabsTrigger>
+        </TabsList>
 
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Facturas Emitidas
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+2350</div>
-            <p className="text-xs text-muted-foreground">+180.1% desde el mes pasado</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Clientes Activos
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+12,234</div>
-            <p className="text-xs text-muted-foreground">+19% desde el mes pasado</p>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">
-              Tasa de Conversión
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="text-2xl font-bold">+57.3%</div>
-            <p className="text-xs text-muted-foreground">+201 desde ayer</p>
-          </CardContent>
-        </Card>
-      </div>
-    </div>
-  );
-}
+        <TabsContent value="overview" className="space-y-4">
+          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+            <Card>
+              <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+                <CardTitle className="text-sm font-medium">
+                  Ingresos Totales
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="text-2xl font-bold">$45,231.89</div>
                 <p className="text-muted-foreground text-xs">
                   +20.1% desde el mes pasado
                 </p>
@@ -142,7 +109,7 @@ export function BillingDashboardRedesign() {
                   {[1, 2, 3, 4, 5].map((i) => (
                     <div key={i} className="flex items-center">
                       <div className="ml-4 space-y-1">
-                        <p className="text-sm leading-none font-medium">
+                        <p className="text-sm font-medium leading-none">
                           Factura #{1000 + i}
                         </p>
                         <p className="text-muted-foreground text-sm">

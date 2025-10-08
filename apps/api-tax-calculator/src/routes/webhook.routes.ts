@@ -1,10 +1,10 @@
-import express from 'express';
-import { WebhookController } from '../controllers/webhook.controller';
-import { asyncHandler } from '../middleware/async-handler.middleware';
-import { WebhookIPWhitelistMiddleware } from '../middleware/webhook-ip-whitelist.middleware';
-import { WebhookRateLimitMiddleware } from '../middleware/webhook-rate-limit.middleware';
+import express from "express";
+import { WebhookController } from "../controllers/webhook.controller";
+import { asyncHandler } from "../middleware/async-handler.middleware";
+import { WebhookIPWhitelistMiddleware } from "../middleware/webhook-ip-whitelist.middleware";
+import { WebhookRateLimitMiddleware } from "../middleware/webhook-rate-limit.middleware";
 
-const router = express.Router();
+const router: express.Router = express.Router();
 const webhookController = new WebhookController();
 
 // Middleware específico para webhooks
@@ -16,7 +16,7 @@ const webhookRateLimit = new WebhookRateLimitMiddleware();
  * Endpoint principal para recibir webhooks de AEAT
  */
 router.post(
-  '/aeat',
+  "/aeat",
   webhookIPWhitelist.checkIPWhitelist,
   webhookRateLimit.limitWebhookRequests,
   asyncHandler(webhookController.receiveAeatWebhook)
@@ -27,7 +27,7 @@ router.post(
  * Obtener estado de un webhook específico
  */
 router.get(
-  '/aeat/:webhookId/status',
+  "/aeat/:webhookId/status",
   asyncHandler(webhookController.getWebhookStatus)
 );
 
@@ -36,7 +36,7 @@ router.get(
  * Reintentar procesamiento de un webhook fallido
  */
 router.post(
-  '/aeat/:webhookId/retry',
+  "/aeat/:webhookId/retry",
   asyncHandler(webhookController.retryWebhook)
 );
 
@@ -44,6 +44,6 @@ router.post(
  * GET /api/webhooks/aeat
  * Listar webhooks con paginación y filtros
  */
-router.get('/aeat', asyncHandler(webhookController.listWebhooks));
+router.get("/aeat", asyncHandler(webhookController.listWebhooks));
 
 export { router as webhookRoutes };

@@ -13,6 +13,8 @@ export class WebhookSignatureService {
   constructor() {
     // Secret compartido para HMAC - simplificado para uso básico
     this.webhookSecret = "basic-webhook-secret";
+    // Clave pública RSA de AEAT (debería venir de variable de entorno en producción)
+    this.aeatPublicKey = process.env.AEAT_PUBLIC_KEY ?? "";
   }
 
   /**
@@ -63,7 +65,9 @@ export class WebhookSignatureService {
 
       // Configurar esquema de firma según algoritmo
       const scheme = this.getRSAScheme(algorithm);
-      key.setOptions({ signingScheme: scheme as any });
+      key.setOptions({
+        signingScheme: scheme as "pkcs1-sha1" | "pkcs1-sha256" | "pkcs1-sha512",
+      });
 
       // Verificar firma
       const signatureBuffer = Buffer.from(signature, "base64");
@@ -91,9 +95,9 @@ export class WebhookSignatureService {
     };
 
     // Extraer headers relevantes
-    const signature = headers["x-aeat-signature"] || headers["x-signature"];
-    const timestamp = headers["x-aeat-timestamp"] || headers["x-timestamp"];
-    const algorithm = headers["x-aeat-algorithm"] || "HMAC-SHA256";
+    const signature = headers["x-aeat-signature"] ?? headers["x-signature"];
+    const timestamp = headers["x-aeat-timestamp"] ?? headers["x-timestamp"];
+    const algorithm = headers["x-aeat-algorithm"] ?? "HMAC-SHA256";
 
     if (!signature) {
       result.errors.push("Signature header missing");

@@ -38,6 +38,16 @@ export type Invoice = $Result.DefaultSelection<Prisma.$InvoicePayload>
  * 
  */
 export type InvoiceLine = $Result.DefaultSelection<Prisma.$InvoiceLinePayload>
+/**
+ * Model WebhookNotificacion
+ * 
+ */
+export type WebhookNotificacion = $Result.DefaultSelection<Prisma.$WebhookNotificacionPayload>
+/**
+ * Model PresentacionModelo
+ * 
+ */
+export type PresentacionModelo = $Result.DefaultSelection<Prisma.$PresentacionModeloPayload>
 
 /**
  * Enums
@@ -62,6 +72,27 @@ export const InvoiceStatus: {
 
 export type InvoiceStatus = (typeof InvoiceStatus)[keyof typeof InvoiceStatus]
 
+
+export const WebhookEstado: {
+  PENDIENTE: 'PENDIENTE',
+  PROCESADO: 'PROCESADO',
+  ERROR: 'ERROR',
+  REINTENTANDO: 'REINTENTANDO'
+};
+
+export type WebhookEstado = (typeof WebhookEstado)[keyof typeof WebhookEstado]
+
+
+export const EstadoPresentacion: {
+  PENDIENTE: 'PENDIENTE',
+  PRESENTADO: 'PRESENTADO',
+  ACEPTADO: 'ACEPTADO',
+  RECHAZADO: 'RECHAZADO',
+  CORREGIDO: 'CORREGIDO'
+};
+
+export type EstadoPresentacion = (typeof EstadoPresentacion)[keyof typeof EstadoPresentacion]
+
 }
 
 export type TaxRegime = $Enums.TaxRegime
@@ -71,6 +102,14 @@ export const TaxRegime: typeof $Enums.TaxRegime
 export type InvoiceStatus = $Enums.InvoiceStatus
 
 export const InvoiceStatus: typeof $Enums.InvoiceStatus
+
+export type WebhookEstado = $Enums.WebhookEstado
+
+export const WebhookEstado: typeof $Enums.WebhookEstado
+
+export type EstadoPresentacion = $Enums.EstadoPresentacion
+
+export const EstadoPresentacion: typeof $Enums.EstadoPresentacion
 
 /**
  * ##  Prisma Client ʲˢ
@@ -239,6 +278,26 @@ export class PrismaClient<
     * ```
     */
   get invoiceLine(): Prisma.InvoiceLineDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.webhookNotificacion`: Exposes CRUD operations for the **WebhookNotificacion** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more WebhookNotificacions
+    * const webhookNotificacions = await prisma.webhookNotificacion.findMany()
+    * ```
+    */
+  get webhookNotificacion(): Prisma.WebhookNotificacionDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.presentacionModelo`: Exposes CRUD operations for the **PresentacionModelo** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more PresentacionModelos
+    * const presentacionModelos = await prisma.presentacionModelo.findMany()
+    * ```
+    */
+  get presentacionModelo(): Prisma.PresentacionModeloDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -683,7 +742,9 @@ export namespace Prisma {
     Company: 'Company',
     Client: 'Client',
     Invoice: 'Invoice',
-    InvoiceLine: 'InvoiceLine'
+    InvoiceLine: 'InvoiceLine',
+    WebhookNotificacion: 'WebhookNotificacion',
+    PresentacionModelo: 'PresentacionModelo'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -702,7 +763,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "company" | "client" | "invoice" | "invoiceLine"
+      modelProps: "user" | "company" | "client" | "invoice" | "invoiceLine" | "webhookNotificacion" | "presentacionModelo"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -1076,6 +1137,154 @@ export namespace Prisma {
           }
         }
       }
+      WebhookNotificacion: {
+        payload: Prisma.$WebhookNotificacionPayload<ExtArgs>
+        fields: Prisma.WebhookNotificacionFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.WebhookNotificacionFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.WebhookNotificacionFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload>
+          }
+          findFirst: {
+            args: Prisma.WebhookNotificacionFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.WebhookNotificacionFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload>
+          }
+          findMany: {
+            args: Prisma.WebhookNotificacionFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload>[]
+          }
+          create: {
+            args: Prisma.WebhookNotificacionCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload>
+          }
+          createMany: {
+            args: Prisma.WebhookNotificacionCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.WebhookNotificacionCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload>[]
+          }
+          delete: {
+            args: Prisma.WebhookNotificacionDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload>
+          }
+          update: {
+            args: Prisma.WebhookNotificacionUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload>
+          }
+          deleteMany: {
+            args: Prisma.WebhookNotificacionDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.WebhookNotificacionUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.WebhookNotificacionUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload>[]
+          }
+          upsert: {
+            args: Prisma.WebhookNotificacionUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$WebhookNotificacionPayload>
+          }
+          aggregate: {
+            args: Prisma.WebhookNotificacionAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateWebhookNotificacion>
+          }
+          groupBy: {
+            args: Prisma.WebhookNotificacionGroupByArgs<ExtArgs>
+            result: $Utils.Optional<WebhookNotificacionGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.WebhookNotificacionCountArgs<ExtArgs>
+            result: $Utils.Optional<WebhookNotificacionCountAggregateOutputType> | number
+          }
+        }
+      }
+      PresentacionModelo: {
+        payload: Prisma.$PresentacionModeloPayload<ExtArgs>
+        fields: Prisma.PresentacionModeloFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.PresentacionModeloFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.PresentacionModeloFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload>
+          }
+          findFirst: {
+            args: Prisma.PresentacionModeloFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.PresentacionModeloFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload>
+          }
+          findMany: {
+            args: Prisma.PresentacionModeloFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload>[]
+          }
+          create: {
+            args: Prisma.PresentacionModeloCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload>
+          }
+          createMany: {
+            args: Prisma.PresentacionModeloCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.PresentacionModeloCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload>[]
+          }
+          delete: {
+            args: Prisma.PresentacionModeloDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload>
+          }
+          update: {
+            args: Prisma.PresentacionModeloUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload>
+          }
+          deleteMany: {
+            args: Prisma.PresentacionModeloDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.PresentacionModeloUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.PresentacionModeloUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload>[]
+          }
+          upsert: {
+            args: Prisma.PresentacionModeloUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$PresentacionModeloPayload>
+          }
+          aggregate: {
+            args: Prisma.PresentacionModeloAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregatePresentacionModelo>
+          }
+          groupBy: {
+            args: Prisma.PresentacionModeloGroupByArgs<ExtArgs>
+            result: $Utils.Optional<PresentacionModeloGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.PresentacionModeloCountArgs<ExtArgs>
+            result: $Utils.Optional<PresentacionModeloCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -1177,6 +1386,8 @@ export namespace Prisma {
     client?: ClientOmit
     invoice?: InvoiceOmit
     invoiceLine?: InvoiceLineOmit
+    webhookNotificacion?: WebhookNotificacionOmit
+    presentacionModelo?: PresentacionModeloOmit
   }
 
   /* Types for Logging */
@@ -7366,6 +7577,2531 @@ export namespace Prisma {
 
 
   /**
+   * Model WebhookNotificacion
+   */
+
+  export type AggregateWebhookNotificacion = {
+    _count: WebhookNotificacionCountAggregateOutputType | null
+    _avg: WebhookNotificacionAvgAggregateOutputType | null
+    _sum: WebhookNotificacionSumAggregateOutputType | null
+    _min: WebhookNotificacionMinAggregateOutputType | null
+    _max: WebhookNotificacionMaxAggregateOutputType | null
+  }
+
+  export type WebhookNotificacionAvgAggregateOutputType = {
+    intentos: number | null
+  }
+
+  export type WebhookNotificacionSumAggregateOutputType = {
+    intentos: number | null
+  }
+
+  export type WebhookNotificacionMinAggregateOutputType = {
+    id: string | null
+    webhookId: string | null
+    tipoNotificacion: string | null
+    origen: string | null
+    modeloId: string | null
+    numeroJustificante: string | null
+    estado: $Enums.WebhookEstado | null
+    firmaVerificada: boolean | null
+    metodoVerificacion: string | null
+    fechaRecepcion: Date | null
+    fechaProcesamiento: Date | null
+    intentos: number | null
+    ultimoIntento: Date | null
+    ultimoError: string | null
+    usuarioId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type WebhookNotificacionMaxAggregateOutputType = {
+    id: string | null
+    webhookId: string | null
+    tipoNotificacion: string | null
+    origen: string | null
+    modeloId: string | null
+    numeroJustificante: string | null
+    estado: $Enums.WebhookEstado | null
+    firmaVerificada: boolean | null
+    metodoVerificacion: string | null
+    fechaRecepcion: Date | null
+    fechaProcesamiento: Date | null
+    intentos: number | null
+    ultimoIntento: Date | null
+    ultimoError: string | null
+    usuarioId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type WebhookNotificacionCountAggregateOutputType = {
+    id: number
+    webhookId: number
+    tipoNotificacion: number
+    origen: number
+    modeloId: number
+    numeroJustificante: number
+    estado: number
+    payload: number
+    respuesta: number
+    errores: number
+    firmaVerificada: number
+    metodoVerificacion: number
+    fechaRecepcion: number
+    fechaProcesamiento: number
+    intentos: number
+    ultimoIntento: number
+    ultimoError: number
+    usuarioId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type WebhookNotificacionAvgAggregateInputType = {
+    intentos?: true
+  }
+
+  export type WebhookNotificacionSumAggregateInputType = {
+    intentos?: true
+  }
+
+  export type WebhookNotificacionMinAggregateInputType = {
+    id?: true
+    webhookId?: true
+    tipoNotificacion?: true
+    origen?: true
+    modeloId?: true
+    numeroJustificante?: true
+    estado?: true
+    firmaVerificada?: true
+    metodoVerificacion?: true
+    fechaRecepcion?: true
+    fechaProcesamiento?: true
+    intentos?: true
+    ultimoIntento?: true
+    ultimoError?: true
+    usuarioId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type WebhookNotificacionMaxAggregateInputType = {
+    id?: true
+    webhookId?: true
+    tipoNotificacion?: true
+    origen?: true
+    modeloId?: true
+    numeroJustificante?: true
+    estado?: true
+    firmaVerificada?: true
+    metodoVerificacion?: true
+    fechaRecepcion?: true
+    fechaProcesamiento?: true
+    intentos?: true
+    ultimoIntento?: true
+    ultimoError?: true
+    usuarioId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type WebhookNotificacionCountAggregateInputType = {
+    id?: true
+    webhookId?: true
+    tipoNotificacion?: true
+    origen?: true
+    modeloId?: true
+    numeroJustificante?: true
+    estado?: true
+    payload?: true
+    respuesta?: true
+    errores?: true
+    firmaVerificada?: true
+    metodoVerificacion?: true
+    fechaRecepcion?: true
+    fechaProcesamiento?: true
+    intentos?: true
+    ultimoIntento?: true
+    ultimoError?: true
+    usuarioId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type WebhookNotificacionAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WebhookNotificacion to aggregate.
+     */
+    where?: WebhookNotificacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WebhookNotificacions to fetch.
+     */
+    orderBy?: WebhookNotificacionOrderByWithRelationInput | WebhookNotificacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: WebhookNotificacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WebhookNotificacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WebhookNotificacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned WebhookNotificacions
+    **/
+    _count?: true | WebhookNotificacionCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: WebhookNotificacionAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: WebhookNotificacionSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: WebhookNotificacionMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: WebhookNotificacionMaxAggregateInputType
+  }
+
+  export type GetWebhookNotificacionAggregateType<T extends WebhookNotificacionAggregateArgs> = {
+        [P in keyof T & keyof AggregateWebhookNotificacion]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateWebhookNotificacion[P]>
+      : GetScalarType<T[P], AggregateWebhookNotificacion[P]>
+  }
+
+
+
+
+  export type WebhookNotificacionGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: WebhookNotificacionWhereInput
+    orderBy?: WebhookNotificacionOrderByWithAggregationInput | WebhookNotificacionOrderByWithAggregationInput[]
+    by: WebhookNotificacionScalarFieldEnum[] | WebhookNotificacionScalarFieldEnum
+    having?: WebhookNotificacionScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: WebhookNotificacionCountAggregateInputType | true
+    _avg?: WebhookNotificacionAvgAggregateInputType
+    _sum?: WebhookNotificacionSumAggregateInputType
+    _min?: WebhookNotificacionMinAggregateInputType
+    _max?: WebhookNotificacionMaxAggregateInputType
+  }
+
+  export type WebhookNotificacionGroupByOutputType = {
+    id: string
+    webhookId: string | null
+    tipoNotificacion: string
+    origen: string
+    modeloId: string | null
+    numeroJustificante: string | null
+    estado: $Enums.WebhookEstado
+    payload: JsonValue | null
+    respuesta: JsonValue | null
+    errores: JsonValue | null
+    firmaVerificada: boolean
+    metodoVerificacion: string | null
+    fechaRecepcion: Date
+    fechaProcesamiento: Date | null
+    intentos: number
+    ultimoIntento: Date | null
+    ultimoError: string | null
+    usuarioId: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: WebhookNotificacionCountAggregateOutputType | null
+    _avg: WebhookNotificacionAvgAggregateOutputType | null
+    _sum: WebhookNotificacionSumAggregateOutputType | null
+    _min: WebhookNotificacionMinAggregateOutputType | null
+    _max: WebhookNotificacionMaxAggregateOutputType | null
+  }
+
+  type GetWebhookNotificacionGroupByPayload<T extends WebhookNotificacionGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<WebhookNotificacionGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof WebhookNotificacionGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], WebhookNotificacionGroupByOutputType[P]>
+            : GetScalarType<T[P], WebhookNotificacionGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type WebhookNotificacionSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    webhookId?: boolean
+    tipoNotificacion?: boolean
+    origen?: boolean
+    modeloId?: boolean
+    numeroJustificante?: boolean
+    estado?: boolean
+    payload?: boolean
+    respuesta?: boolean
+    errores?: boolean
+    firmaVerificada?: boolean
+    metodoVerificacion?: boolean
+    fechaRecepcion?: boolean
+    fechaProcesamiento?: boolean
+    intentos?: boolean
+    ultimoIntento?: boolean
+    ultimoError?: boolean
+    usuarioId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    presentacion?: boolean | WebhookNotificacion$presentacionArgs<ExtArgs>
+  }, ExtArgs["result"]["webhookNotificacion"]>
+
+  export type WebhookNotificacionSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    webhookId?: boolean
+    tipoNotificacion?: boolean
+    origen?: boolean
+    modeloId?: boolean
+    numeroJustificante?: boolean
+    estado?: boolean
+    payload?: boolean
+    respuesta?: boolean
+    errores?: boolean
+    firmaVerificada?: boolean
+    metodoVerificacion?: boolean
+    fechaRecepcion?: boolean
+    fechaProcesamiento?: boolean
+    intentos?: boolean
+    ultimoIntento?: boolean
+    ultimoError?: boolean
+    usuarioId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["webhookNotificacion"]>
+
+  export type WebhookNotificacionSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    webhookId?: boolean
+    tipoNotificacion?: boolean
+    origen?: boolean
+    modeloId?: boolean
+    numeroJustificante?: boolean
+    estado?: boolean
+    payload?: boolean
+    respuesta?: boolean
+    errores?: boolean
+    firmaVerificada?: boolean
+    metodoVerificacion?: boolean
+    fechaRecepcion?: boolean
+    fechaProcesamiento?: boolean
+    intentos?: boolean
+    ultimoIntento?: boolean
+    ultimoError?: boolean
+    usuarioId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["webhookNotificacion"]>
+
+  export type WebhookNotificacionSelectScalar = {
+    id?: boolean
+    webhookId?: boolean
+    tipoNotificacion?: boolean
+    origen?: boolean
+    modeloId?: boolean
+    numeroJustificante?: boolean
+    estado?: boolean
+    payload?: boolean
+    respuesta?: boolean
+    errores?: boolean
+    firmaVerificada?: boolean
+    metodoVerificacion?: boolean
+    fechaRecepcion?: boolean
+    fechaProcesamiento?: boolean
+    intentos?: boolean
+    ultimoIntento?: boolean
+    ultimoError?: boolean
+    usuarioId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type WebhookNotificacionOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "webhookId" | "tipoNotificacion" | "origen" | "modeloId" | "numeroJustificante" | "estado" | "payload" | "respuesta" | "errores" | "firmaVerificada" | "metodoVerificacion" | "fechaRecepcion" | "fechaProcesamiento" | "intentos" | "ultimoIntento" | "ultimoError" | "usuarioId" | "createdAt" | "updatedAt", ExtArgs["result"]["webhookNotificacion"]>
+  export type WebhookNotificacionInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    presentacion?: boolean | WebhookNotificacion$presentacionArgs<ExtArgs>
+  }
+  export type WebhookNotificacionIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+  export type WebhookNotificacionIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
+
+  export type $WebhookNotificacionPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "WebhookNotificacion"
+    objects: {
+      presentacion: Prisma.$PresentacionModeloPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      webhookId: string | null
+      tipoNotificacion: string
+      origen: string
+      modeloId: string | null
+      numeroJustificante: string | null
+      estado: $Enums.WebhookEstado
+      payload: Prisma.JsonValue | null
+      respuesta: Prisma.JsonValue | null
+      errores: Prisma.JsonValue | null
+      firmaVerificada: boolean
+      metodoVerificacion: string | null
+      fechaRecepcion: Date
+      fechaProcesamiento: Date | null
+      intentos: number
+      ultimoIntento: Date | null
+      ultimoError: string | null
+      usuarioId: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["webhookNotificacion"]>
+    composites: {}
+  }
+
+  type WebhookNotificacionGetPayload<S extends boolean | null | undefined | WebhookNotificacionDefaultArgs> = $Result.GetResult<Prisma.$WebhookNotificacionPayload, S>
+
+  type WebhookNotificacionCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<WebhookNotificacionFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: WebhookNotificacionCountAggregateInputType | true
+    }
+
+  export interface WebhookNotificacionDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['WebhookNotificacion'], meta: { name: 'WebhookNotificacion' } }
+    /**
+     * Find zero or one WebhookNotificacion that matches the filter.
+     * @param {WebhookNotificacionFindUniqueArgs} args - Arguments to find a WebhookNotificacion
+     * @example
+     * // Get one WebhookNotificacion
+     * const webhookNotificacion = await prisma.webhookNotificacion.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends WebhookNotificacionFindUniqueArgs>(args: SelectSubset<T, WebhookNotificacionFindUniqueArgs<ExtArgs>>): Prisma__WebhookNotificacionClient<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one WebhookNotificacion that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {WebhookNotificacionFindUniqueOrThrowArgs} args - Arguments to find a WebhookNotificacion
+     * @example
+     * // Get one WebhookNotificacion
+     * const webhookNotificacion = await prisma.webhookNotificacion.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends WebhookNotificacionFindUniqueOrThrowArgs>(args: SelectSubset<T, WebhookNotificacionFindUniqueOrThrowArgs<ExtArgs>>): Prisma__WebhookNotificacionClient<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WebhookNotificacion that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WebhookNotificacionFindFirstArgs} args - Arguments to find a WebhookNotificacion
+     * @example
+     * // Get one WebhookNotificacion
+     * const webhookNotificacion = await prisma.webhookNotificacion.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends WebhookNotificacionFindFirstArgs>(args?: SelectSubset<T, WebhookNotificacionFindFirstArgs<ExtArgs>>): Prisma__WebhookNotificacionClient<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first WebhookNotificacion that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WebhookNotificacionFindFirstOrThrowArgs} args - Arguments to find a WebhookNotificacion
+     * @example
+     * // Get one WebhookNotificacion
+     * const webhookNotificacion = await prisma.webhookNotificacion.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends WebhookNotificacionFindFirstOrThrowArgs>(args?: SelectSubset<T, WebhookNotificacionFindFirstOrThrowArgs<ExtArgs>>): Prisma__WebhookNotificacionClient<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more WebhookNotificacions that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WebhookNotificacionFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all WebhookNotificacions
+     * const webhookNotificacions = await prisma.webhookNotificacion.findMany()
+     * 
+     * // Get first 10 WebhookNotificacions
+     * const webhookNotificacions = await prisma.webhookNotificacion.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const webhookNotificacionWithIdOnly = await prisma.webhookNotificacion.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends WebhookNotificacionFindManyArgs>(args?: SelectSubset<T, WebhookNotificacionFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a WebhookNotificacion.
+     * @param {WebhookNotificacionCreateArgs} args - Arguments to create a WebhookNotificacion.
+     * @example
+     * // Create one WebhookNotificacion
+     * const WebhookNotificacion = await prisma.webhookNotificacion.create({
+     *   data: {
+     *     // ... data to create a WebhookNotificacion
+     *   }
+     * })
+     * 
+     */
+    create<T extends WebhookNotificacionCreateArgs>(args: SelectSubset<T, WebhookNotificacionCreateArgs<ExtArgs>>): Prisma__WebhookNotificacionClient<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many WebhookNotificacions.
+     * @param {WebhookNotificacionCreateManyArgs} args - Arguments to create many WebhookNotificacions.
+     * @example
+     * // Create many WebhookNotificacions
+     * const webhookNotificacion = await prisma.webhookNotificacion.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends WebhookNotificacionCreateManyArgs>(args?: SelectSubset<T, WebhookNotificacionCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many WebhookNotificacions and returns the data saved in the database.
+     * @param {WebhookNotificacionCreateManyAndReturnArgs} args - Arguments to create many WebhookNotificacions.
+     * @example
+     * // Create many WebhookNotificacions
+     * const webhookNotificacion = await prisma.webhookNotificacion.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many WebhookNotificacions and only return the `id`
+     * const webhookNotificacionWithIdOnly = await prisma.webhookNotificacion.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends WebhookNotificacionCreateManyAndReturnArgs>(args?: SelectSubset<T, WebhookNotificacionCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a WebhookNotificacion.
+     * @param {WebhookNotificacionDeleteArgs} args - Arguments to delete one WebhookNotificacion.
+     * @example
+     * // Delete one WebhookNotificacion
+     * const WebhookNotificacion = await prisma.webhookNotificacion.delete({
+     *   where: {
+     *     // ... filter to delete one WebhookNotificacion
+     *   }
+     * })
+     * 
+     */
+    delete<T extends WebhookNotificacionDeleteArgs>(args: SelectSubset<T, WebhookNotificacionDeleteArgs<ExtArgs>>): Prisma__WebhookNotificacionClient<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one WebhookNotificacion.
+     * @param {WebhookNotificacionUpdateArgs} args - Arguments to update one WebhookNotificacion.
+     * @example
+     * // Update one WebhookNotificacion
+     * const webhookNotificacion = await prisma.webhookNotificacion.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends WebhookNotificacionUpdateArgs>(args: SelectSubset<T, WebhookNotificacionUpdateArgs<ExtArgs>>): Prisma__WebhookNotificacionClient<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more WebhookNotificacions.
+     * @param {WebhookNotificacionDeleteManyArgs} args - Arguments to filter WebhookNotificacions to delete.
+     * @example
+     * // Delete a few WebhookNotificacions
+     * const { count } = await prisma.webhookNotificacion.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends WebhookNotificacionDeleteManyArgs>(args?: SelectSubset<T, WebhookNotificacionDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WebhookNotificacions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WebhookNotificacionUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many WebhookNotificacions
+     * const webhookNotificacion = await prisma.webhookNotificacion.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends WebhookNotificacionUpdateManyArgs>(args: SelectSubset<T, WebhookNotificacionUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more WebhookNotificacions and returns the data updated in the database.
+     * @param {WebhookNotificacionUpdateManyAndReturnArgs} args - Arguments to update many WebhookNotificacions.
+     * @example
+     * // Update many WebhookNotificacions
+     * const webhookNotificacion = await prisma.webhookNotificacion.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more WebhookNotificacions and only return the `id`
+     * const webhookNotificacionWithIdOnly = await prisma.webhookNotificacion.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends WebhookNotificacionUpdateManyAndReturnArgs>(args: SelectSubset<T, WebhookNotificacionUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one WebhookNotificacion.
+     * @param {WebhookNotificacionUpsertArgs} args - Arguments to update or create a WebhookNotificacion.
+     * @example
+     * // Update or create a WebhookNotificacion
+     * const webhookNotificacion = await prisma.webhookNotificacion.upsert({
+     *   create: {
+     *     // ... data to create a WebhookNotificacion
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the WebhookNotificacion we want to update
+     *   }
+     * })
+     */
+    upsert<T extends WebhookNotificacionUpsertArgs>(args: SelectSubset<T, WebhookNotificacionUpsertArgs<ExtArgs>>): Prisma__WebhookNotificacionClient<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of WebhookNotificacions.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WebhookNotificacionCountArgs} args - Arguments to filter WebhookNotificacions to count.
+     * @example
+     * // Count the number of WebhookNotificacions
+     * const count = await prisma.webhookNotificacion.count({
+     *   where: {
+     *     // ... the filter for the WebhookNotificacions we want to count
+     *   }
+     * })
+    **/
+    count<T extends WebhookNotificacionCountArgs>(
+      args?: Subset<T, WebhookNotificacionCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], WebhookNotificacionCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a WebhookNotificacion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WebhookNotificacionAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends WebhookNotificacionAggregateArgs>(args: Subset<T, WebhookNotificacionAggregateArgs>): Prisma.PrismaPromise<GetWebhookNotificacionAggregateType<T>>
+
+    /**
+     * Group by WebhookNotificacion.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {WebhookNotificacionGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends WebhookNotificacionGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: WebhookNotificacionGroupByArgs['orderBy'] }
+        : { orderBy?: WebhookNotificacionGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, WebhookNotificacionGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetWebhookNotificacionGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the WebhookNotificacion model
+   */
+  readonly fields: WebhookNotificacionFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for WebhookNotificacion.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__WebhookNotificacionClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    presentacion<T extends WebhookNotificacion$presentacionArgs<ExtArgs> = {}>(args?: Subset<T, WebhookNotificacion$presentacionArgs<ExtArgs>>): Prisma__PresentacionModeloClient<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the WebhookNotificacion model
+   */
+  interface WebhookNotificacionFieldRefs {
+    readonly id: FieldRef<"WebhookNotificacion", 'String'>
+    readonly webhookId: FieldRef<"WebhookNotificacion", 'String'>
+    readonly tipoNotificacion: FieldRef<"WebhookNotificacion", 'String'>
+    readonly origen: FieldRef<"WebhookNotificacion", 'String'>
+    readonly modeloId: FieldRef<"WebhookNotificacion", 'String'>
+    readonly numeroJustificante: FieldRef<"WebhookNotificacion", 'String'>
+    readonly estado: FieldRef<"WebhookNotificacion", 'WebhookEstado'>
+    readonly payload: FieldRef<"WebhookNotificacion", 'Json'>
+    readonly respuesta: FieldRef<"WebhookNotificacion", 'Json'>
+    readonly errores: FieldRef<"WebhookNotificacion", 'Json'>
+    readonly firmaVerificada: FieldRef<"WebhookNotificacion", 'Boolean'>
+    readonly metodoVerificacion: FieldRef<"WebhookNotificacion", 'String'>
+    readonly fechaRecepcion: FieldRef<"WebhookNotificacion", 'DateTime'>
+    readonly fechaProcesamiento: FieldRef<"WebhookNotificacion", 'DateTime'>
+    readonly intentos: FieldRef<"WebhookNotificacion", 'Int'>
+    readonly ultimoIntento: FieldRef<"WebhookNotificacion", 'DateTime'>
+    readonly ultimoError: FieldRef<"WebhookNotificacion", 'String'>
+    readonly usuarioId: FieldRef<"WebhookNotificacion", 'String'>
+    readonly createdAt: FieldRef<"WebhookNotificacion", 'DateTime'>
+    readonly updatedAt: FieldRef<"WebhookNotificacion", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * WebhookNotificacion findUnique
+   */
+  export type WebhookNotificacionFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+    /**
+     * Filter, which WebhookNotificacion to fetch.
+     */
+    where: WebhookNotificacionWhereUniqueInput
+  }
+
+  /**
+   * WebhookNotificacion findUniqueOrThrow
+   */
+  export type WebhookNotificacionFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+    /**
+     * Filter, which WebhookNotificacion to fetch.
+     */
+    where: WebhookNotificacionWhereUniqueInput
+  }
+
+  /**
+   * WebhookNotificacion findFirst
+   */
+  export type WebhookNotificacionFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+    /**
+     * Filter, which WebhookNotificacion to fetch.
+     */
+    where?: WebhookNotificacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WebhookNotificacions to fetch.
+     */
+    orderBy?: WebhookNotificacionOrderByWithRelationInput | WebhookNotificacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WebhookNotificacions.
+     */
+    cursor?: WebhookNotificacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WebhookNotificacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WebhookNotificacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WebhookNotificacions.
+     */
+    distinct?: WebhookNotificacionScalarFieldEnum | WebhookNotificacionScalarFieldEnum[]
+  }
+
+  /**
+   * WebhookNotificacion findFirstOrThrow
+   */
+  export type WebhookNotificacionFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+    /**
+     * Filter, which WebhookNotificacion to fetch.
+     */
+    where?: WebhookNotificacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WebhookNotificacions to fetch.
+     */
+    orderBy?: WebhookNotificacionOrderByWithRelationInput | WebhookNotificacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for WebhookNotificacions.
+     */
+    cursor?: WebhookNotificacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WebhookNotificacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WebhookNotificacions.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of WebhookNotificacions.
+     */
+    distinct?: WebhookNotificacionScalarFieldEnum | WebhookNotificacionScalarFieldEnum[]
+  }
+
+  /**
+   * WebhookNotificacion findMany
+   */
+  export type WebhookNotificacionFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+    /**
+     * Filter, which WebhookNotificacions to fetch.
+     */
+    where?: WebhookNotificacionWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of WebhookNotificacions to fetch.
+     */
+    orderBy?: WebhookNotificacionOrderByWithRelationInput | WebhookNotificacionOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing WebhookNotificacions.
+     */
+    cursor?: WebhookNotificacionWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` WebhookNotificacions from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` WebhookNotificacions.
+     */
+    skip?: number
+    distinct?: WebhookNotificacionScalarFieldEnum | WebhookNotificacionScalarFieldEnum[]
+  }
+
+  /**
+   * WebhookNotificacion create
+   */
+  export type WebhookNotificacionCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+    /**
+     * The data needed to create a WebhookNotificacion.
+     */
+    data: XOR<WebhookNotificacionCreateInput, WebhookNotificacionUncheckedCreateInput>
+  }
+
+  /**
+   * WebhookNotificacion createMany
+   */
+  export type WebhookNotificacionCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many WebhookNotificacions.
+     */
+    data: WebhookNotificacionCreateManyInput | WebhookNotificacionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * WebhookNotificacion createManyAndReturn
+   */
+  export type WebhookNotificacionCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * The data used to create many WebhookNotificacions.
+     */
+    data: WebhookNotificacionCreateManyInput | WebhookNotificacionCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * WebhookNotificacion update
+   */
+  export type WebhookNotificacionUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+    /**
+     * The data needed to update a WebhookNotificacion.
+     */
+    data: XOR<WebhookNotificacionUpdateInput, WebhookNotificacionUncheckedUpdateInput>
+    /**
+     * Choose, which WebhookNotificacion to update.
+     */
+    where: WebhookNotificacionWhereUniqueInput
+  }
+
+  /**
+   * WebhookNotificacion updateMany
+   */
+  export type WebhookNotificacionUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update WebhookNotificacions.
+     */
+    data: XOR<WebhookNotificacionUpdateManyMutationInput, WebhookNotificacionUncheckedUpdateManyInput>
+    /**
+     * Filter which WebhookNotificacions to update
+     */
+    where?: WebhookNotificacionWhereInput
+    /**
+     * Limit how many WebhookNotificacions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * WebhookNotificacion updateManyAndReturn
+   */
+  export type WebhookNotificacionUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * The data used to update WebhookNotificacions.
+     */
+    data: XOR<WebhookNotificacionUpdateManyMutationInput, WebhookNotificacionUncheckedUpdateManyInput>
+    /**
+     * Filter which WebhookNotificacions to update
+     */
+    where?: WebhookNotificacionWhereInput
+    /**
+     * Limit how many WebhookNotificacions to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * WebhookNotificacion upsert
+   */
+  export type WebhookNotificacionUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+    /**
+     * The filter to search for the WebhookNotificacion to update in case it exists.
+     */
+    where: WebhookNotificacionWhereUniqueInput
+    /**
+     * In case the WebhookNotificacion found by the `where` argument doesn't exist, create a new WebhookNotificacion with this data.
+     */
+    create: XOR<WebhookNotificacionCreateInput, WebhookNotificacionUncheckedCreateInput>
+    /**
+     * In case the WebhookNotificacion was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<WebhookNotificacionUpdateInput, WebhookNotificacionUncheckedUpdateInput>
+  }
+
+  /**
+   * WebhookNotificacion delete
+   */
+  export type WebhookNotificacionDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+    /**
+     * Filter which WebhookNotificacion to delete.
+     */
+    where: WebhookNotificacionWhereUniqueInput
+  }
+
+  /**
+   * WebhookNotificacion deleteMany
+   */
+  export type WebhookNotificacionDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which WebhookNotificacions to delete
+     */
+    where?: WebhookNotificacionWhereInput
+    /**
+     * Limit how many WebhookNotificacions to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * WebhookNotificacion.presentacion
+   */
+  export type WebhookNotificacion$presentacionArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+    where?: PresentacionModeloWhereInput
+  }
+
+  /**
+   * WebhookNotificacion without action
+   */
+  export type WebhookNotificacionDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+  }
+
+
+  /**
+   * Model PresentacionModelo
+   */
+
+  export type AggregatePresentacionModelo = {
+    _count: PresentacionModeloCountAggregateOutputType | null
+    _avg: PresentacionModeloAvgAggregateOutputType | null
+    _sum: PresentacionModeloSumAggregateOutputType | null
+    _min: PresentacionModeloMinAggregateOutputType | null
+    _max: PresentacionModeloMaxAggregateOutputType | null
+  }
+
+  export type PresentacionModeloAvgAggregateOutputType = {
+    ejercicio: number | null
+    trimestre: number | null
+    importeTotal: Decimal | null
+  }
+
+  export type PresentacionModeloSumAggregateOutputType = {
+    ejercicio: number | null
+    trimestre: number | null
+    importeTotal: Decimal | null
+  }
+
+  export type PresentacionModeloMinAggregateOutputType = {
+    id: string | null
+    modelo: string | null
+    ejercicio: number | null
+    trimestre: number | null
+    periodo: string | null
+    estado: $Enums.EstadoPresentacion | null
+    numeroJustificante: string | null
+    fechaPresentacion: Date | null
+    fechaAceptacion: Date | null
+    importeTotal: Decimal | null
+    usuarioId: string | null
+    webhookId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PresentacionModeloMaxAggregateOutputType = {
+    id: string | null
+    modelo: string | null
+    ejercicio: number | null
+    trimestre: number | null
+    periodo: string | null
+    estado: $Enums.EstadoPresentacion | null
+    numeroJustificante: string | null
+    fechaPresentacion: Date | null
+    fechaAceptacion: Date | null
+    importeTotal: Decimal | null
+    usuarioId: string | null
+    webhookId: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type PresentacionModeloCountAggregateOutputType = {
+    id: number
+    modelo: number
+    ejercicio: number
+    trimestre: number
+    periodo: number
+    estado: number
+    numeroJustificante: number
+    fechaPresentacion: number
+    fechaAceptacion: number
+    importeTotal: number
+    datosPresentacion: number
+    usuarioId: number
+    webhookId: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type PresentacionModeloAvgAggregateInputType = {
+    ejercicio?: true
+    trimestre?: true
+    importeTotal?: true
+  }
+
+  export type PresentacionModeloSumAggregateInputType = {
+    ejercicio?: true
+    trimestre?: true
+    importeTotal?: true
+  }
+
+  export type PresentacionModeloMinAggregateInputType = {
+    id?: true
+    modelo?: true
+    ejercicio?: true
+    trimestre?: true
+    periodo?: true
+    estado?: true
+    numeroJustificante?: true
+    fechaPresentacion?: true
+    fechaAceptacion?: true
+    importeTotal?: true
+    usuarioId?: true
+    webhookId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PresentacionModeloMaxAggregateInputType = {
+    id?: true
+    modelo?: true
+    ejercicio?: true
+    trimestre?: true
+    periodo?: true
+    estado?: true
+    numeroJustificante?: true
+    fechaPresentacion?: true
+    fechaAceptacion?: true
+    importeTotal?: true
+    usuarioId?: true
+    webhookId?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type PresentacionModeloCountAggregateInputType = {
+    id?: true
+    modelo?: true
+    ejercicio?: true
+    trimestre?: true
+    periodo?: true
+    estado?: true
+    numeroJustificante?: true
+    fechaPresentacion?: true
+    fechaAceptacion?: true
+    importeTotal?: true
+    datosPresentacion?: true
+    usuarioId?: true
+    webhookId?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type PresentacionModeloAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PresentacionModelo to aggregate.
+     */
+    where?: PresentacionModeloWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PresentacionModelos to fetch.
+     */
+    orderBy?: PresentacionModeloOrderByWithRelationInput | PresentacionModeloOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: PresentacionModeloWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PresentacionModelos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PresentacionModelos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned PresentacionModelos
+    **/
+    _count?: true | PresentacionModeloCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to average
+    **/
+    _avg?: PresentacionModeloAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: PresentacionModeloSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: PresentacionModeloMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: PresentacionModeloMaxAggregateInputType
+  }
+
+  export type GetPresentacionModeloAggregateType<T extends PresentacionModeloAggregateArgs> = {
+        [P in keyof T & keyof AggregatePresentacionModelo]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregatePresentacionModelo[P]>
+      : GetScalarType<T[P], AggregatePresentacionModelo[P]>
+  }
+
+
+
+
+  export type PresentacionModeloGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: PresentacionModeloWhereInput
+    orderBy?: PresentacionModeloOrderByWithAggregationInput | PresentacionModeloOrderByWithAggregationInput[]
+    by: PresentacionModeloScalarFieldEnum[] | PresentacionModeloScalarFieldEnum
+    having?: PresentacionModeloScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: PresentacionModeloCountAggregateInputType | true
+    _avg?: PresentacionModeloAvgAggregateInputType
+    _sum?: PresentacionModeloSumAggregateInputType
+    _min?: PresentacionModeloMinAggregateInputType
+    _max?: PresentacionModeloMaxAggregateInputType
+  }
+
+  export type PresentacionModeloGroupByOutputType = {
+    id: string
+    modelo: string
+    ejercicio: number
+    trimestre: number | null
+    periodo: string
+    estado: $Enums.EstadoPresentacion
+    numeroJustificante: string | null
+    fechaPresentacion: Date | null
+    fechaAceptacion: Date | null
+    importeTotal: Decimal | null
+    datosPresentacion: JsonValue | null
+    usuarioId: string
+    webhookId: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: PresentacionModeloCountAggregateOutputType | null
+    _avg: PresentacionModeloAvgAggregateOutputType | null
+    _sum: PresentacionModeloSumAggregateOutputType | null
+    _min: PresentacionModeloMinAggregateOutputType | null
+    _max: PresentacionModeloMaxAggregateOutputType | null
+  }
+
+  type GetPresentacionModeloGroupByPayload<T extends PresentacionModeloGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<PresentacionModeloGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof PresentacionModeloGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], PresentacionModeloGroupByOutputType[P]>
+            : GetScalarType<T[P], PresentacionModeloGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type PresentacionModeloSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    modelo?: boolean
+    ejercicio?: boolean
+    trimestre?: boolean
+    periodo?: boolean
+    estado?: boolean
+    numeroJustificante?: boolean
+    fechaPresentacion?: boolean
+    fechaAceptacion?: boolean
+    importeTotal?: boolean
+    datosPresentacion?: boolean
+    usuarioId?: boolean
+    webhookId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    webhook?: boolean | PresentacionModelo$webhookArgs<ExtArgs>
+  }, ExtArgs["result"]["presentacionModelo"]>
+
+  export type PresentacionModeloSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    modelo?: boolean
+    ejercicio?: boolean
+    trimestre?: boolean
+    periodo?: boolean
+    estado?: boolean
+    numeroJustificante?: boolean
+    fechaPresentacion?: boolean
+    fechaAceptacion?: boolean
+    importeTotal?: boolean
+    datosPresentacion?: boolean
+    usuarioId?: boolean
+    webhookId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    webhook?: boolean | PresentacionModelo$webhookArgs<ExtArgs>
+  }, ExtArgs["result"]["presentacionModelo"]>
+
+  export type PresentacionModeloSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    modelo?: boolean
+    ejercicio?: boolean
+    trimestre?: boolean
+    periodo?: boolean
+    estado?: boolean
+    numeroJustificante?: boolean
+    fechaPresentacion?: boolean
+    fechaAceptacion?: boolean
+    importeTotal?: boolean
+    datosPresentacion?: boolean
+    usuarioId?: boolean
+    webhookId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+    webhook?: boolean | PresentacionModelo$webhookArgs<ExtArgs>
+  }, ExtArgs["result"]["presentacionModelo"]>
+
+  export type PresentacionModeloSelectScalar = {
+    id?: boolean
+    modelo?: boolean
+    ejercicio?: boolean
+    trimestre?: boolean
+    periodo?: boolean
+    estado?: boolean
+    numeroJustificante?: boolean
+    fechaPresentacion?: boolean
+    fechaAceptacion?: boolean
+    importeTotal?: boolean
+    datosPresentacion?: boolean
+    usuarioId?: boolean
+    webhookId?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type PresentacionModeloOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "modelo" | "ejercicio" | "trimestre" | "periodo" | "estado" | "numeroJustificante" | "fechaPresentacion" | "fechaAceptacion" | "importeTotal" | "datosPresentacion" | "usuarioId" | "webhookId" | "createdAt" | "updatedAt", ExtArgs["result"]["presentacionModelo"]>
+  export type PresentacionModeloInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    webhook?: boolean | PresentacionModelo$webhookArgs<ExtArgs>
+  }
+  export type PresentacionModeloIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    webhook?: boolean | PresentacionModelo$webhookArgs<ExtArgs>
+  }
+  export type PresentacionModeloIncludeUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    webhook?: boolean | PresentacionModelo$webhookArgs<ExtArgs>
+  }
+
+  export type $PresentacionModeloPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "PresentacionModelo"
+    objects: {
+      webhook: Prisma.$WebhookNotificacionPayload<ExtArgs> | null
+    }
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      modelo: string
+      ejercicio: number
+      trimestre: number | null
+      periodo: string
+      estado: $Enums.EstadoPresentacion
+      numeroJustificante: string | null
+      fechaPresentacion: Date | null
+      fechaAceptacion: Date | null
+      importeTotal: Prisma.Decimal | null
+      datosPresentacion: Prisma.JsonValue | null
+      usuarioId: string
+      webhookId: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["presentacionModelo"]>
+    composites: {}
+  }
+
+  type PresentacionModeloGetPayload<S extends boolean | null | undefined | PresentacionModeloDefaultArgs> = $Result.GetResult<Prisma.$PresentacionModeloPayload, S>
+
+  type PresentacionModeloCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<PresentacionModeloFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: PresentacionModeloCountAggregateInputType | true
+    }
+
+  export interface PresentacionModeloDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['PresentacionModelo'], meta: { name: 'PresentacionModelo' } }
+    /**
+     * Find zero or one PresentacionModelo that matches the filter.
+     * @param {PresentacionModeloFindUniqueArgs} args - Arguments to find a PresentacionModelo
+     * @example
+     * // Get one PresentacionModelo
+     * const presentacionModelo = await prisma.presentacionModelo.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends PresentacionModeloFindUniqueArgs>(args: SelectSubset<T, PresentacionModeloFindUniqueArgs<ExtArgs>>): Prisma__PresentacionModeloClient<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one PresentacionModelo that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {PresentacionModeloFindUniqueOrThrowArgs} args - Arguments to find a PresentacionModelo
+     * @example
+     * // Get one PresentacionModelo
+     * const presentacionModelo = await prisma.presentacionModelo.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends PresentacionModeloFindUniqueOrThrowArgs>(args: SelectSubset<T, PresentacionModeloFindUniqueOrThrowArgs<ExtArgs>>): Prisma__PresentacionModeloClient<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PresentacionModelo that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PresentacionModeloFindFirstArgs} args - Arguments to find a PresentacionModelo
+     * @example
+     * // Get one PresentacionModelo
+     * const presentacionModelo = await prisma.presentacionModelo.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends PresentacionModeloFindFirstArgs>(args?: SelectSubset<T, PresentacionModeloFindFirstArgs<ExtArgs>>): Prisma__PresentacionModeloClient<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first PresentacionModelo that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PresentacionModeloFindFirstOrThrowArgs} args - Arguments to find a PresentacionModelo
+     * @example
+     * // Get one PresentacionModelo
+     * const presentacionModelo = await prisma.presentacionModelo.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends PresentacionModeloFindFirstOrThrowArgs>(args?: SelectSubset<T, PresentacionModeloFindFirstOrThrowArgs<ExtArgs>>): Prisma__PresentacionModeloClient<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more PresentacionModelos that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PresentacionModeloFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all PresentacionModelos
+     * const presentacionModelos = await prisma.presentacionModelo.findMany()
+     * 
+     * // Get first 10 PresentacionModelos
+     * const presentacionModelos = await prisma.presentacionModelo.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const presentacionModeloWithIdOnly = await prisma.presentacionModelo.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends PresentacionModeloFindManyArgs>(args?: SelectSubset<T, PresentacionModeloFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a PresentacionModelo.
+     * @param {PresentacionModeloCreateArgs} args - Arguments to create a PresentacionModelo.
+     * @example
+     * // Create one PresentacionModelo
+     * const PresentacionModelo = await prisma.presentacionModelo.create({
+     *   data: {
+     *     // ... data to create a PresentacionModelo
+     *   }
+     * })
+     * 
+     */
+    create<T extends PresentacionModeloCreateArgs>(args: SelectSubset<T, PresentacionModeloCreateArgs<ExtArgs>>): Prisma__PresentacionModeloClient<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many PresentacionModelos.
+     * @param {PresentacionModeloCreateManyArgs} args - Arguments to create many PresentacionModelos.
+     * @example
+     * // Create many PresentacionModelos
+     * const presentacionModelo = await prisma.presentacionModelo.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends PresentacionModeloCreateManyArgs>(args?: SelectSubset<T, PresentacionModeloCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many PresentacionModelos and returns the data saved in the database.
+     * @param {PresentacionModeloCreateManyAndReturnArgs} args - Arguments to create many PresentacionModelos.
+     * @example
+     * // Create many PresentacionModelos
+     * const presentacionModelo = await prisma.presentacionModelo.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many PresentacionModelos and only return the `id`
+     * const presentacionModeloWithIdOnly = await prisma.presentacionModelo.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends PresentacionModeloCreateManyAndReturnArgs>(args?: SelectSubset<T, PresentacionModeloCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a PresentacionModelo.
+     * @param {PresentacionModeloDeleteArgs} args - Arguments to delete one PresentacionModelo.
+     * @example
+     * // Delete one PresentacionModelo
+     * const PresentacionModelo = await prisma.presentacionModelo.delete({
+     *   where: {
+     *     // ... filter to delete one PresentacionModelo
+     *   }
+     * })
+     * 
+     */
+    delete<T extends PresentacionModeloDeleteArgs>(args: SelectSubset<T, PresentacionModeloDeleteArgs<ExtArgs>>): Prisma__PresentacionModeloClient<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one PresentacionModelo.
+     * @param {PresentacionModeloUpdateArgs} args - Arguments to update one PresentacionModelo.
+     * @example
+     * // Update one PresentacionModelo
+     * const presentacionModelo = await prisma.presentacionModelo.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends PresentacionModeloUpdateArgs>(args: SelectSubset<T, PresentacionModeloUpdateArgs<ExtArgs>>): Prisma__PresentacionModeloClient<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more PresentacionModelos.
+     * @param {PresentacionModeloDeleteManyArgs} args - Arguments to filter PresentacionModelos to delete.
+     * @example
+     * // Delete a few PresentacionModelos
+     * const { count } = await prisma.presentacionModelo.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends PresentacionModeloDeleteManyArgs>(args?: SelectSubset<T, PresentacionModeloDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PresentacionModelos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PresentacionModeloUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many PresentacionModelos
+     * const presentacionModelo = await prisma.presentacionModelo.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends PresentacionModeloUpdateManyArgs>(args: SelectSubset<T, PresentacionModeloUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more PresentacionModelos and returns the data updated in the database.
+     * @param {PresentacionModeloUpdateManyAndReturnArgs} args - Arguments to update many PresentacionModelos.
+     * @example
+     * // Update many PresentacionModelos
+     * const presentacionModelo = await prisma.presentacionModelo.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more PresentacionModelos and only return the `id`
+     * const presentacionModeloWithIdOnly = await prisma.presentacionModelo.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends PresentacionModeloUpdateManyAndReturnArgs>(args: SelectSubset<T, PresentacionModeloUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one PresentacionModelo.
+     * @param {PresentacionModeloUpsertArgs} args - Arguments to update or create a PresentacionModelo.
+     * @example
+     * // Update or create a PresentacionModelo
+     * const presentacionModelo = await prisma.presentacionModelo.upsert({
+     *   create: {
+     *     // ... data to create a PresentacionModelo
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the PresentacionModelo we want to update
+     *   }
+     * })
+     */
+    upsert<T extends PresentacionModeloUpsertArgs>(args: SelectSubset<T, PresentacionModeloUpsertArgs<ExtArgs>>): Prisma__PresentacionModeloClient<$Result.GetResult<Prisma.$PresentacionModeloPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of PresentacionModelos.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PresentacionModeloCountArgs} args - Arguments to filter PresentacionModelos to count.
+     * @example
+     * // Count the number of PresentacionModelos
+     * const count = await prisma.presentacionModelo.count({
+     *   where: {
+     *     // ... the filter for the PresentacionModelos we want to count
+     *   }
+     * })
+    **/
+    count<T extends PresentacionModeloCountArgs>(
+      args?: Subset<T, PresentacionModeloCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], PresentacionModeloCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a PresentacionModelo.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PresentacionModeloAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends PresentacionModeloAggregateArgs>(args: Subset<T, PresentacionModeloAggregateArgs>): Prisma.PrismaPromise<GetPresentacionModeloAggregateType<T>>
+
+    /**
+     * Group by PresentacionModelo.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {PresentacionModeloGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends PresentacionModeloGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: PresentacionModeloGroupByArgs['orderBy'] }
+        : { orderBy?: PresentacionModeloGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, PresentacionModeloGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetPresentacionModeloGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the PresentacionModelo model
+   */
+  readonly fields: PresentacionModeloFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for PresentacionModelo.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__PresentacionModeloClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    webhook<T extends PresentacionModelo$webhookArgs<ExtArgs> = {}>(args?: Subset<T, PresentacionModelo$webhookArgs<ExtArgs>>): Prisma__WebhookNotificacionClient<$Result.GetResult<Prisma.$WebhookNotificacionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the PresentacionModelo model
+   */
+  interface PresentacionModeloFieldRefs {
+    readonly id: FieldRef<"PresentacionModelo", 'String'>
+    readonly modelo: FieldRef<"PresentacionModelo", 'String'>
+    readonly ejercicio: FieldRef<"PresentacionModelo", 'Int'>
+    readonly trimestre: FieldRef<"PresentacionModelo", 'Int'>
+    readonly periodo: FieldRef<"PresentacionModelo", 'String'>
+    readonly estado: FieldRef<"PresentacionModelo", 'EstadoPresentacion'>
+    readonly numeroJustificante: FieldRef<"PresentacionModelo", 'String'>
+    readonly fechaPresentacion: FieldRef<"PresentacionModelo", 'DateTime'>
+    readonly fechaAceptacion: FieldRef<"PresentacionModelo", 'DateTime'>
+    readonly importeTotal: FieldRef<"PresentacionModelo", 'Decimal'>
+    readonly datosPresentacion: FieldRef<"PresentacionModelo", 'Json'>
+    readonly usuarioId: FieldRef<"PresentacionModelo", 'String'>
+    readonly webhookId: FieldRef<"PresentacionModelo", 'String'>
+    readonly createdAt: FieldRef<"PresentacionModelo", 'DateTime'>
+    readonly updatedAt: FieldRef<"PresentacionModelo", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * PresentacionModelo findUnique
+   */
+  export type PresentacionModeloFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+    /**
+     * Filter, which PresentacionModelo to fetch.
+     */
+    where: PresentacionModeloWhereUniqueInput
+  }
+
+  /**
+   * PresentacionModelo findUniqueOrThrow
+   */
+  export type PresentacionModeloFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+    /**
+     * Filter, which PresentacionModelo to fetch.
+     */
+    where: PresentacionModeloWhereUniqueInput
+  }
+
+  /**
+   * PresentacionModelo findFirst
+   */
+  export type PresentacionModeloFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+    /**
+     * Filter, which PresentacionModelo to fetch.
+     */
+    where?: PresentacionModeloWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PresentacionModelos to fetch.
+     */
+    orderBy?: PresentacionModeloOrderByWithRelationInput | PresentacionModeloOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PresentacionModelos.
+     */
+    cursor?: PresentacionModeloWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PresentacionModelos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PresentacionModelos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PresentacionModelos.
+     */
+    distinct?: PresentacionModeloScalarFieldEnum | PresentacionModeloScalarFieldEnum[]
+  }
+
+  /**
+   * PresentacionModelo findFirstOrThrow
+   */
+  export type PresentacionModeloFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+    /**
+     * Filter, which PresentacionModelo to fetch.
+     */
+    where?: PresentacionModeloWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PresentacionModelos to fetch.
+     */
+    orderBy?: PresentacionModeloOrderByWithRelationInput | PresentacionModeloOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for PresentacionModelos.
+     */
+    cursor?: PresentacionModeloWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PresentacionModelos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PresentacionModelos.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of PresentacionModelos.
+     */
+    distinct?: PresentacionModeloScalarFieldEnum | PresentacionModeloScalarFieldEnum[]
+  }
+
+  /**
+   * PresentacionModelo findMany
+   */
+  export type PresentacionModeloFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+    /**
+     * Filter, which PresentacionModelos to fetch.
+     */
+    where?: PresentacionModeloWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of PresentacionModelos to fetch.
+     */
+    orderBy?: PresentacionModeloOrderByWithRelationInput | PresentacionModeloOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing PresentacionModelos.
+     */
+    cursor?: PresentacionModeloWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` PresentacionModelos from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` PresentacionModelos.
+     */
+    skip?: number
+    distinct?: PresentacionModeloScalarFieldEnum | PresentacionModeloScalarFieldEnum[]
+  }
+
+  /**
+   * PresentacionModelo create
+   */
+  export type PresentacionModeloCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+    /**
+     * The data needed to create a PresentacionModelo.
+     */
+    data: XOR<PresentacionModeloCreateInput, PresentacionModeloUncheckedCreateInput>
+  }
+
+  /**
+   * PresentacionModelo createMany
+   */
+  export type PresentacionModeloCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many PresentacionModelos.
+     */
+    data: PresentacionModeloCreateManyInput | PresentacionModeloCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * PresentacionModelo createManyAndReturn
+   */
+  export type PresentacionModeloCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * The data used to create many PresentacionModelos.
+     */
+    data: PresentacionModeloCreateManyInput | PresentacionModeloCreateManyInput[]
+    skipDuplicates?: boolean
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloIncludeCreateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PresentacionModelo update
+   */
+  export type PresentacionModeloUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+    /**
+     * The data needed to update a PresentacionModelo.
+     */
+    data: XOR<PresentacionModeloUpdateInput, PresentacionModeloUncheckedUpdateInput>
+    /**
+     * Choose, which PresentacionModelo to update.
+     */
+    where: PresentacionModeloWhereUniqueInput
+  }
+
+  /**
+   * PresentacionModelo updateMany
+   */
+  export type PresentacionModeloUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update PresentacionModelos.
+     */
+    data: XOR<PresentacionModeloUpdateManyMutationInput, PresentacionModeloUncheckedUpdateManyInput>
+    /**
+     * Filter which PresentacionModelos to update
+     */
+    where?: PresentacionModeloWhereInput
+    /**
+     * Limit how many PresentacionModelos to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * PresentacionModelo updateManyAndReturn
+   */
+  export type PresentacionModeloUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * The data used to update PresentacionModelos.
+     */
+    data: XOR<PresentacionModeloUpdateManyMutationInput, PresentacionModeloUncheckedUpdateManyInput>
+    /**
+     * Filter which PresentacionModelos to update
+     */
+    where?: PresentacionModeloWhereInput
+    /**
+     * Limit how many PresentacionModelos to update.
+     */
+    limit?: number
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloIncludeUpdateManyAndReturn<ExtArgs> | null
+  }
+
+  /**
+   * PresentacionModelo upsert
+   */
+  export type PresentacionModeloUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+    /**
+     * The filter to search for the PresentacionModelo to update in case it exists.
+     */
+    where: PresentacionModeloWhereUniqueInput
+    /**
+     * In case the PresentacionModelo found by the `where` argument doesn't exist, create a new PresentacionModelo with this data.
+     */
+    create: XOR<PresentacionModeloCreateInput, PresentacionModeloUncheckedCreateInput>
+    /**
+     * In case the PresentacionModelo was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<PresentacionModeloUpdateInput, PresentacionModeloUncheckedUpdateInput>
+  }
+
+  /**
+   * PresentacionModelo delete
+   */
+  export type PresentacionModeloDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+    /**
+     * Filter which PresentacionModelo to delete.
+     */
+    where: PresentacionModeloWhereUniqueInput
+  }
+
+  /**
+   * PresentacionModelo deleteMany
+   */
+  export type PresentacionModeloDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which PresentacionModelos to delete
+     */
+    where?: PresentacionModeloWhereInput
+    /**
+     * Limit how many PresentacionModelos to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * PresentacionModelo.webhook
+   */
+  export type PresentacionModelo$webhookArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the WebhookNotificacion
+     */
+    select?: WebhookNotificacionSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the WebhookNotificacion
+     */
+    omit?: WebhookNotificacionOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: WebhookNotificacionInclude<ExtArgs> | null
+    where?: WebhookNotificacionWhereInput
+  }
+
+  /**
+   * PresentacionModelo without action
+   */
+  export type PresentacionModeloDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the PresentacionModelo
+     */
+    select?: PresentacionModeloSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the PresentacionModelo
+     */
+    omit?: PresentacionModeloOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: PresentacionModeloInclude<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -7467,12 +10203,67 @@ export namespace Prisma {
   export type InvoiceLineScalarFieldEnum = (typeof InvoiceLineScalarFieldEnum)[keyof typeof InvoiceLineScalarFieldEnum]
 
 
+  export const WebhookNotificacionScalarFieldEnum: {
+    id: 'id',
+    webhookId: 'webhookId',
+    tipoNotificacion: 'tipoNotificacion',
+    origen: 'origen',
+    modeloId: 'modeloId',
+    numeroJustificante: 'numeroJustificante',
+    estado: 'estado',
+    payload: 'payload',
+    respuesta: 'respuesta',
+    errores: 'errores',
+    firmaVerificada: 'firmaVerificada',
+    metodoVerificacion: 'metodoVerificacion',
+    fechaRecepcion: 'fechaRecepcion',
+    fechaProcesamiento: 'fechaProcesamiento',
+    intentos: 'intentos',
+    ultimoIntento: 'ultimoIntento',
+    ultimoError: 'ultimoError',
+    usuarioId: 'usuarioId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type WebhookNotificacionScalarFieldEnum = (typeof WebhookNotificacionScalarFieldEnum)[keyof typeof WebhookNotificacionScalarFieldEnum]
+
+
+  export const PresentacionModeloScalarFieldEnum: {
+    id: 'id',
+    modelo: 'modelo',
+    ejercicio: 'ejercicio',
+    trimestre: 'trimestre',
+    periodo: 'periodo',
+    estado: 'estado',
+    numeroJustificante: 'numeroJustificante',
+    fechaPresentacion: 'fechaPresentacion',
+    fechaAceptacion: 'fechaAceptacion',
+    importeTotal: 'importeTotal',
+    datosPresentacion: 'datosPresentacion',
+    usuarioId: 'usuarioId',
+    webhookId: 'webhookId',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type PresentacionModeloScalarFieldEnum = (typeof PresentacionModeloScalarFieldEnum)[keyof typeof PresentacionModeloScalarFieldEnum]
+
+
   export const SortOrder: {
     asc: 'asc',
     desc: 'desc'
   };
 
   export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
+
+
+  export const NullableJsonNullValueInput: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull
+  };
+
+  export type NullableJsonNullValueInput = (typeof NullableJsonNullValueInput)[keyof typeof NullableJsonNullValueInput]
 
 
   export const QueryMode: {
@@ -7489,6 +10280,15 @@ export namespace Prisma {
   };
 
   export type NullsOrder = (typeof NullsOrder)[keyof typeof NullsOrder]
+
+
+  export const JsonNullValueFilter: {
+    DbNull: typeof DbNull,
+    JsonNull: typeof JsonNull,
+    AnyNull: typeof AnyNull
+  };
+
+  export type JsonNullValueFilter = (typeof JsonNullValueFilter)[keyof typeof JsonNullValueFilter]
 
 
   /**
@@ -7574,6 +10374,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'WebhookEstado'
+   */
+  export type EnumWebhookEstadoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WebhookEstado'>
+    
+
+
+  /**
+   * Reference to a field of type 'WebhookEstado[]'
+   */
+  export type ListEnumWebhookEstadoFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'WebhookEstado[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Json'
+   */
+  export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Json'>
+    
+
+
+  /**
+   * Reference to a field of type 'QueryMode'
+   */
+  export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
+    
+
+
+  /**
    * Reference to a field of type 'Int'
    */
   export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -7584,6 +10412,34 @@ export namespace Prisma {
    * Reference to a field of type 'Int[]'
    */
   export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'EstadoPresentacion'
+   */
+  export type EnumEstadoPresentacionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EstadoPresentacion'>
+    
+
+
+  /**
+   * Reference to a field of type 'EstadoPresentacion[]'
+   */
+  export type ListEnumEstadoPresentacionFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'EstadoPresentacion[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
   /**
    * Deep Input Types
@@ -8053,6 +10909,246 @@ export namespace Prisma {
     vatRate?: DecimalWithAggregatesFilter<"InvoiceLine"> | Decimal | DecimalJsLike | number | string
     amount?: DecimalWithAggregatesFilter<"InvoiceLine"> | Decimal | DecimalJsLike | number | string
     invoiceId?: StringWithAggregatesFilter<"InvoiceLine"> | string
+  }
+
+  export type WebhookNotificacionWhereInput = {
+    AND?: WebhookNotificacionWhereInput | WebhookNotificacionWhereInput[]
+    OR?: WebhookNotificacionWhereInput[]
+    NOT?: WebhookNotificacionWhereInput | WebhookNotificacionWhereInput[]
+    id?: StringFilter<"WebhookNotificacion"> | string
+    webhookId?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    tipoNotificacion?: StringFilter<"WebhookNotificacion"> | string
+    origen?: StringFilter<"WebhookNotificacion"> | string
+    modeloId?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    numeroJustificante?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    estado?: EnumWebhookEstadoFilter<"WebhookNotificacion"> | $Enums.WebhookEstado
+    payload?: JsonNullableFilter<"WebhookNotificacion">
+    respuesta?: JsonNullableFilter<"WebhookNotificacion">
+    errores?: JsonNullableFilter<"WebhookNotificacion">
+    firmaVerificada?: BoolFilter<"WebhookNotificacion"> | boolean
+    metodoVerificacion?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    fechaRecepcion?: DateTimeFilter<"WebhookNotificacion"> | Date | string
+    fechaProcesamiento?: DateTimeNullableFilter<"WebhookNotificacion"> | Date | string | null
+    intentos?: IntFilter<"WebhookNotificacion"> | number
+    ultimoIntento?: DateTimeNullableFilter<"WebhookNotificacion"> | Date | string | null
+    ultimoError?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    usuarioId?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    createdAt?: DateTimeFilter<"WebhookNotificacion"> | Date | string
+    updatedAt?: DateTimeFilter<"WebhookNotificacion"> | Date | string
+    presentacion?: XOR<PresentacionModeloNullableScalarRelationFilter, PresentacionModeloWhereInput> | null
+  }
+
+  export type WebhookNotificacionOrderByWithRelationInput = {
+    id?: SortOrder
+    webhookId?: SortOrderInput | SortOrder
+    tipoNotificacion?: SortOrder
+    origen?: SortOrder
+    modeloId?: SortOrderInput | SortOrder
+    numeroJustificante?: SortOrderInput | SortOrder
+    estado?: SortOrder
+    payload?: SortOrderInput | SortOrder
+    respuesta?: SortOrderInput | SortOrder
+    errores?: SortOrderInput | SortOrder
+    firmaVerificada?: SortOrder
+    metodoVerificacion?: SortOrderInput | SortOrder
+    fechaRecepcion?: SortOrder
+    fechaProcesamiento?: SortOrderInput | SortOrder
+    intentos?: SortOrder
+    ultimoIntento?: SortOrderInput | SortOrder
+    ultimoError?: SortOrderInput | SortOrder
+    usuarioId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    presentacion?: PresentacionModeloOrderByWithRelationInput
+  }
+
+  export type WebhookNotificacionWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: WebhookNotificacionWhereInput | WebhookNotificacionWhereInput[]
+    OR?: WebhookNotificacionWhereInput[]
+    NOT?: WebhookNotificacionWhereInput | WebhookNotificacionWhereInput[]
+    webhookId?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    tipoNotificacion?: StringFilter<"WebhookNotificacion"> | string
+    origen?: StringFilter<"WebhookNotificacion"> | string
+    modeloId?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    numeroJustificante?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    estado?: EnumWebhookEstadoFilter<"WebhookNotificacion"> | $Enums.WebhookEstado
+    payload?: JsonNullableFilter<"WebhookNotificacion">
+    respuesta?: JsonNullableFilter<"WebhookNotificacion">
+    errores?: JsonNullableFilter<"WebhookNotificacion">
+    firmaVerificada?: BoolFilter<"WebhookNotificacion"> | boolean
+    metodoVerificacion?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    fechaRecepcion?: DateTimeFilter<"WebhookNotificacion"> | Date | string
+    fechaProcesamiento?: DateTimeNullableFilter<"WebhookNotificacion"> | Date | string | null
+    intentos?: IntFilter<"WebhookNotificacion"> | number
+    ultimoIntento?: DateTimeNullableFilter<"WebhookNotificacion"> | Date | string | null
+    ultimoError?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    usuarioId?: StringNullableFilter<"WebhookNotificacion"> | string | null
+    createdAt?: DateTimeFilter<"WebhookNotificacion"> | Date | string
+    updatedAt?: DateTimeFilter<"WebhookNotificacion"> | Date | string
+    presentacion?: XOR<PresentacionModeloNullableScalarRelationFilter, PresentacionModeloWhereInput> | null
+  }, "id">
+
+  export type WebhookNotificacionOrderByWithAggregationInput = {
+    id?: SortOrder
+    webhookId?: SortOrderInput | SortOrder
+    tipoNotificacion?: SortOrder
+    origen?: SortOrder
+    modeloId?: SortOrderInput | SortOrder
+    numeroJustificante?: SortOrderInput | SortOrder
+    estado?: SortOrder
+    payload?: SortOrderInput | SortOrder
+    respuesta?: SortOrderInput | SortOrder
+    errores?: SortOrderInput | SortOrder
+    firmaVerificada?: SortOrder
+    metodoVerificacion?: SortOrderInput | SortOrder
+    fechaRecepcion?: SortOrder
+    fechaProcesamiento?: SortOrderInput | SortOrder
+    intentos?: SortOrder
+    ultimoIntento?: SortOrderInput | SortOrder
+    ultimoError?: SortOrderInput | SortOrder
+    usuarioId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: WebhookNotificacionCountOrderByAggregateInput
+    _avg?: WebhookNotificacionAvgOrderByAggregateInput
+    _max?: WebhookNotificacionMaxOrderByAggregateInput
+    _min?: WebhookNotificacionMinOrderByAggregateInput
+    _sum?: WebhookNotificacionSumOrderByAggregateInput
+  }
+
+  export type WebhookNotificacionScalarWhereWithAggregatesInput = {
+    AND?: WebhookNotificacionScalarWhereWithAggregatesInput | WebhookNotificacionScalarWhereWithAggregatesInput[]
+    OR?: WebhookNotificacionScalarWhereWithAggregatesInput[]
+    NOT?: WebhookNotificacionScalarWhereWithAggregatesInput | WebhookNotificacionScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"WebhookNotificacion"> | string
+    webhookId?: StringNullableWithAggregatesFilter<"WebhookNotificacion"> | string | null
+    tipoNotificacion?: StringWithAggregatesFilter<"WebhookNotificacion"> | string
+    origen?: StringWithAggregatesFilter<"WebhookNotificacion"> | string
+    modeloId?: StringNullableWithAggregatesFilter<"WebhookNotificacion"> | string | null
+    numeroJustificante?: StringNullableWithAggregatesFilter<"WebhookNotificacion"> | string | null
+    estado?: EnumWebhookEstadoWithAggregatesFilter<"WebhookNotificacion"> | $Enums.WebhookEstado
+    payload?: JsonNullableWithAggregatesFilter<"WebhookNotificacion">
+    respuesta?: JsonNullableWithAggregatesFilter<"WebhookNotificacion">
+    errores?: JsonNullableWithAggregatesFilter<"WebhookNotificacion">
+    firmaVerificada?: BoolWithAggregatesFilter<"WebhookNotificacion"> | boolean
+    metodoVerificacion?: StringNullableWithAggregatesFilter<"WebhookNotificacion"> | string | null
+    fechaRecepcion?: DateTimeWithAggregatesFilter<"WebhookNotificacion"> | Date | string
+    fechaProcesamiento?: DateTimeNullableWithAggregatesFilter<"WebhookNotificacion"> | Date | string | null
+    intentos?: IntWithAggregatesFilter<"WebhookNotificacion"> | number
+    ultimoIntento?: DateTimeNullableWithAggregatesFilter<"WebhookNotificacion"> | Date | string | null
+    ultimoError?: StringNullableWithAggregatesFilter<"WebhookNotificacion"> | string | null
+    usuarioId?: StringNullableWithAggregatesFilter<"WebhookNotificacion"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"WebhookNotificacion"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"WebhookNotificacion"> | Date | string
+  }
+
+  export type PresentacionModeloWhereInput = {
+    AND?: PresentacionModeloWhereInput | PresentacionModeloWhereInput[]
+    OR?: PresentacionModeloWhereInput[]
+    NOT?: PresentacionModeloWhereInput | PresentacionModeloWhereInput[]
+    id?: StringFilter<"PresentacionModelo"> | string
+    modelo?: StringFilter<"PresentacionModelo"> | string
+    ejercicio?: IntFilter<"PresentacionModelo"> | number
+    trimestre?: IntNullableFilter<"PresentacionModelo"> | number | null
+    periodo?: StringFilter<"PresentacionModelo"> | string
+    estado?: EnumEstadoPresentacionFilter<"PresentacionModelo"> | $Enums.EstadoPresentacion
+    numeroJustificante?: StringNullableFilter<"PresentacionModelo"> | string | null
+    fechaPresentacion?: DateTimeNullableFilter<"PresentacionModelo"> | Date | string | null
+    fechaAceptacion?: DateTimeNullableFilter<"PresentacionModelo"> | Date | string | null
+    importeTotal?: DecimalNullableFilter<"PresentacionModelo"> | Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: JsonNullableFilter<"PresentacionModelo">
+    usuarioId?: StringFilter<"PresentacionModelo"> | string
+    webhookId?: StringNullableFilter<"PresentacionModelo"> | string | null
+    createdAt?: DateTimeFilter<"PresentacionModelo"> | Date | string
+    updatedAt?: DateTimeFilter<"PresentacionModelo"> | Date | string
+    webhook?: XOR<WebhookNotificacionNullableScalarRelationFilter, WebhookNotificacionWhereInput> | null
+  }
+
+  export type PresentacionModeloOrderByWithRelationInput = {
+    id?: SortOrder
+    modelo?: SortOrder
+    ejercicio?: SortOrder
+    trimestre?: SortOrderInput | SortOrder
+    periodo?: SortOrder
+    estado?: SortOrder
+    numeroJustificante?: SortOrderInput | SortOrder
+    fechaPresentacion?: SortOrderInput | SortOrder
+    fechaAceptacion?: SortOrderInput | SortOrder
+    importeTotal?: SortOrderInput | SortOrder
+    datosPresentacion?: SortOrderInput | SortOrder
+    usuarioId?: SortOrder
+    webhookId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    webhook?: WebhookNotificacionOrderByWithRelationInput
+  }
+
+  export type PresentacionModeloWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    webhookId?: string
+    usuarioId_modelo_ejercicio_periodo?: PresentacionModeloUsuarioIdModeloEjercicioPeriodoCompoundUniqueInput
+    AND?: PresentacionModeloWhereInput | PresentacionModeloWhereInput[]
+    OR?: PresentacionModeloWhereInput[]
+    NOT?: PresentacionModeloWhereInput | PresentacionModeloWhereInput[]
+    modelo?: StringFilter<"PresentacionModelo"> | string
+    ejercicio?: IntFilter<"PresentacionModelo"> | number
+    trimestre?: IntNullableFilter<"PresentacionModelo"> | number | null
+    periodo?: StringFilter<"PresentacionModelo"> | string
+    estado?: EnumEstadoPresentacionFilter<"PresentacionModelo"> | $Enums.EstadoPresentacion
+    numeroJustificante?: StringNullableFilter<"PresentacionModelo"> | string | null
+    fechaPresentacion?: DateTimeNullableFilter<"PresentacionModelo"> | Date | string | null
+    fechaAceptacion?: DateTimeNullableFilter<"PresentacionModelo"> | Date | string | null
+    importeTotal?: DecimalNullableFilter<"PresentacionModelo"> | Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: JsonNullableFilter<"PresentacionModelo">
+    usuarioId?: StringFilter<"PresentacionModelo"> | string
+    createdAt?: DateTimeFilter<"PresentacionModelo"> | Date | string
+    updatedAt?: DateTimeFilter<"PresentacionModelo"> | Date | string
+    webhook?: XOR<WebhookNotificacionNullableScalarRelationFilter, WebhookNotificacionWhereInput> | null
+  }, "id" | "webhookId" | "usuarioId_modelo_ejercicio_periodo">
+
+  export type PresentacionModeloOrderByWithAggregationInput = {
+    id?: SortOrder
+    modelo?: SortOrder
+    ejercicio?: SortOrder
+    trimestre?: SortOrderInput | SortOrder
+    periodo?: SortOrder
+    estado?: SortOrder
+    numeroJustificante?: SortOrderInput | SortOrder
+    fechaPresentacion?: SortOrderInput | SortOrder
+    fechaAceptacion?: SortOrderInput | SortOrder
+    importeTotal?: SortOrderInput | SortOrder
+    datosPresentacion?: SortOrderInput | SortOrder
+    usuarioId?: SortOrder
+    webhookId?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: PresentacionModeloCountOrderByAggregateInput
+    _avg?: PresentacionModeloAvgOrderByAggregateInput
+    _max?: PresentacionModeloMaxOrderByAggregateInput
+    _min?: PresentacionModeloMinOrderByAggregateInput
+    _sum?: PresentacionModeloSumOrderByAggregateInput
+  }
+
+  export type PresentacionModeloScalarWhereWithAggregatesInput = {
+    AND?: PresentacionModeloScalarWhereWithAggregatesInput | PresentacionModeloScalarWhereWithAggregatesInput[]
+    OR?: PresentacionModeloScalarWhereWithAggregatesInput[]
+    NOT?: PresentacionModeloScalarWhereWithAggregatesInput | PresentacionModeloScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"PresentacionModelo"> | string
+    modelo?: StringWithAggregatesFilter<"PresentacionModelo"> | string
+    ejercicio?: IntWithAggregatesFilter<"PresentacionModelo"> | number
+    trimestre?: IntNullableWithAggregatesFilter<"PresentacionModelo"> | number | null
+    periodo?: StringWithAggregatesFilter<"PresentacionModelo"> | string
+    estado?: EnumEstadoPresentacionWithAggregatesFilter<"PresentacionModelo"> | $Enums.EstadoPresentacion
+    numeroJustificante?: StringNullableWithAggregatesFilter<"PresentacionModelo"> | string | null
+    fechaPresentacion?: DateTimeNullableWithAggregatesFilter<"PresentacionModelo"> | Date | string | null
+    fechaAceptacion?: DateTimeNullableWithAggregatesFilter<"PresentacionModelo"> | Date | string | null
+    importeTotal?: DecimalNullableWithAggregatesFilter<"PresentacionModelo"> | Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: JsonNullableWithAggregatesFilter<"PresentacionModelo">
+    usuarioId?: StringWithAggregatesFilter<"PresentacionModelo"> | string
+    webhookId?: StringNullableWithAggregatesFilter<"PresentacionModelo"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"PresentacionModelo"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"PresentacionModelo"> | Date | string
   }
 
   export type UserCreateInput = {
@@ -8584,6 +11680,296 @@ export namespace Prisma {
     invoiceId?: StringFieldUpdateOperationsInput | string
   }
 
+  export type WebhookNotificacionCreateInput = {
+    id?: string
+    webhookId?: string | null
+    tipoNotificacion: string
+    origen?: string
+    modeloId?: string | null
+    numeroJustificante?: string | null
+    estado?: $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: boolean
+    metodoVerificacion?: string | null
+    fechaRecepcion?: Date | string
+    fechaProcesamiento?: Date | string | null
+    intentos?: number
+    ultimoIntento?: Date | string | null
+    ultimoError?: string | null
+    usuarioId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    presentacion?: PresentacionModeloCreateNestedOneWithoutWebhookInput
+  }
+
+  export type WebhookNotificacionUncheckedCreateInput = {
+    id?: string
+    webhookId?: string | null
+    tipoNotificacion: string
+    origen?: string
+    modeloId?: string | null
+    numeroJustificante?: string | null
+    estado?: $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: boolean
+    metodoVerificacion?: string | null
+    fechaRecepcion?: Date | string
+    fechaProcesamiento?: Date | string | null
+    intentos?: number
+    ultimoIntento?: Date | string | null
+    ultimoError?: string | null
+    usuarioId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    presentacion?: PresentacionModeloUncheckedCreateNestedOneWithoutWebhookInput
+  }
+
+  export type WebhookNotificacionUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoNotificacion?: StringFieldUpdateOperationsInput | string
+    origen?: StringFieldUpdateOperationsInput | string
+    modeloId?: NullableStringFieldUpdateOperationsInput | string | null
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: EnumWebhookEstadoFieldUpdateOperationsInput | $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: BoolFieldUpdateOperationsInput | boolean
+    metodoVerificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaRecepcion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fechaProcesamiento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    intentos?: IntFieldUpdateOperationsInput | number
+    ultimoIntento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimoError?: NullableStringFieldUpdateOperationsInput | string | null
+    usuarioId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    presentacion?: PresentacionModeloUpdateOneWithoutWebhookNestedInput
+  }
+
+  export type WebhookNotificacionUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoNotificacion?: StringFieldUpdateOperationsInput | string
+    origen?: StringFieldUpdateOperationsInput | string
+    modeloId?: NullableStringFieldUpdateOperationsInput | string | null
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: EnumWebhookEstadoFieldUpdateOperationsInput | $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: BoolFieldUpdateOperationsInput | boolean
+    metodoVerificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaRecepcion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fechaProcesamiento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    intentos?: IntFieldUpdateOperationsInput | number
+    ultimoIntento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimoError?: NullableStringFieldUpdateOperationsInput | string | null
+    usuarioId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    presentacion?: PresentacionModeloUncheckedUpdateOneWithoutWebhookNestedInput
+  }
+
+  export type WebhookNotificacionCreateManyInput = {
+    id?: string
+    webhookId?: string | null
+    tipoNotificacion: string
+    origen?: string
+    modeloId?: string | null
+    numeroJustificante?: string | null
+    estado?: $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: boolean
+    metodoVerificacion?: string | null
+    fechaRecepcion?: Date | string
+    fechaProcesamiento?: Date | string | null
+    intentos?: number
+    ultimoIntento?: Date | string | null
+    ultimoError?: string | null
+    usuarioId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WebhookNotificacionUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoNotificacion?: StringFieldUpdateOperationsInput | string
+    origen?: StringFieldUpdateOperationsInput | string
+    modeloId?: NullableStringFieldUpdateOperationsInput | string | null
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: EnumWebhookEstadoFieldUpdateOperationsInput | $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: BoolFieldUpdateOperationsInput | boolean
+    metodoVerificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaRecepcion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fechaProcesamiento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    intentos?: IntFieldUpdateOperationsInput | number
+    ultimoIntento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimoError?: NullableStringFieldUpdateOperationsInput | string | null
+    usuarioId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WebhookNotificacionUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoNotificacion?: StringFieldUpdateOperationsInput | string
+    origen?: StringFieldUpdateOperationsInput | string
+    modeloId?: NullableStringFieldUpdateOperationsInput | string | null
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: EnumWebhookEstadoFieldUpdateOperationsInput | $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: BoolFieldUpdateOperationsInput | boolean
+    metodoVerificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaRecepcion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fechaProcesamiento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    intentos?: IntFieldUpdateOperationsInput | number
+    ultimoIntento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimoError?: NullableStringFieldUpdateOperationsInput | string | null
+    usuarioId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PresentacionModeloCreateInput = {
+    id?: string
+    modelo: string
+    ejercicio: number
+    trimestre?: number | null
+    periodo: string
+    estado?: $Enums.EstadoPresentacion
+    numeroJustificante?: string | null
+    fechaPresentacion?: Date | string | null
+    fechaAceptacion?: Date | string | null
+    importeTotal?: Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    webhook?: WebhookNotificacionCreateNestedOneWithoutPresentacionInput
+  }
+
+  export type PresentacionModeloUncheckedCreateInput = {
+    id?: string
+    modelo: string
+    ejercicio: number
+    trimestre?: number | null
+    periodo: string
+    estado?: $Enums.EstadoPresentacion
+    numeroJustificante?: string | null
+    fechaPresentacion?: Date | string | null
+    fechaAceptacion?: Date | string | null
+    importeTotal?: Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId: string
+    webhookId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PresentacionModeloUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    modelo?: StringFieldUpdateOperationsInput | string
+    ejercicio?: IntFieldUpdateOperationsInput | number
+    trimestre?: NullableIntFieldUpdateOperationsInput | number | null
+    periodo?: StringFieldUpdateOperationsInput | string
+    estado?: EnumEstadoPresentacionFieldUpdateOperationsInput | $Enums.EstadoPresentacion
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaPresentacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fechaAceptacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    importeTotal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    webhook?: WebhookNotificacionUpdateOneWithoutPresentacionNestedInput
+  }
+
+  export type PresentacionModeloUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    modelo?: StringFieldUpdateOperationsInput | string
+    ejercicio?: IntFieldUpdateOperationsInput | number
+    trimestre?: NullableIntFieldUpdateOperationsInput | number | null
+    periodo?: StringFieldUpdateOperationsInput | string
+    estado?: EnumEstadoPresentacionFieldUpdateOperationsInput | $Enums.EstadoPresentacion
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaPresentacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fechaAceptacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    importeTotal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId?: StringFieldUpdateOperationsInput | string
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PresentacionModeloCreateManyInput = {
+    id?: string
+    modelo: string
+    ejercicio: number
+    trimestre?: number | null
+    periodo: string
+    estado?: $Enums.EstadoPresentacion
+    numeroJustificante?: string | null
+    fechaPresentacion?: Date | string | null
+    fechaAceptacion?: Date | string | null
+    importeTotal?: Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId: string
+    webhookId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PresentacionModeloUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    modelo?: StringFieldUpdateOperationsInput | string
+    ejercicio?: IntFieldUpdateOperationsInput | number
+    trimestre?: NullableIntFieldUpdateOperationsInput | number | null
+    periodo?: StringFieldUpdateOperationsInput | string
+    estado?: EnumEstadoPresentacionFieldUpdateOperationsInput | $Enums.EstadoPresentacion
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaPresentacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fechaAceptacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    importeTotal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PresentacionModeloUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    modelo?: StringFieldUpdateOperationsInput | string
+    ejercicio?: IntFieldUpdateOperationsInput | number
+    trimestre?: NullableIntFieldUpdateOperationsInput | number | null
+    periodo?: StringFieldUpdateOperationsInput | string
+    estado?: EnumEstadoPresentacionFieldUpdateOperationsInput | $Enums.EstadoPresentacion
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaPresentacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fechaAceptacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    importeTotal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId?: StringFieldUpdateOperationsInput | string
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -9079,6 +12465,322 @@ export namespace Prisma {
     amount?: SortOrder
   }
 
+  export type EnumWebhookEstadoFilter<$PrismaModel = never> = {
+    equals?: $Enums.WebhookEstado | EnumWebhookEstadoFieldRefInput<$PrismaModel>
+    in?: $Enums.WebhookEstado[] | ListEnumWebhookEstadoFieldRefInput<$PrismaModel>
+    notIn?: $Enums.WebhookEstado[] | ListEnumWebhookEstadoFieldRefInput<$PrismaModel>
+    not?: NestedEnumWebhookEstadoFilter<$PrismaModel> | $Enums.WebhookEstado
+  }
+  export type JsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type IntFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntFilter<$PrismaModel> | number
+  }
+
+  export type PresentacionModeloNullableScalarRelationFilter = {
+    is?: PresentacionModeloWhereInput | null
+    isNot?: PresentacionModeloWhereInput | null
+  }
+
+  export type WebhookNotificacionCountOrderByAggregateInput = {
+    id?: SortOrder
+    webhookId?: SortOrder
+    tipoNotificacion?: SortOrder
+    origen?: SortOrder
+    modeloId?: SortOrder
+    numeroJustificante?: SortOrder
+    estado?: SortOrder
+    payload?: SortOrder
+    respuesta?: SortOrder
+    errores?: SortOrder
+    firmaVerificada?: SortOrder
+    metodoVerificacion?: SortOrder
+    fechaRecepcion?: SortOrder
+    fechaProcesamiento?: SortOrder
+    intentos?: SortOrder
+    ultimoIntento?: SortOrder
+    ultimoError?: SortOrder
+    usuarioId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WebhookNotificacionAvgOrderByAggregateInput = {
+    intentos?: SortOrder
+  }
+
+  export type WebhookNotificacionMaxOrderByAggregateInput = {
+    id?: SortOrder
+    webhookId?: SortOrder
+    tipoNotificacion?: SortOrder
+    origen?: SortOrder
+    modeloId?: SortOrder
+    numeroJustificante?: SortOrder
+    estado?: SortOrder
+    firmaVerificada?: SortOrder
+    metodoVerificacion?: SortOrder
+    fechaRecepcion?: SortOrder
+    fechaProcesamiento?: SortOrder
+    intentos?: SortOrder
+    ultimoIntento?: SortOrder
+    ultimoError?: SortOrder
+    usuarioId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WebhookNotificacionMinOrderByAggregateInput = {
+    id?: SortOrder
+    webhookId?: SortOrder
+    tipoNotificacion?: SortOrder
+    origen?: SortOrder
+    modeloId?: SortOrder
+    numeroJustificante?: SortOrder
+    estado?: SortOrder
+    firmaVerificada?: SortOrder
+    metodoVerificacion?: SortOrder
+    fechaRecepcion?: SortOrder
+    fechaProcesamiento?: SortOrder
+    intentos?: SortOrder
+    ultimoIntento?: SortOrder
+    ultimoError?: SortOrder
+    usuarioId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type WebhookNotificacionSumOrderByAggregateInput = {
+    intentos?: SortOrder
+  }
+
+  export type EnumWebhookEstadoWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.WebhookEstado | EnumWebhookEstadoFieldRefInput<$PrismaModel>
+    in?: $Enums.WebhookEstado[] | ListEnumWebhookEstadoFieldRefInput<$PrismaModel>
+    notIn?: $Enums.WebhookEstado[] | ListEnumWebhookEstadoFieldRefInput<$PrismaModel>
+    not?: NestedEnumWebhookEstadoWithAggregatesFilter<$PrismaModel> | $Enums.WebhookEstado
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumWebhookEstadoFilter<$PrismaModel>
+    _max?: NestedEnumWebhookEstadoFilter<$PrismaModel>
+  }
+  export type JsonNullableWithAggregatesFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, Exclude<keyof Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>,
+        Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<JsonNullableWithAggregatesFilterBase<$PrismaModel>>, 'path'>>
+
+  export type JsonNullableWithAggregatesFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedJsonNullableFilter<$PrismaModel>
+    _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type IntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type IntNullableFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type EnumEstadoPresentacionFilter<$PrismaModel = never> = {
+    equals?: $Enums.EstadoPresentacion | EnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    in?: $Enums.EstadoPresentacion[] | ListEnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EstadoPresentacion[] | ListEnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    not?: NestedEnumEstadoPresentacionFilter<$PrismaModel> | $Enums.EstadoPresentacion
+  }
+
+  export type DecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type WebhookNotificacionNullableScalarRelationFilter = {
+    is?: WebhookNotificacionWhereInput | null
+    isNot?: WebhookNotificacionWhereInput | null
+  }
+
+  export type PresentacionModeloUsuarioIdModeloEjercicioPeriodoCompoundUniqueInput = {
+    usuarioId: string
+    modelo: string
+    ejercicio: number
+    periodo: string
+  }
+
+  export type PresentacionModeloCountOrderByAggregateInput = {
+    id?: SortOrder
+    modelo?: SortOrder
+    ejercicio?: SortOrder
+    trimestre?: SortOrder
+    periodo?: SortOrder
+    estado?: SortOrder
+    numeroJustificante?: SortOrder
+    fechaPresentacion?: SortOrder
+    fechaAceptacion?: SortOrder
+    importeTotal?: SortOrder
+    datosPresentacion?: SortOrder
+    usuarioId?: SortOrder
+    webhookId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PresentacionModeloAvgOrderByAggregateInput = {
+    ejercicio?: SortOrder
+    trimestre?: SortOrder
+    importeTotal?: SortOrder
+  }
+
+  export type PresentacionModeloMaxOrderByAggregateInput = {
+    id?: SortOrder
+    modelo?: SortOrder
+    ejercicio?: SortOrder
+    trimestre?: SortOrder
+    periodo?: SortOrder
+    estado?: SortOrder
+    numeroJustificante?: SortOrder
+    fechaPresentacion?: SortOrder
+    fechaAceptacion?: SortOrder
+    importeTotal?: SortOrder
+    usuarioId?: SortOrder
+    webhookId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PresentacionModeloMinOrderByAggregateInput = {
+    id?: SortOrder
+    modelo?: SortOrder
+    ejercicio?: SortOrder
+    trimestre?: SortOrder
+    periodo?: SortOrder
+    estado?: SortOrder
+    numeroJustificante?: SortOrder
+    fechaPresentacion?: SortOrder
+    fechaAceptacion?: SortOrder
+    importeTotal?: SortOrder
+    usuarioId?: SortOrder
+    webhookId?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type PresentacionModeloSumOrderByAggregateInput = {
+    ejercicio?: SortOrder
+    trimestre?: SortOrder
+    importeTotal?: SortOrder
+  }
+
+  export type IntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type EnumEstadoPresentacionWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EstadoPresentacion | EnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    in?: $Enums.EstadoPresentacion[] | ListEnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EstadoPresentacion[] | ListEnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    not?: NestedEnumEstadoPresentacionWithAggregatesFilter<$PrismaModel> | $Enums.EstadoPresentacion
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEstadoPresentacionFilter<$PrismaModel>
+    _max?: NestedEnumEstadoPresentacionFilter<$PrismaModel>
+  }
+
+  export type DecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
+  }
+
   export type CompanyCreateNestedOneWithoutUserInput = {
     create?: XOR<CompanyCreateWithoutUserInput, CompanyUncheckedCreateWithoutUserInput>
     connectOrCreate?: CompanyCreateOrConnectWithoutUserInput
@@ -9441,6 +13143,86 @@ export namespace Prisma {
     update?: XOR<XOR<InvoiceUpdateToOneWithWhereWithoutLinesInput, InvoiceUpdateWithoutLinesInput>, InvoiceUncheckedUpdateWithoutLinesInput>
   }
 
+  export type PresentacionModeloCreateNestedOneWithoutWebhookInput = {
+    create?: XOR<PresentacionModeloCreateWithoutWebhookInput, PresentacionModeloUncheckedCreateWithoutWebhookInput>
+    connectOrCreate?: PresentacionModeloCreateOrConnectWithoutWebhookInput
+    connect?: PresentacionModeloWhereUniqueInput
+  }
+
+  export type PresentacionModeloUncheckedCreateNestedOneWithoutWebhookInput = {
+    create?: XOR<PresentacionModeloCreateWithoutWebhookInput, PresentacionModeloUncheckedCreateWithoutWebhookInput>
+    connectOrCreate?: PresentacionModeloCreateOrConnectWithoutWebhookInput
+    connect?: PresentacionModeloWhereUniqueInput
+  }
+
+  export type EnumWebhookEstadoFieldUpdateOperationsInput = {
+    set?: $Enums.WebhookEstado
+  }
+
+  export type IntFieldUpdateOperationsInput = {
+    set?: number
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type PresentacionModeloUpdateOneWithoutWebhookNestedInput = {
+    create?: XOR<PresentacionModeloCreateWithoutWebhookInput, PresentacionModeloUncheckedCreateWithoutWebhookInput>
+    connectOrCreate?: PresentacionModeloCreateOrConnectWithoutWebhookInput
+    upsert?: PresentacionModeloUpsertWithoutWebhookInput
+    disconnect?: PresentacionModeloWhereInput | boolean
+    delete?: PresentacionModeloWhereInput | boolean
+    connect?: PresentacionModeloWhereUniqueInput
+    update?: XOR<XOR<PresentacionModeloUpdateToOneWithWhereWithoutWebhookInput, PresentacionModeloUpdateWithoutWebhookInput>, PresentacionModeloUncheckedUpdateWithoutWebhookInput>
+  }
+
+  export type PresentacionModeloUncheckedUpdateOneWithoutWebhookNestedInput = {
+    create?: XOR<PresentacionModeloCreateWithoutWebhookInput, PresentacionModeloUncheckedCreateWithoutWebhookInput>
+    connectOrCreate?: PresentacionModeloCreateOrConnectWithoutWebhookInput
+    upsert?: PresentacionModeloUpsertWithoutWebhookInput
+    disconnect?: PresentacionModeloWhereInput | boolean
+    delete?: PresentacionModeloWhereInput | boolean
+    connect?: PresentacionModeloWhereUniqueInput
+    update?: XOR<XOR<PresentacionModeloUpdateToOneWithWhereWithoutWebhookInput, PresentacionModeloUpdateWithoutWebhookInput>, PresentacionModeloUncheckedUpdateWithoutWebhookInput>
+  }
+
+  export type WebhookNotificacionCreateNestedOneWithoutPresentacionInput = {
+    create?: XOR<WebhookNotificacionCreateWithoutPresentacionInput, WebhookNotificacionUncheckedCreateWithoutPresentacionInput>
+    connectOrCreate?: WebhookNotificacionCreateOrConnectWithoutPresentacionInput
+    connect?: WebhookNotificacionWhereUniqueInput
+  }
+
+  export type NullableIntFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
+  export type EnumEstadoPresentacionFieldUpdateOperationsInput = {
+    set?: $Enums.EstadoPresentacion
+  }
+
+  export type NullableDecimalFieldUpdateOperationsInput = {
+    set?: Decimal | DecimalJsLike | number | string | null
+    increment?: Decimal | DecimalJsLike | number | string
+    decrement?: Decimal | DecimalJsLike | number | string
+    multiply?: Decimal | DecimalJsLike | number | string
+    divide?: Decimal | DecimalJsLike | number | string
+  }
+
+  export type WebhookNotificacionUpdateOneWithoutPresentacionNestedInput = {
+    create?: XOR<WebhookNotificacionCreateWithoutPresentacionInput, WebhookNotificacionUncheckedCreateWithoutPresentacionInput>
+    connectOrCreate?: WebhookNotificacionCreateOrConnectWithoutPresentacionInput
+    upsert?: WebhookNotificacionUpsertWithoutPresentacionInput
+    disconnect?: WebhookNotificacionWhereInput | boolean
+    delete?: WebhookNotificacionWhereInput | boolean
+    connect?: WebhookNotificacionWhereUniqueInput
+    update?: XOR<XOR<WebhookNotificacionUpdateToOneWithWhereWithoutPresentacionInput, WebhookNotificacionUpdateWithoutPresentacionInput>, WebhookNotificacionUncheckedUpdateWithoutPresentacionInput>
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -9647,6 +13429,144 @@ export namespace Prisma {
     _count?: NestedIntFilter<$PrismaModel>
     _min?: NestedBoolFilter<$PrismaModel>
     _max?: NestedBoolFilter<$PrismaModel>
+  }
+
+  export type NestedEnumWebhookEstadoFilter<$PrismaModel = never> = {
+    equals?: $Enums.WebhookEstado | EnumWebhookEstadoFieldRefInput<$PrismaModel>
+    in?: $Enums.WebhookEstado[] | ListEnumWebhookEstadoFieldRefInput<$PrismaModel>
+    notIn?: $Enums.WebhookEstado[] | ListEnumWebhookEstadoFieldRefInput<$PrismaModel>
+    not?: NestedEnumWebhookEstadoFilter<$PrismaModel> | $Enums.WebhookEstado
+  }
+
+  export type NestedEnumWebhookEstadoWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.WebhookEstado | EnumWebhookEstadoFieldRefInput<$PrismaModel>
+    in?: $Enums.WebhookEstado[] | ListEnumWebhookEstadoFieldRefInput<$PrismaModel>
+    notIn?: $Enums.WebhookEstado[] | ListEnumWebhookEstadoFieldRefInput<$PrismaModel>
+    not?: NestedEnumWebhookEstadoWithAggregatesFilter<$PrismaModel> | $Enums.WebhookEstado
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumWebhookEstadoFilter<$PrismaModel>
+    _max?: NestedEnumWebhookEstadoFilter<$PrismaModel>
+  }
+  export type NestedJsonNullableFilter<$PrismaModel = never> =
+    | PatchUndefined<
+        Either<Required<NestedJsonNullableFilterBase<$PrismaModel>>, Exclude<keyof Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>,
+        Required<NestedJsonNullableFilterBase<$PrismaModel>>
+      >
+    | OptionalFlat<Omit<Required<NestedJsonNullableFilterBase<$PrismaModel>>, 'path'>>
+
+  export type NestedJsonNullableFilterBase<$PrismaModel = never> = {
+    equals?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+    path?: string[]
+    mode?: QueryMode | EnumQueryModeFieldRefInput<$PrismaModel>
+    string_contains?: string | StringFieldRefInput<$PrismaModel>
+    string_starts_with?: string | StringFieldRefInput<$PrismaModel>
+    string_ends_with?: string | StringFieldRefInput<$PrismaModel>
+    array_starts_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_ends_with?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    array_contains?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | null
+    lt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    lte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gt?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    gte?: InputJsonValue | JsonFieldRefInput<$PrismaModel>
+    not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
+  }
+
+  export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel>
+    in?: number[] | ListIntFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel>
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntWithAggregatesFilter<$PrismaModel> | number
+    _count?: NestedIntFilter<$PrismaModel>
+    _avg?: NestedFloatFilter<$PrismaModel>
+    _sum?: NestedIntFilter<$PrismaModel>
+    _min?: NestedIntFilter<$PrismaModel>
+    _max?: NestedIntFilter<$PrismaModel>
+  }
+
+  export type NestedFloatFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel>
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel>
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatFilter<$PrismaModel> | number
+  }
+
+  export type NestedEnumEstadoPresentacionFilter<$PrismaModel = never> = {
+    equals?: $Enums.EstadoPresentacion | EnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    in?: $Enums.EstadoPresentacion[] | ListEnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EstadoPresentacion[] | ListEnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    not?: NestedEnumEstadoPresentacionFilter<$PrismaModel> | $Enums.EstadoPresentacion
+  }
+
+  export type NestedDecimalNullableFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+  }
+
+  export type NestedIntNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | IntFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListIntFieldRefInput<$PrismaModel> | null
+    lt?: number | IntFieldRefInput<$PrismaModel>
+    lte?: number | IntFieldRefInput<$PrismaModel>
+    gt?: number | IntFieldRefInput<$PrismaModel>
+    gte?: number | IntFieldRefInput<$PrismaModel>
+    not?: NestedIntNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedIntNullableFilter<$PrismaModel>
+    _min?: NestedIntNullableFilter<$PrismaModel>
+    _max?: NestedIntNullableFilter<$PrismaModel>
+  }
+
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedEnumEstadoPresentacionWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.EstadoPresentacion | EnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    in?: $Enums.EstadoPresentacion[] | ListEnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    notIn?: $Enums.EstadoPresentacion[] | ListEnumEstadoPresentacionFieldRefInput<$PrismaModel>
+    not?: NestedEnumEstadoPresentacionWithAggregatesFilter<$PrismaModel> | $Enums.EstadoPresentacion
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumEstadoPresentacionFilter<$PrismaModel>
+    _max?: NestedEnumEstadoPresentacionFilter<$PrismaModel>
+  }
+
+  export type NestedDecimalNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel> | null
+    in?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    notIn?: Decimal[] | DecimalJsLike[] | number[] | string[] | ListDecimalFieldRefInput<$PrismaModel> | null
+    lt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    lte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gt?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    gte?: Decimal | DecimalJsLike | number | string | DecimalFieldRefInput<$PrismaModel>
+    not?: NestedDecimalNullableWithAggregatesFilter<$PrismaModel> | Decimal | DecimalJsLike | number | string | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedDecimalNullableFilter<$PrismaModel>
+    _sum?: NestedDecimalNullableFilter<$PrismaModel>
+    _min?: NestedDecimalNullableFilter<$PrismaModel>
+    _max?: NestedDecimalNullableFilter<$PrismaModel>
   }
 
   export type CompanyCreateWithoutUserInput = {
@@ -10535,6 +14455,198 @@ export namespace Prisma {
     clientId?: StringFieldUpdateOperationsInput | string
     userId?: StringFieldUpdateOperationsInput | string
     notes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PresentacionModeloCreateWithoutWebhookInput = {
+    id?: string
+    modelo: string
+    ejercicio: number
+    trimestre?: number | null
+    periodo: string
+    estado?: $Enums.EstadoPresentacion
+    numeroJustificante?: string | null
+    fechaPresentacion?: Date | string | null
+    fechaAceptacion?: Date | string | null
+    importeTotal?: Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PresentacionModeloUncheckedCreateWithoutWebhookInput = {
+    id?: string
+    modelo: string
+    ejercicio: number
+    trimestre?: number | null
+    periodo: string
+    estado?: $Enums.EstadoPresentacion
+    numeroJustificante?: string | null
+    fechaPresentacion?: Date | string | null
+    fechaAceptacion?: Date | string | null
+    importeTotal?: Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type PresentacionModeloCreateOrConnectWithoutWebhookInput = {
+    where: PresentacionModeloWhereUniqueInput
+    create: XOR<PresentacionModeloCreateWithoutWebhookInput, PresentacionModeloUncheckedCreateWithoutWebhookInput>
+  }
+
+  export type PresentacionModeloUpsertWithoutWebhookInput = {
+    update: XOR<PresentacionModeloUpdateWithoutWebhookInput, PresentacionModeloUncheckedUpdateWithoutWebhookInput>
+    create: XOR<PresentacionModeloCreateWithoutWebhookInput, PresentacionModeloUncheckedCreateWithoutWebhookInput>
+    where?: PresentacionModeloWhereInput
+  }
+
+  export type PresentacionModeloUpdateToOneWithWhereWithoutWebhookInput = {
+    where?: PresentacionModeloWhereInput
+    data: XOR<PresentacionModeloUpdateWithoutWebhookInput, PresentacionModeloUncheckedUpdateWithoutWebhookInput>
+  }
+
+  export type PresentacionModeloUpdateWithoutWebhookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    modelo?: StringFieldUpdateOperationsInput | string
+    ejercicio?: IntFieldUpdateOperationsInput | number
+    trimestre?: NullableIntFieldUpdateOperationsInput | number | null
+    periodo?: StringFieldUpdateOperationsInput | string
+    estado?: EnumEstadoPresentacionFieldUpdateOperationsInput | $Enums.EstadoPresentacion
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaPresentacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fechaAceptacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    importeTotal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type PresentacionModeloUncheckedUpdateWithoutWebhookInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    modelo?: StringFieldUpdateOperationsInput | string
+    ejercicio?: IntFieldUpdateOperationsInput | number
+    trimestre?: NullableIntFieldUpdateOperationsInput | number | null
+    periodo?: StringFieldUpdateOperationsInput | string
+    estado?: EnumEstadoPresentacionFieldUpdateOperationsInput | $Enums.EstadoPresentacion
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaPresentacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    fechaAceptacion?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    importeTotal?: NullableDecimalFieldUpdateOperationsInput | Decimal | DecimalJsLike | number | string | null
+    datosPresentacion?: NullableJsonNullValueInput | InputJsonValue
+    usuarioId?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WebhookNotificacionCreateWithoutPresentacionInput = {
+    id?: string
+    webhookId?: string | null
+    tipoNotificacion: string
+    origen?: string
+    modeloId?: string | null
+    numeroJustificante?: string | null
+    estado?: $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: boolean
+    metodoVerificacion?: string | null
+    fechaRecepcion?: Date | string
+    fechaProcesamiento?: Date | string | null
+    intentos?: number
+    ultimoIntento?: Date | string | null
+    ultimoError?: string | null
+    usuarioId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WebhookNotificacionUncheckedCreateWithoutPresentacionInput = {
+    id?: string
+    webhookId?: string | null
+    tipoNotificacion: string
+    origen?: string
+    modeloId?: string | null
+    numeroJustificante?: string | null
+    estado?: $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: boolean
+    metodoVerificacion?: string | null
+    fechaRecepcion?: Date | string
+    fechaProcesamiento?: Date | string | null
+    intentos?: number
+    ultimoIntento?: Date | string | null
+    ultimoError?: string | null
+    usuarioId?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type WebhookNotificacionCreateOrConnectWithoutPresentacionInput = {
+    where: WebhookNotificacionWhereUniqueInput
+    create: XOR<WebhookNotificacionCreateWithoutPresentacionInput, WebhookNotificacionUncheckedCreateWithoutPresentacionInput>
+  }
+
+  export type WebhookNotificacionUpsertWithoutPresentacionInput = {
+    update: XOR<WebhookNotificacionUpdateWithoutPresentacionInput, WebhookNotificacionUncheckedUpdateWithoutPresentacionInput>
+    create: XOR<WebhookNotificacionCreateWithoutPresentacionInput, WebhookNotificacionUncheckedCreateWithoutPresentacionInput>
+    where?: WebhookNotificacionWhereInput
+  }
+
+  export type WebhookNotificacionUpdateToOneWithWhereWithoutPresentacionInput = {
+    where?: WebhookNotificacionWhereInput
+    data: XOR<WebhookNotificacionUpdateWithoutPresentacionInput, WebhookNotificacionUncheckedUpdateWithoutPresentacionInput>
+  }
+
+  export type WebhookNotificacionUpdateWithoutPresentacionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoNotificacion?: StringFieldUpdateOperationsInput | string
+    origen?: StringFieldUpdateOperationsInput | string
+    modeloId?: NullableStringFieldUpdateOperationsInput | string | null
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: EnumWebhookEstadoFieldUpdateOperationsInput | $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: BoolFieldUpdateOperationsInput | boolean
+    metodoVerificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaRecepcion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fechaProcesamiento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    intentos?: IntFieldUpdateOperationsInput | number
+    ultimoIntento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimoError?: NullableStringFieldUpdateOperationsInput | string | null
+    usuarioId?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type WebhookNotificacionUncheckedUpdateWithoutPresentacionInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    webhookId?: NullableStringFieldUpdateOperationsInput | string | null
+    tipoNotificacion?: StringFieldUpdateOperationsInput | string
+    origen?: StringFieldUpdateOperationsInput | string
+    modeloId?: NullableStringFieldUpdateOperationsInput | string | null
+    numeroJustificante?: NullableStringFieldUpdateOperationsInput | string | null
+    estado?: EnumWebhookEstadoFieldUpdateOperationsInput | $Enums.WebhookEstado
+    payload?: NullableJsonNullValueInput | InputJsonValue
+    respuesta?: NullableJsonNullValueInput | InputJsonValue
+    errores?: NullableJsonNullValueInput | InputJsonValue
+    firmaVerificada?: BoolFieldUpdateOperationsInput | boolean
+    metodoVerificacion?: NullableStringFieldUpdateOperationsInput | string | null
+    fechaRecepcion?: DateTimeFieldUpdateOperationsInput | Date | string
+    fechaProcesamiento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    intentos?: IntFieldUpdateOperationsInput | number
+    ultimoIntento?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    ultimoError?: NullableStringFieldUpdateOperationsInput | string | null
+    usuarioId?: NullableStringFieldUpdateOperationsInput | string | null
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

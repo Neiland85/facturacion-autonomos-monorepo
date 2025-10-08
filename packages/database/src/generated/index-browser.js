@@ -193,9 +193,55 @@ exports.Prisma.InvoiceLineScalarFieldEnum = {
   invoiceId: 'invoiceId'
 };
 
+exports.Prisma.WebhookNotificacionScalarFieldEnum = {
+  id: 'id',
+  webhookId: 'webhookId',
+  tipoNotificacion: 'tipoNotificacion',
+  origen: 'origen',
+  modeloId: 'modeloId',
+  numeroJustificante: 'numeroJustificante',
+  estado: 'estado',
+  payload: 'payload',
+  respuesta: 'respuesta',
+  errores: 'errores',
+  firmaVerificada: 'firmaVerificada',
+  metodoVerificacion: 'metodoVerificacion',
+  fechaRecepcion: 'fechaRecepcion',
+  fechaProcesamiento: 'fechaProcesamiento',
+  intentos: 'intentos',
+  ultimoIntento: 'ultimoIntento',
+  ultimoError: 'ultimoError',
+  usuarioId: 'usuarioId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PresentacionModeloScalarFieldEnum = {
+  id: 'id',
+  modelo: 'modelo',
+  ejercicio: 'ejercicio',
+  trimestre: 'trimestre',
+  periodo: 'periodo',
+  estado: 'estado',
+  numeroJustificante: 'numeroJustificante',
+  fechaPresentacion: 'fechaPresentacion',
+  fechaAceptacion: 'fechaAceptacion',
+  importeTotal: 'importeTotal',
+  datosPresentacion: 'datosPresentacion',
+  usuarioId: 'usuarioId',
+  webhookId: 'webhookId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
+};
+
+exports.Prisma.NullableJsonNullValueInput = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull
 };
 
 exports.Prisma.QueryMode = {
@@ -206,6 +252,12 @@ exports.Prisma.QueryMode = {
 exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
+};
+
+exports.Prisma.JsonNullValueFilter = {
+  DbNull: Prisma.DbNull,
+  JsonNull: Prisma.JsonNull,
+  AnyNull: Prisma.AnyNull
 };
 exports.TaxRegime = exports.$Enums.TaxRegime = {
   GENERAL: 'GENERAL',
@@ -221,12 +273,29 @@ exports.InvoiceStatus = exports.$Enums.InvoiceStatus = {
   CANCELLED: 'CANCELLED'
 };
 
+exports.WebhookEstado = exports.$Enums.WebhookEstado = {
+  PENDIENTE: 'PENDIENTE',
+  PROCESADO: 'PROCESADO',
+  ERROR: 'ERROR',
+  REINTENTANDO: 'REINTENTANDO'
+};
+
+exports.EstadoPresentacion = exports.$Enums.EstadoPresentacion = {
+  PENDIENTE: 'PENDIENTE',
+  PRESENTADO: 'PRESENTADO',
+  ACEPTADO: 'ACEPTADO',
+  RECHAZADO: 'RECHAZADO',
+  CORREGIDO: 'CORREGIDO'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Company: 'Company',
   Client: 'Client',
   Invoice: 'Invoice',
-  InvoiceLine: 'InvoiceLine'
+  InvoiceLine: 'InvoiceLine',
+  WebhookNotificacion: 'WebhookNotificacion',
+  PresentacionModelo: 'PresentacionModelo'
 };
 
 /**

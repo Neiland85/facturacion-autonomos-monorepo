@@ -1,6 +1,6 @@
-import { Request, Response } from 'express';
-import { z } from 'zod';
-import { WebhookProcessorService } from '../services/webhook-processor.service';
+import { Request, Response } from "express";
+import { z } from "zod";
+import { WebhookProcessorService } from "../services/webhook-processor.service";
 
 /**
  * Controlador para manejar webhooks de AEAT
@@ -26,19 +26,19 @@ export class WebhookController {
 
       // Obtener headers
       const headers: Record<string, string> = {};
-      Object.keys(req.headers).forEach(key => {
+      Object.keys(req.headers).forEach((key) => {
         const value = req.headers[key];
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           headers[key] = value;
         } else if (Array.isArray(value)) {
-          headers[key] = value.join(', ');
+          headers[key] = value.join(", ");
         }
       });
 
       // Obtener IP de origen
       const ipOrigen = this.getClientIp(req);
 
-      console.log('Recibiendo webhook AEAT:', {
+      console.log("Recibiendo webhook AEAT:", {
         ip: ipOrigen,
         headers: this.filterSensitiveHeaders(headers),
         payloadSize: rawPayload.length,
@@ -53,24 +53,24 @@ export class WebhookController {
 
       if (result.success) {
         res.status(200).json({
-          status: 'success',
+          status: "success",
           message: result.message,
           webhookId: result.webhookId,
         });
       } else {
-        console.error('Error procesando webhook AEAT:', result.errors);
+        console.error("Error procesando webhook AEAT:", result.error);
         res.status(400).json({
-          status: 'error',
-          message: 'Error procesando webhook',
-          errors: result.errors,
+          status: "error",
+          message: "Error procesando webhook",
+          errors: result.error,
           webhookId: result.webhookId,
         });
       }
     } catch (error) {
-      console.error('Error en webhook endpoint:', error);
+      console.error("Error en webhook endpoint:", error);
       res.status(500).json({
-        status: 'error',
-        message: 'Error interno del servidor',
+        status: "error",
+        message: "Error interno del servidor",
       });
     }
   };
@@ -91,30 +91,30 @@ export class WebhookController {
 
       if (!status) {
         res.status(404).json({
-          status: 'error',
-          message: 'Webhook no encontrado',
+          status: "error",
+          message: "Webhook no encontrado",
         });
         return;
       }
 
       res.status(200).json({
-        status: 'success',
+        status: "success",
         data: status,
       });
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({
-          status: 'error',
-          message: 'ID de webhook inválido',
+          status: "error",
+          message: "ID de webhook inválido",
           errors: error.errors,
         });
         return;
       }
 
-      console.error('Error obteniendo estado del webhook:', error);
+      console.error("Error obteniendo estado del webhook:", error);
       res.status(500).json({
-        status: 'error',
-        message: 'Error interno del servidor',
+        status: "error",
+        message: "Error interno del servidor",
       });
     }
   };
@@ -132,12 +132,12 @@ export class WebhookController {
 
       if (result.success) {
         res.status(200).json({
-          status: 'success',
+          status: "success",
           message: result.message,
         });
       } else {
         res.status(400).json({
-          status: 'error',
+          status: "error",
           message: result.message,
           errors: result.errors,
         });
@@ -145,17 +145,17 @@ export class WebhookController {
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({
-          status: 'error',
-          message: 'ID de webhook inválido',
+          status: "error",
+          message: "ID de webhook inválido",
           errors: error.errors,
         });
         return;
       }
 
-      console.error('Error reintentando webhook:', error);
+      console.error("Error reintentando webhook:", error);
       res.status(500).json({
-        status: 'error',
-        message: 'Error interno del servidor',
+        status: "error",
+        message: "Error interno del servidor",
       });
     }
   };
@@ -167,9 +167,9 @@ export class WebhookController {
   public listWebhooks = async (req: Request, res: Response): Promise<void> => {
     try {
       const querySchema = z.object({
-        page: z.string().optional().default('1'),
-        limit: z.string().optional().default('10'),
-        estado: z.enum(['PENDIENTE', 'PROCESADO', 'ERROR']).optional(),
+        page: z.string().optional().default("1"),
+        limit: z.string().optional().default("10"),
+        estado: z.enum(["PENDIENTE", "PROCESADO", "ERROR"]).optional(),
         fechaDesde: z.string().optional(),
         fechaHasta: z.string().optional(),
       });
@@ -187,7 +187,7 @@ export class WebhookController {
       });
 
       res.status(200).json({
-        status: 'success',
+        status: "success",
         data: result.webhooks,
         pagination: {
           page,
@@ -199,30 +199,27 @@ export class WebhookController {
     } catch (error) {
       if (error instanceof z.ZodError) {
         res.status(400).json({
-          status: 'error',
-          message: 'Parámetros de consulta inválidos',
+          status: "error",
+          message: "Parámetros de consulta inválidos",
           errors: error.errors,
         });
         return;
       }
 
-      console.error('Error listando webhooks:', error);
+      console.error("Error listando webhooks:", error);
       res.status(500).json({
-        status: 'error',
-        message: 'Error interno del servidor',
+        status: "error",
+        message: "Error interno del servidor",
       });
     }
   };
 
-  /**
-   * Obtiene la IP real del cliente
-   */
   private getClientIp(req: Request): string {
-    const forwarded = req.headers['x-forwarded-for'];
-    if (typeof forwarded === 'string') {
-      return forwarded.split(',')[0]?.trim() || 'unknown';
+    const forwarded = req.headers["x-forwarded-for"];
+    if (typeof forwarded === "string") {
+      return forwarded.split(",")[0]?.trim() ?? "unknown";
     }
-    return req.socket.remoteAddress || 'unknown';
+    return req.socket.remoteAddress ?? "unknown";
   }
 
   /**
@@ -235,13 +232,13 @@ export class WebhookController {
 
     // Ocultar headers sensibles
     const sensitiveHeaders = [
-      'authorization',
-      'x-aeat-signature',
-      'x-aeat-hmac',
+      "authorization",
+      "x-aeat-signature",
+      "x-aeat-hmac",
     ];
-    sensitiveHeaders.forEach(header => {
+    sensitiveHeaders.forEach((header) => {
       if (filtered[header]) {
-        filtered[header] = '***';
+        filtered[header] = "***";
       }
     });
 
