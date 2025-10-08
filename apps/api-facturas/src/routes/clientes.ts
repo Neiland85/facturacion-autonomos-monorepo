@@ -1,6 +1,6 @@
-import express from 'express';
-import { ClienteController } from '../controllers/clientes';
-import { validateCliente } from '../middleware/validation';
+import express from "express";
+import { ClienteController } from "../controllers/clientes";
+import { validateCliente } from "../middleware/validation";
 
 const router = express.Router();
 const clienteController = new ClienteController();
@@ -34,7 +34,7 @@ const clienteController = new ClienteController();
  *       200:
  *         description: Lista de clientes
  */
-router.get('/', clienteController.getClientes);
+router.get("/", clienteController.getClientes);
 
 /**
  * @swagger
@@ -52,7 +52,7 @@ router.get('/', clienteController.getClientes);
  *       201:
  *         description: Cliente creado correctamente
  */
-router.post('/', validateCliente, clienteController.createCliente);
+router.post("/", validateCliente, clienteController.createCliente);
 
 /**
  * @swagger
@@ -73,7 +73,7 @@ router.post('/', validateCliente, clienteController.createCliente);
  *       404:
  *         description: Cliente no encontrado
  */
-router.get('/:id', clienteController.getClienteById);
+router.get("/:id", clienteController.getClienteById);
 
 /**
  * @swagger
@@ -100,7 +100,7 @@ router.get('/:id', clienteController.getClienteById);
  *       404:
  *         description: Cliente no encontrado
  */
-router.put('/:id', validateCliente, clienteController.updateCliente);
+router.put("/:id", validateCliente, clienteController.updateCliente);
 
 /**
  * @swagger
@@ -121,6 +121,6 @@ router.put('/:id', validateCliente, clienteController.updateCliente);
  *       404:
  *         description: Cliente no encontrado
  */
-router.delete('/:id', clienteController.deleteCliente);
+router.delete("/:id", clienteController.deleteCliente);
 
 export default router;

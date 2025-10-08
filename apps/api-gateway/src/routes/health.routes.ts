@@ -60,36 +60,42 @@ router.get("/", async (req: express.Request, res: express.Response) => {
     // Verificar servicio de autenticación
     try {
       const authResponse = await axios.get(
-        `${process.env.AUTH_SERVICE_URL || "http://localhost:3003"}/api/health`,
+        `${process.env.AUTH_SERVICE_URL ?? "http://localhost:3003"}/api/health`,
         { timeout: 5000 }
       );
       services.auth = authResponse.status === 200;
     } catch (error) {
-      console.warn("Auth service health check failed:", error.message);
+      console.warn(
+        "Auth service health check failed:",
+        error instanceof Error ? error.message : String(error)
+      );
     }
 
     // Verificar servicio de facturas
     try {
       const invoiceResponse = await axios.get(
-        `${process.env.INVOICE_SERVICE_URL || "http://localhost:3002"}/api/health`,
+        `${process.env.INVOICE_SERVICE_URL ?? "http://localhost:3002"}/api/health`,
         { timeout: 5000 }
       );
       services.invoice = invoiceResponse.status === 200;
     } catch (error) {
-      console.warn("Invoice service health check failed:", error.message);
+      console.warn(
+        "Invoice service health check failed:",
+        error instanceof Error ? error.message : String(error)
+      );
     }
 
     // Verificar servicio de impuestos
     try {
       const taxResponse = await axios.get(
-        `${process.env.TAX_CALCULATOR_URL || "http://localhost:3004"}/api/health`,
+        `${process.env.TAX_CALCULATOR_URL ?? "http://localhost:3004"}/api/health`,
         { timeout: 5000 }
       );
       services.tax = taxResponse.status === 200;
     } catch (error) {
       console.warn(
         "Tax calculator service health check failed:",
-        error.message
+        error instanceof Error ? error.message : String(error)
       );
     }
 
@@ -105,7 +111,7 @@ router.get("/", async (req: express.Request, res: express.Response) => {
         ? "API Gateway is healthy"
         : "API Gateway is degraded - some services are down",
       service: "api-gateway",
-      version: process.env.npm_package_version || "1.0.0",
+      version: process.env.npm_package_version ?? "1.0.0",
       timestamp: new Date().toISOString(),
       services: {
         auth: services.auth ? "up" : "down",
@@ -145,15 +151,15 @@ router.get("/services", async (req: express.Request, res: express.Response) => {
   const services = [
     {
       name: "auth",
-      url: process.env.AUTH_SERVICE_URL || "http://localhost:3003",
+      url: process.env.AUTH_SERVICE_URL ?? "http://localhost:3003",
     },
     {
       name: "invoice",
-      url: process.env.INVOICE_SERVICE_URL || "http://localhost:3002",
+      url: process.env.INVOICE_SERVICE_URL ?? "http://localhost:3002",
     },
     {
       name: "tax",
-      url: process.env.TAX_CALCULATOR_URL || "http://localhost:3004",
+      url: process.env.TAX_CALCULATOR_URL ?? "http://localhost:3004",
     },
   ];
 
@@ -170,14 +176,14 @@ router.get("/services", async (req: express.Request, res: express.Response) => {
         url: service.url,
         status: "up",
         responseTime: `${responseTime}ms`,
-        version: response.data?.version || "unknown",
+        version: response.data?.version ?? "unknown",
       });
     } catch (error) {
       serviceChecks.push({
         name: service.name,
         url: service.url,
         status: "down",
-        error: error.message,
+        error: error instanceof Error ? error.message : String(error),
       });
     }
   }

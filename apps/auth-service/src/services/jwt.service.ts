@@ -1,5 +1,5 @@
-import jwt from 'jsonwebtoken';
-import { redis } from '../index';
+import jwt from "jsonwebtoken";
+import { redis } from "../index";
 
 interface JWTPayload {
   userId: string;
@@ -18,12 +18,98 @@ interface TokenPair {
 export class JWTService {
   private readonly accessTokenSecret: string;
   private readonly refreshTokenSecret: string;
-  private readonly accessTokenExpiry = '15m'; // 15 minutos
-  private readonly refreshTokenExpiry = '7d'; // 7 días
+  private readonly accessTokenExpiry = "15m"; // 15 minutos
+  private readonly refreshTokenExpiry = "7d"; // 7 días
 
   constructor() {
-    this.accessTokenSecret = process.env.JWT_ACCESS_SECRET || 'fallback-access-secret-change-in-production';
-    this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET || 'fallback-refresh-secret-change-in-production';
+    this.accessTokenSecret =
+      process.env.JWT_ACCESS_SECRET ??
+      "fallback-access-secret-change-in-production";
+    this.refreshTokenSecret =
+      process.env.JWT_REFRESH_SECRET ??
+      "fallback-refresh-secret-change-in-production";
+  }
+
+  /**
+   * Generar access token individual (para compatibilidad con controlador)
+   */
+  async generateAccessToken(payload: JWTPayload): Promise<string> {
+    try {
+      const accessToken = jwt.sign(
+        {
+          userId: payload.userId,
+          email: payload.email,
+          role: payload.role,
+          sessionId: payload.sessionId,
+        },
+        this.accessTokenSecret,
+        {
+          expiresIn: this.accessTokenExpiry,
+          issuer: "facturacion-autonomos",
+          audience: "facturacion-autonomos-app",
+        }
+      );
+
+      return accessToken;
+    } catch (error) {
+      console.error("Error generando access token:", error);
+      throw new Error("Error al generar access token");
+    }
+  }
+
+  /**
+   * Generar refresh token individual (para compatibilidad con controlador)
+   */
+  async generateRefreshToken(userId: string): Promise<string> {
+    try {
+      const refreshTokenId = this.generateSecureTokenId();
+      const refreshToken = jwt.sign(
+        {
+          userId,
+          tokenId: refreshTokenId,
+          type: "refresh",
+        },
+        this.refreshTokenSecret,
+        {
+          expiresIn: this.refreshTokenExpiry,
+          issuer: "facturacion-autonomos",
+          audience: "facturacion-autonomos-app",
+        }
+      );
+
+      return refreshToken;
+    } catch (error) {
+      console.error("Error generando refresh token:", error);
+      throw new Error("Error al generar refresh token");
+    }
+  }
+
+  /**
+   * Almacenar refresh token en Redis (para compatibilidad con controlador)
+   */
+  async storeRefreshToken(userId: string, refreshToken: string): Promise<void> {
+    try {
+      const decoded = jwt.verify(refreshToken, this.refreshTokenSecret) as any;
+
+      const refreshTokenData = {
+        userId,
+        email: decoded.email || "", // Puede no estar disponible en este contexto
+        role: decoded.role || "user", // Valor por defecto
+        sessionId: decoded.sessionId,
+        createdAt: new Date().toISOString(),
+        lastUsed: new Date().toISOString(),
+      };
+
+      // TTL de 7 días (604800 segundos)
+      await redis.setex(
+        `refresh_token:${userId}:${decoded.tokenId}`,
+        604800,
+        JSON.stringify(refreshTokenData)
+      );
+    } catch (error) {
+      console.error("Error almacenando refresh token:", error);
+      throw new Error("Error al almacenar refresh token");
+    }
   }
 
   /**
@@ -37,13 +123,13 @@ export class JWTService {
           userId: payload.userId,
           email: payload.email,
           role: payload.role,
-          sessionId: payload.sessionId
+          sessionId: payload.sessionId,
         },
         this.accessTokenSecret,
         {
           expiresIn: this.accessTokenExpiry,
-          issuer: 'facturacion-autonomos',
-          audience: 'facturacion-autonomos-app'
+          issuer: "facturacion-autonomos",
+          audience: "facturacion-autonomos-app",
         }
       );
 
@@ -53,13 +139,13 @@ export class JWTService {
         {
           userId: payload.userId,
           tokenId: refreshTokenId,
-          type: 'refresh'
+          type: "refresh",
         },
         this.refreshTokenSecret,
         {
           expiresIn: this.refreshTokenExpiry,
-          issuer: 'facturacion-autonomos',
-          audience: 'facturacion-autonomos-app'
+          issuer: "facturacion-autonomos",
+          audience: "facturacion-autonomos-app",
         }
       );
 
@@ -70,7 +156,7 @@ export class JWTService {
         role: payload.role,
         sessionId: payload.sessionId,
         createdAt: new Date().toISOString(),
-        lastUsed: new Date().toISOString()
+        lastUsed: new Date().toISOString(),
       };
 
       // TTL de 7 días (604800 segundos)
@@ -82,8 +168,8 @@ export class JWTService {
 
       return { accessToken, refreshToken };
     } catch (error) {
-      console.error('Error generando tokens:', error);
-      throw new Error('Error al generar tokens de autenticación');
+      console.error("Error generando tokens:", error);
+      throw new Error("Error al generar tokens de autenticación");
     }
   }
 
@@ -93,16 +179,16 @@ export class JWTService {
   async verifyAccessToken(token: string): Promise<JWTPayload | null> {
     try {
       const decoded = jwt.verify(token, this.accessTokenSecret, {
-        issuer: 'facturacion-autonomos',
-        audience: 'facturacion-autonomos-app'
+        issuer: "facturacion-autonomos",
+        audience: "facturacion-autonomos-app",
       }) as JWTPayload;
 
       return decoded;
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
-        console.log('Access token expirado');
+        console.log("Access token expirado");
       } else if (error instanceof jwt.JsonWebTokenError) {
-        console.log('Access token inválido');
+        console.log("Access token inválido");
       }
       return null;
     }
@@ -114,14 +200,16 @@ export class JWTService {
   async verifyRefreshToken(token: string): Promise<JWTPayload | null> {
     try {
       const decoded = jwt.verify(token, this.refreshTokenSecret, {
-        issuer: 'facturacion-autonomos',
-        audience: 'facturacion-autonomos-app'
+        issuer: "facturacion-autonomos",
+        audience: "facturacion-autonomos-app",
       }) as any;
 
       // Verificar que el token existe en Redis
-      const tokenData = await redis.get(`refresh_token:${decoded.userId}:${decoded.tokenId}`);
+      const tokenData = await redis.get(
+        `refresh_token:${decoded.userId}:${decoded.tokenId}`
+      );
       if (!tokenData) {
-        console.log('Refresh token no encontrado en Redis');
+        console.log("Refresh token no encontrado en Redis");
         return null;
       }
 
@@ -139,13 +227,13 @@ export class JWTService {
         userId: parsedData.userId,
         email: parsedData.email,
         role: parsedData.role,
-        sessionId: parsedData.sessionId
+        sessionId: parsedData.sessionId,
       };
     } catch (error) {
       if (error instanceof jwt.TokenExpiredError) {
-        console.log('Refresh token expirado');
+        console.log("Refresh token expirado");
       } else if (error instanceof jwt.JsonWebTokenError) {
-        console.log('Refresh token inválido');
+        console.log("Refresh token inválido");
       }
       return null;
     }
@@ -167,19 +255,19 @@ export class JWTService {
           userId: payload.userId,
           email: payload.email,
           role: payload.role,
-          sessionId: payload.sessionId
+          sessionId: payload.sessionId,
         },
         this.accessTokenSecret,
         {
           expiresIn: this.accessTokenExpiry,
-          issuer: 'facturacion-autonomos',
-          audience: 'facturacion-autonomos-app'
+          issuer: "facturacion-autonomos",
+          audience: "facturacion-autonomos-app",
         }
       );
 
       return accessToken;
     } catch (error) {
-      console.error('Error refrescando access token:', error);
+      console.error("Error refrescando access token:", error);
       return null;
     }
   }
@@ -193,7 +281,7 @@ export class JWTService {
       await redis.del(`refresh_token:${decoded.userId}:${decoded.tokenId}`);
       return true;
     } catch (error) {
-      console.error('Error revocando refresh token:', error);
+      console.error("Error revocando refresh token:", error);
       return false;
     }
   }
@@ -209,7 +297,7 @@ export class JWTService {
       }
       return true;
     } catch (error) {
-      console.error('Error revocando todos los refresh tokens:', error);
+      console.error("Error revocando todos los refresh tokens:", error);
       return false;
     }
   }
@@ -219,7 +307,7 @@ export class JWTService {
    */
   async cleanupExpiredTokens(): Promise<void> {
     try {
-      const keys = await redis.keys('refresh_token:*');
+      const keys = await redis.keys("refresh_token:*");
       const expiredKeys: string[] = [];
 
       for (const key of keys) {
@@ -234,7 +322,7 @@ export class JWTService {
         console.log(`Limpiados ${expiredKeys.length} tokens expirados`);
       }
     } catch (error) {
-      console.error('Error limpiando tokens expirados:', error);
+      console.error("Error limpiando tokens expirados:", error);
     }
   }
 
@@ -255,14 +343,14 @@ export class JWTService {
             sessionId: parsed.sessionId,
             createdAt: parsed.createdAt,
             lastUsed: parsed.lastUsed,
-            expiresIn: ttl
+            expiresIn: ttl,
           });
         }
       }
 
       return sessions;
     } catch (error) {
-      console.error('Error obteniendo sesiones activas:', error);
+      console.error("Error obteniendo sesiones activas:", error);
       return [];
     }
   }
@@ -271,8 +359,8 @@ export class JWTService {
    * Generar ID único para tokens
    */
   private generateSecureTokenId(): string {
-    const crypto = require('crypto');
-    return crypto.randomBytes(32).toString('hex');
+    const crypto = require("crypto");
+    return crypto.randomBytes(32).toString("hex");
   }
 
   /**
@@ -282,7 +370,7 @@ export class JWTService {
     try {
       return jwt.decode(token);
     } catch (error) {
-      console.error('Error decodificando token:', error);
+      console.error("Error decodificando token:", error);
       return null;
     }
   }

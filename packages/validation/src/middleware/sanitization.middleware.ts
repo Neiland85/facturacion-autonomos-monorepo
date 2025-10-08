@@ -1,3 +1,4 @@
+import { Request, Response, NextFunction } from "express";
 
 /**
  * Funciones de sanitización para prevenir inyecciones
@@ -7,44 +8,50 @@
  * Sanitizar cadenas para prevenir XSS básico
  */
 export function sanitizeString(input: string): string {
-  if (typeof input !== 'string') return input;
+  if (typeof input !== "string") return input;
 
   return input
     .trim()
-    .replace(/[<>\"']/g, '') // Eliminar caracteres HTML peligrosos
-    .replace(/javascript:/gi, '') // Eliminar javascript: urls
-    .replace(/on\w+=/gi, '') // Eliminar event handlers
-    .replace(/data:/gi, '') // Eliminar data: urls
+    .replace(/[<>\"']/g, "") // Eliminar caracteres HTML peligrosos
+    .replace(/javascript:/gi, "") // Eliminar javascript: urls
+    .replace(/on\w+=/gi, "") // Eliminar event handlers
+    .replace(/data:/gi, "") // Eliminar data: urls
     .slice(0, 10000); // Limitar longitud máxima
 }
 
 /**
  * Sanitizar números para prevenir inyección
  */
-export function sanitizeNumber(input: any): number | null {
-  if (typeof input === 'number') {
+export function sanitizeNumber(input: unknown): number | null {
+  if (typeof input === "number") {
     return isFinite(input) ? input : null;
   }
-  
-  if (typeof input === 'string') {
+
+  if (typeof input === "string") {
     // Permitir solo números, puntos y comas
-    const cleaned = input.replace(/[^\d.,-]/g, '');
+    const cleaned = input.replace(/[^\d.,-]/g, "");
     const parsed = parseFloat(cleaned);
     return isFinite(parsed) ? parsed : null;
   }
-  
+
   return null;
 }
 
 /**
  * Validar y sanitizar identificadores fiscales españoles
  */
-export function validateAndSanitizeFiscalId(input: string): { isValid: boolean; sanitized: string } {
-  if (typeof input !== 'string') {
-    return { isValid: false, sanitized: '' };
+export function validateAndSanitizeFiscalId(input: string): {
+  isValid: boolean;
+  sanitized: string;
+} {
+  if (typeof input !== "string") {
+    return { isValid: false, sanitized: "" };
   }
 
-  const sanitized = input.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+  const sanitized = input
+    .trim()
+    .toUpperCase()
+    .replace(/[^A-Z0-9]/g, "");
 
   // Validar NIF
   const nifRegex = /^\d{8}[TRWAGMYFPDXBNJZSQVHLCKE]$/;
@@ -70,17 +77,20 @@ export function validateAndSanitizeFiscalId(input: string): { isValid: boolean; 
 /**
  * Sanitizar email
  */
-export function sanitizeEmail(input: string): { isValid: boolean; sanitized: string } {
-  if (typeof input !== 'string') {
-    return { isValid: false, sanitized: '' };
+export function sanitizeEmail(input: string): {
+  isValid: boolean;
+  sanitized: string;
+} {
+  if (typeof input !== "string") {
+    return { isValid: false, sanitized: "" };
   }
 
   const sanitized = input.trim().toLowerCase();
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  
+
   return {
     isValid: emailRegex.test(sanitized) && sanitized.length <= 254,
-    sanitized
+    sanitized,
   };
 }
 
@@ -88,64 +98,67 @@ export function sanitizeEmail(input: string): { isValid: boolean; sanitized: str
  * Detectar patrones de inyección SQL
  */
 export function detectSqlInjection(input: string): boolean {
-  if (typeof input !== 'string') return false;
+  if (typeof input !== "string") return false;
 
   const sqlPatterns = [
     /(\bselect\b|\binsert\b|\bupdate\b|\bdelete\b|\bdrop\b|\bcreate\b|\balter\b)/i,
     /(\bunion\b|\bjoin\b)/i,
     /('|"|;|--|\*|\/\*|\*\/)/,
     /(\bor\b|\band\b)\s+[\w\d]+\s*=\s*[\w\d'"]/i,
-    /\b(exec|execute|sp_|xp_)\b/i
+    /\b(exec|execute|sp_|xp_)\b/i,
   ];
 
-  return sqlPatterns.some(pattern => pattern.test(input));
+  return sqlPatterns.some((pattern) => pattern.test(input));
 }
 
 /**
  * Middleware principal de sanitización
  */
-export const sanitizeMiddleware = (req: Request, res: Response, next: NextFunction): void => {
+export const sanitizeMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   try {
     // Sanitizar body
-    if (req.body && typeof req.body === 'object') {
+    if (req.body && typeof req.body === "object") {
       req.body = sanitizeObject(req.body);
     }
 
     // Sanitizar query params
-    if (req.query && typeof req.query === 'object') {
-      const sanitizedQuery: any = {};
+    if (req.query && typeof req.query === "object") {
+      const sanitizedQuery: Record<string, unknown> = {};
       Object.entries(req.query).forEach(([key, value]) => {
         const sanitizedKey = sanitizeString(key);
         if (Array.isArray(value)) {
-          sanitizedQuery[sanitizedKey] = value.map(v => 
-            typeof v === 'string' ? sanitizeString(v) : v
+          sanitizedQuery[sanitizedKey] = value.map((v) =>
+            typeof v === "string" ? sanitizeString(v) : v
           );
-        } else if (typeof value === 'string') {
+        } else if (typeof value === "string") {
           sanitizedQuery[sanitizedKey] = sanitizeString(value);
         } else {
           sanitizedQuery[sanitizedKey] = value;
         }
       });
-      (req as any).query = sanitizedQuery;
+      (req as { query: Record<string, unknown> }).query = sanitizedQuery;
     }
 
     // Sanitizar params
-    if (req.params && typeof req.params === 'object') {
-      const sanitizedParams: any = {};
+    if (req.params && typeof req.params === "object") {
+      const sanitizedParams: Record<string, unknown> = {};
       Object.entries(req.params).forEach(([key, value]) => {
-        sanitizedParams[sanitizeString(key)] = typeof value === 'string' 
-          ? sanitizeString(value) 
-          : value;
+        sanitizedParams[sanitizeString(key)] =
+          typeof value === "string" ? sanitizeString(value) : value;
       });
-      (req as any).params = sanitizedParams;
+      (req as { params: Record<string, unknown> }).params = sanitizedParams;
     }
 
     next();
   } catch (error) {
-    console.error('Error en sanitización:', error);
+    console.error("Error en sanitización:", error);
     res.status(500).json({
       success: false,
-      message: 'Error de procesamiento'
+      message: "Error de procesamiento",
     });
   }
 };
@@ -153,12 +166,12 @@ export const sanitizeMiddleware = (req: Request, res: Response, next: NextFuncti
 /**
  * Sanitizar objeto recursivamente
  */
-function sanitizeObject(obj: any): any {
-  if (typeof obj === 'string') {
+function sanitizeObject(obj: unknown): unknown {
+  if (typeof obj === "string") {
     return sanitizeString(obj);
   }
 
-  if (typeof obj === 'number') {
+  if (typeof obj === "number") {
     return isFinite(obj) ? obj : null;
   }
 
@@ -166,8 +179,8 @@ function sanitizeObject(obj: any): any {
     return obj.map(sanitizeObject);
   }
 
-  if (obj !== null && typeof obj === 'object') {
-    const sanitized: any = {};
+  if (obj !== null && typeof obj === "object") {
+    const sanitized: Record<string, unknown> = {};
     Object.entries(obj).forEach(([key, value]) => {
       const sanitizedKey = sanitizeString(key);
       sanitized[sanitizedKey] = sanitizeObject(value);
@@ -181,22 +194,40 @@ function sanitizeObject(obj: any): any {
 /**
  * Middleware para validar límites de datos específicos de facturación
  */
-export const validateInvoiceDataLimits = (req: Request, res: Response, next: NextFunction): void => {
+export const validateInvoiceDataLimits = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   const errors: string[] = [];
 
   if (req.body) {
     // Validar límites específicos de facturación
     if (req.body.lines && Array.isArray(req.body.lines)) {
       if (req.body.lines.length > 100) {
-        errors.push('Una factura no puede tener más de 100 líneas');
+        errors.push("Una factura no puede tener más de 100 líneas");
       }
 
-      req.body.lines.forEach((line: any, index: number) => {
-        if (line.description && line.description.length > 500) {
-          errors.push(`Descripción de línea ${index + 1} demasiado larga (máximo 500 caracteres)`);
+      req.body.lines.forEach((line: unknown, index: number) => {
+        if (
+          line &&
+          typeof line === "object" &&
+          "description" in line &&
+          typeof line.description === "string" &&
+          line.description.length > 500
+        ) {
+          errors.push(
+            `Descripción de línea ${index + 1} demasiado larga (máximo 500 caracteres)`
+          );
         }
-        
-        if (line.quantity && (line.quantity < 0 || line.quantity > 999999)) {
+
+        if (
+          line &&
+          typeof line === "object" &&
+          "quantity" in line &&
+          typeof line.quantity === "number" &&
+          (line.quantity < 0 || line.quantity > 999999)
+        ) {
           errors.push(`Cantidad inválida en línea ${index + 1}`);
         }
       });
@@ -206,45 +237,69 @@ export const validateInvoiceDataLimits = (req: Request, res: Response, next: Nex
     if (req.body.total !== undefined) {
       const total = sanitizeNumber(req.body.total);
       if (total === null || total < 0 || total > 999999999.99) {
-        errors.push('Importe total inválido');
+        errors.push("Importe total inválido");
       }
     }
 
     // Validar identificador fiscal
-    if (req.body.client?.fiscalId) {
-      const { isValid } = validateAndSanitizeFiscalId(req.body.client.fiscalId);
+    if (
+      req.body.client &&
+      typeof req.body.client === "object" &&
+      "fiscalId" in req.body.client
+    ) {
+      const { isValid } = validateAndSanitizeFiscalId(
+        req.body.client.fiscalId as string
+      );
       if (!isValid) {
-        errors.push('Identificador fiscal del cliente inválido');
+        errors.push("Identificador fiscal del cliente inválido");
       }
     }
 
-    if (req.body.issuer?.fiscalId) {
-      const { isValid } = validateAndSanitizeFiscalId(req.body.issuer.fiscalId);
+    if (
+      req.body.issuer &&
+      typeof req.body.issuer === "object" &&
+      "fiscalId" in req.body.issuer
+    ) {
+      const { isValid } = validateAndSanitizeFiscalId(
+        req.body.issuer.fiscalId as string
+      );
       if (!isValid) {
-        errors.push('Identificador fiscal del emisor inválido');
+        errors.push("Identificador fiscal del emisor inválido");
       }
     }
 
     // Validar emails
-    if (req.body.client?.email) {
-      const { isValid } = sanitizeEmail(req.body.client.email);
+    if (
+      req.body.client &&
+      typeof req.body.client === "object" &&
+      "email" in req.body.client
+    ) {
+      const { isValid } = sanitizeEmail(req.body.client.email as string);
       if (!isValid) {
-        errors.push('Email del cliente inválido');
+        errors.push("Email del cliente inválido");
       }
     }
 
     // Validar fechas
     if (req.body.date) {
-      const date = new Date(req.body.date);
+      const date = new Date(req.body.date as string);
       if (isNaN(date.getTime())) {
-        errors.push('Fecha de factura inválida');
+        errors.push("Fecha de factura inválida");
       } else {
         const now = new Date();
-        const oneYearAgo = new Date(now.getFullYear() - 1, now.getMonth(), now.getDate());
-        const oneYearFromNow = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate());
-        
+        const oneYearAgo = new Date(
+          now.getFullYear() - 1,
+          now.getMonth(),
+          now.getDate()
+        );
+        const oneYearFromNow = new Date(
+          now.getFullYear() + 1,
+          now.getMonth(),
+          now.getDate()
+        );
+
         if (date < oneYearAgo || date > oneYearFromNow) {
-          errors.push('Fecha de factura fuera del rango permitido');
+          errors.push("Fecha de factura fuera del rango permitido");
         }
       }
     }
@@ -253,8 +308,8 @@ export const validateInvoiceDataLimits = (req: Request, res: Response, next: Nex
   if (errors.length > 0) {
     res.status(400).json({
       success: false,
-      message: 'Datos de factura inválidos',
-      errors
+      message: "Datos de factura inválidos",
+      errors,
     });
     return;
   }
@@ -265,10 +320,14 @@ export const validateInvoiceDataLimits = (req: Request, res: Response, next: Nex
 /**
  * Middleware para detectar inyecciones SQL
  */
-export const sqlInjectionMiddleware = (req: Request, res: Response, next: NextFunction): void => {
-  const checkSqlInjection = (obj: any, path = ''): string | null => {
-    if (typeof obj === 'string' && detectSqlInjection(obj)) {
-      return path || 'entrada';
+export const sqlInjectionMiddleware = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
+  const checkSqlInjection = (obj: unknown, path = ""): string | null => {
+    if (typeof obj === "string" && detectSqlInjection(obj)) {
+      return path || "entrada";
     }
 
     if (Array.isArray(obj)) {
@@ -278,7 +337,7 @@ export const sqlInjectionMiddleware = (req: Request, res: Response, next: NextFu
       }
     }
 
-    if (obj !== null && typeof obj === 'object') {
+    if (obj !== null && typeof obj === "object") {
       for (const [key, value] of Object.entries(obj)) {
         const result = checkSqlInjection(value, path ? `${path}.${key}` : key);
         if (result) return result;
@@ -292,25 +351,25 @@ export const sqlInjectionMiddleware = (req: Request, res: Response, next: NextFu
   const dataToCheck = {
     body: req.body,
     query: req.query,
-    params: req.params
+    params: req.params,
   };
 
   const suspiciousField = checkSqlInjection(dataToCheck);
-  
+
   if (suspiciousField) {
-    console.warn('Intento de inyección SQL detectado:', {
+    console.warn("Intento de inyección SQL detectado:", {
       ip: req.ip,
-      userAgent: req.get('User-Agent'),
+      userAgent: req.get("User-Agent"),
       url: req.url,
       method: req.method,
       field: suspiciousField,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
 
     res.status(400).json({
       success: false,
-      message: 'Datos de entrada inválidos',
-      code: 'INVALID_INPUT'
+      message: "Datos de entrada inválidos",
+      code: "INVALID_INPUT",
     });
     return;
   }
@@ -324,5 +383,5 @@ export const sqlInjectionMiddleware = (req: Request, res: Response, next: NextFu
 export const completeValidationMiddleware = [
   sanitizeMiddleware,
   sqlInjectionMiddleware,
-  validateInvoiceDataLimits
+  validateInvoiceDataLimits,
 ];

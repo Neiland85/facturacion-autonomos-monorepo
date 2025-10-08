@@ -1,5 +1,5 @@
-import express from 'express';
-import { ReportesController } from '../controllers/reportes';
+import express from "express";
+import { ReportesController } from "../controllers/reportes";
 
 const router = express.Router();
 const reportesController = new ReportesController();
@@ -35,7 +35,7 @@ const reportesController = new ReportesController();
  *             schema:
  *               $ref: '#/components/schemas/ReporteTrimestral'
  */
-router.get('/trimestral', reportesController.getTrimestral);
+router.get("/trimestral", reportesController.getTrimestral);
 
 /**
  * @swagger
@@ -56,7 +56,7 @@ router.get('/trimestral', reportesController.getTrimestral);
  *       200:
  *         description: Reporte anual generado correctamente
  */
-router.get('/anual', reportesController.getAnual);
+router.get("/anual", reportesController.getAnual);
 
 /**
  * @swagger
@@ -83,7 +83,7 @@ router.get('/anual', reportesController.getAnual);
  *       200:
  *         description: Reporte de ventas generado correctamente
  */
-router.get('/ventas', reportesController.getVentas);
+router.get("/ventas", reportesController.getVentas);
 
 /**
  * @swagger
@@ -110,7 +110,7 @@ router.get('/ventas', reportesController.getVentas);
  *       200:
  *         description: Reporte de gastos generado correctamente
  */
-router.get('/gastos', reportesController.getGastos);
+router.get("/gastos", reportesController.getGastos);
 
 /**
  * @swagger
@@ -156,6 +156,6 @@ router.get('/gastos', reportesController.getGastos);
  *               type: string
  *               format: binary
  */
-router.post('/exportar/:formato', reportesController.exportar);
+router.post("/exportar/:formato", reportesController.exportar);
 
 export default router;

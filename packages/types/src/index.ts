@@ -8,7 +8,7 @@ export interface User {
   id: string;
   email: string;
   name: string;
-  role: 'admin' | 'user';
+  role: "admin" | "user";
   createdAt: Date;
   updatedAt: Date;
 }
@@ -17,13 +17,13 @@ export interface CreateUserRequest {
   email: string;
   name: string;
   password: string;
-  role?: 'admin' | 'user';
+  role?: "admin" | "user";
 }
 
 export interface UpdateUserRequest {
   email?: string;
   name?: string;
-  role?: 'admin' | 'user';
+  role?: "admin" | "user";
 }
 
 // Tipos de cliente
@@ -81,7 +81,7 @@ export interface InvoiceItem {
   totalAmount: number;
 }
 
-export type InvoiceStatus = 'draft' | 'sent' | 'paid' | 'overdue' | 'cancelled';
+export type InvoiceStatus = "draft" | "sent" | "paid" | "overdue" | "cancelled";
 
 export interface CreateInvoiceRequest {
   clientId: string;
@@ -133,7 +133,7 @@ export interface TaxCalculationRequest {
   income: number;
   expenses: number;
   taxYear: number;
-  taxpayerType: 'individual' | 'company';
+  taxpayerType: "individual" | "company";
 }
 
 export interface TaxCalculationResponse {
@@ -207,7 +207,7 @@ export interface QueryParams {
   page?: number;
   limit?: number;
   sort?: string;
-  order?: 'asc' | 'desc';
+  order?: "asc" | "desc";
   search?: string;
 }
 
@@ -235,14 +235,14 @@ export interface DomainEvent {
 }
 
 export interface InvoiceCreatedEvent extends DomainEvent {
-  type: 'invoice.created';
+  type: "invoice.created";
   data: {
     invoice: Invoice;
   };
 }
 
 export interface InvoicePaidEvent extends DomainEvent {
-  type: 'invoice.paid';
+  type: "invoice.paid";
   data: {
     invoice: Invoice;
     paymentDate: Date;
@@ -250,7 +250,7 @@ export interface InvoicePaidEvent extends DomainEvent {
 }
 
 export interface ClientCreatedEvent extends DomainEvent {
-  type: 'client.created';
+  type: "client.created";
   data: {
     client: Client;
   };
@@ -259,7 +259,7 @@ export interface ClientCreatedEvent extends DomainEvent {
 // Tipos de notificaciones
 export interface Notification {
   id: string;
-  type: 'info' | 'success' | 'warning' | 'error';
+  type: "info" | "success" | "warning" | "error";
   title: string;
   message: string;
   read: boolean;
@@ -268,7 +268,7 @@ export interface Notification {
 
 // Tipos de reportes
 export interface ReportData {
-  period: 'monthly' | 'quarterly' | 'yearly';
+  period: "monthly" | "quarterly" | "yearly";
   startDate: Date;
   endDate: Date;
   totalInvoices: number;
@@ -280,21 +280,21 @@ export interface ReportData {
 
 // Constantes de tipos
 export const INVOICE_STATUS = {
-  DRAFT: 'draft',
-  SENT: 'sent',
-  PAID: 'paid',
-  OVERDUE: 'overdue',
-  CANCELLED: 'cancelled',
+  DRAFT: "draft",
+  SENT: "sent",
+  PAID: "paid",
+  OVERDUE: "overdue",
+  CANCELLED: "cancelled",
 } as const;
 
 export const USER_ROLES = {
-  ADMIN: 'admin',
-  USER: 'user',
+  ADMIN: "admin",
+  USER: "user",
 } as const;
 
 export const TAXPAYER_TYPES = {
-  INDIVIDUAL: 'individual',
-  COMPANY: 'company',
+  INDIVIDUAL: "individual",
+  COMPANY: "company",
 } as const;
 
 export const VAT_RATES = {
@@ -311,6 +311,9 @@ export type DeepPartial<T> = {
 
 export type Optional<T, K extends keyof T> = Omit<T, K> & Partial<Pick<T, K>>;
 export type Required<T, K extends keyof T> = T & { [P in K]-?: T[P] };
+
+// Exportar tipos OCR
+export * from "./ocr";
 
 // Exportar todo como default también
 export default {

@@ -1,6 +1,6 @@
-'use client';
+"use client";
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from "react";
 
 interface UseVoiceRecognitionOptions {
   onResult?: (transcript: string) => void;
@@ -29,9 +29,9 @@ export function useVoiceRecognition({
   onEnd,
   continuous = false,
   interimResults = true,
-  lang = 'es-ES',
+  lang = "es-ES",
 }: UseVoiceRecognitionOptions = {}): UseVoiceRecognitionReturn {
-  const [transcript, setTranscript] = useState('');
+  const [transcript, setTranscript] = useState("");
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hasSupport, setHasSupport] = useState(false);
@@ -58,16 +58,18 @@ export function useVoiceRecognition({
         onStart?.();
       };
 
-      recognition.onresult = event => {
-        let finalTranscript = '';
-        let interimTranscript = '';
+      recognition.onresult = (event) => {
+        let finalTranscript = "";
+        let interimTranscript = "";
 
         for (let i = event.resultIndex; i < event.results.length; i++) {
           const result = event.results[i];
-          if (result.isFinal) {
-            finalTranscript += result[0].transcript;
-          } else {
-            interimTranscript += result[0].transcript;
+          if (result?.[0]) {
+            if (result.isFinal) {
+              finalTranscript += result[0].transcript;
+            } else {
+              interimTranscript += result[0].transcript;
+            }
           }
         }
 
@@ -79,7 +81,7 @@ export function useVoiceRecognition({
         }
       };
 
-      recognition.onerror = event => {
+      recognition.onerror = (event) => {
         const errorMessage = getErrorMessage(event.error);
         setError(errorMessage);
         setIsListening(false);
@@ -92,7 +94,7 @@ export function useVoiceRecognition({
       };
     } else {
       setHasSupport(false);
-      setError('El reconocimiento de voz no está soportado en este navegador');
+      setError("El reconocimiento de voz no está soportado en este navegador");
     }
 
     return () => {
@@ -107,7 +109,7 @@ export function useVoiceRecognition({
       try {
         recognitionRef.current.start();
       } catch (err) {
-        setError('Error al iniciar el reconocimiento de voz');
+        setError("Error al iniciar el reconocimiento de voz");
       }
     }
   };
@@ -119,7 +121,7 @@ export function useVoiceRecognition({
   };
 
   const resetTranscript = () => {
-    setTranscript('');
+    setTranscript("");
     setError(null);
   };
 
@@ -136,20 +138,20 @@ export function useVoiceRecognition({
 
 function getErrorMessage(error: string): string {
   switch (error) {
-    case 'no-speech':
-      return 'No se detectó habla. Inténtalo de nuevo.';
-    case 'audio-capture':
-      return 'Error al capturar audio. Verifica los permisos del micrófono.';
-    case 'not-allowed':
-      return 'Acceso al micrófono denegado. Permite el acceso e inténtalo de nuevo.';
-    case 'network':
-      return 'Error de red. Verifica tu conexión a internet.';
-    case 'service-not-allowed':
-      return 'Servicio de reconocimiento de voz no disponible.';
-    case 'aborted':
-      return 'Reconocimiento de voz cancelado.';
-    case 'language-not-supported':
-      return 'Idioma no soportado.';
+    case "no-speech":
+      return "No se detectó habla. Inténtalo de nuevo.";
+    case "audio-capture":
+      return "Error al capturar audio. Verifica los permisos del micrófono.";
+    case "not-allowed":
+      return "Acceso al micrófono denegado. Permite el acceso e inténtalo de nuevo.";
+    case "network":
+      return "Error de red. Verifica tu conexión a internet.";
+    case "service-not-allowed":
+      return "Servicio de reconocimiento de voz no disponible.";
+    case "aborted":
+      return "Reconocimiento de voz cancelado.";
+    case "language-not-supported":
+      return "Idioma no soportado.";
     default:
       return `Error desconocido: ${error}`;
   }

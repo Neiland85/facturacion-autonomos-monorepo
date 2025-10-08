@@ -1,5 +1,5 @@
-import { PrismaClient } from '@prisma/client';
-import { Request, Response } from 'express';
+import { PrismaClient } from "@prisma/client";
+import { Request, Response } from "express";
 
 const prisma = new PrismaClient();
 
@@ -11,10 +11,10 @@ export class ReportesController {
 
       if (!trimestre || !año || trimestre < 1 || trimestre > 4) {
         return res.status(400).json({
-          error: 'BAD_REQUEST',
-          message: 'Trimestre y año son requeridos',
+          error: "BAD_REQUEST",
+          message: "Trimestre y año son requeridos",
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
@@ -23,7 +23,7 @@ export class ReportesController {
         [1, 2, 3],
         [4, 5, 6],
         [7, 8, 9],
-        [10, 11, 12]
+        [10, 11, 12],
       ];
 
       const meses = mesesTrimestre[trimestre - 1];
@@ -35,8 +35,8 @@ export class ReportesController {
         where: {
           fecha: {
             gte: fechaInicio,
-            lte: fechaFin
-          }
+            lte: fechaFin,
+          },
         },
         select: {
           tipo: true,
@@ -44,44 +44,55 @@ export class ReportesController {
           baseImponible: true,
           importeIVA: true,
           importeIRPF: true,
-          total: true
-        }
+          total: true,
+        },
       });
 
       // Procesar datos
-      const facturasEmitidas = facturas.filter(f => f.tipo === 'emitida');
-      const facturasRecibidas = facturas.filter(f => f.tipo === 'recibida');
+      const facturasEmitidas = facturas.filter((f) => f.tipo === "emitida");
+      const facturasRecibidas = facturas.filter((f) => f.tipo === "recibida");
 
       const resumen = {
         facturasEmitidas: {
           cantidad: facturasEmitidas.length,
-          baseImponible: facturasEmitidas.reduce((sum, f) => sum + f.baseImponible, 0),
+          baseImponible: facturasEmitidas.reduce(
+            (sum, f) => sum + f.baseImponible,
+            0
+          ),
           iva: facturasEmitidas.reduce((sum, f) => sum + f.importeIVA, 0),
           irpf: facturasEmitidas.reduce((sum, f) => sum + f.importeIRPF, 0),
-          total: facturasEmitidas.reduce((sum, f) => sum + f.total, 0)
+          total: facturasEmitidas.reduce((sum, f) => sum + f.total, 0),
         },
         facturasRecibidas: {
           cantidad: facturasRecibidas.length,
-          baseImponible: facturasRecibidas.reduce((sum, f) => sum + f.baseImponible, 0),
+          baseImponible: facturasRecibidas.reduce(
+            (sum, f) => sum + f.baseImponible,
+            0
+          ),
           iva: facturasRecibidas.reduce((sum, f) => sum + f.importeIVA, 0),
           irpf: facturasRecibidas.reduce((sum, f) => sum + f.importeIRPF, 0),
-          total: facturasRecibidas.reduce((sum, f) => sum + f.total, 0)
-        }
+          total: facturasRecibidas.reduce((sum, f) => sum + f.total, 0),
+        },
       };
 
       // Detalles por mes
-      const detalles = meses.map(mes => {
-        const facturasMes = facturas.filter(f => f.fecha.getMonth() + 1 === mes);
-        const emitidas = facturasMes.filter(f => f.tipo === 'emitida');
-        const recibidas = facturasMes.filter(f => f.tipo === 'recibida');
+      const detalles = meses.map((mes) => {
+        const facturasMes = facturas.filter(
+          (f) => f.fecha.getMonth() + 1 === mes
+        );
+        const emitidas = facturasMes.filter((f) => f.tipo === "emitida");
+        const recibidas = facturasMes.filter((f) => f.tipo === "recibida");
 
         return {
           mes,
           facturasEmitidas: emitidas.length,
           facturasRecibidas: recibidas.length,
-          baseImponible: facturasMes.reduce((sum, f) => sum + f.baseImponible, 0),
+          baseImponible: facturasMes.reduce(
+            (sum, f) => sum + f.baseImponible,
+            0
+          ),
           iva: facturasMes.reduce((sum, f) => sum + f.importeIVA, 0),
-          irpf: facturasMes.reduce((sum, f) => sum + f.importeIRPF, 0)
+          irpf: facturasMes.reduce((sum, f) => sum + f.importeIRPF, 0),
         };
       });
 
@@ -89,15 +100,15 @@ export class ReportesController {
         trimestre,
         año,
         resumen,
-        detalles
+        detalles,
       });
     } catch (error) {
-      console.error('Error al generar reporte trimestral:', error);
+      console.error("Error al generar reporte trimestral:", error);
       res.status(500).json({
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al generar el reporte trimestral',
+        error: "INTERNAL_SERVER_ERROR",
+        message: "Error al generar el reporte trimestral",
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -108,10 +119,10 @@ export class ReportesController {
 
       if (!año) {
         return res.status(400).json({
-          error: 'BAD_REQUEST',
-          message: 'Año es requerido',
+          error: "BAD_REQUEST",
+          message: "Año es requerido",
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
@@ -123,8 +134,8 @@ export class ReportesController {
         where: {
           fecha: {
             gte: fechaInicio,
-            lte: fechaFin
-          }
+            lte: fechaFin,
+          },
         },
         select: {
           tipo: true,
@@ -132,60 +143,65 @@ export class ReportesController {
           baseImponible: true,
           importeIVA: true,
           importeIRPF: true,
-          total: true
-        }
+          total: true,
+        },
       });
 
       // Procesar datos por trimestre
-      const trimestres = [1, 2, 3, 4].map(trimestre => {
+      const trimestres = [1, 2, 3, 4].map((trimestre) => {
         const mesesTrimestre = [
           [1, 2, 3],
           [4, 5, 6],
           [7, 8, 9],
-          [10, 11, 12]
+          [10, 11, 12],
         ];
 
         const meses = mesesTrimestre[trimestre - 1];
-        const facturasTrimestre = facturas.filter(f => 
+        const facturasTrimestre = facturas.filter((f) =>
           meses.includes(f.fecha.getMonth() + 1)
         );
 
-        const emitidas = facturasTrimestre.filter(f => f.tipo === 'emitida');
-        const recibidas = facturasTrimestre.filter(f => f.tipo === 'recibida');
+        const emitidas = facturasTrimestre.filter((f) => f.tipo === "emitida");
+        const recibidas = facturasTrimestre.filter(
+          (f) => f.tipo === "recibida"
+        );
 
         return {
           trimestre,
           facturasEmitidas: emitidas.length,
           facturasRecibidas: recibidas.length,
-          baseImponible: facturasTrimestre.reduce((sum, f) => sum + f.baseImponible, 0),
+          baseImponible: facturasTrimestre.reduce(
+            (sum, f) => sum + f.baseImponible,
+            0
+          ),
           iva: facturasTrimestre.reduce((sum, f) => sum + f.importeIVA, 0),
           irpf: facturasTrimestre.reduce((sum, f) => sum + f.importeIRPF, 0),
-          total: facturasTrimestre.reduce((sum, f) => sum + f.total, 0)
+          total: facturasTrimestre.reduce((sum, f) => sum + f.total, 0),
         };
       });
 
       const resumen = {
         totalFacturas: facturas.length,
-        totalEmitidas: facturas.filter(f => f.tipo === 'emitida').length,
-        totalRecibidas: facturas.filter(f => f.tipo === 'recibida').length,
+        totalEmitidas: facturas.filter((f) => f.tipo === "emitida").length,
+        totalRecibidas: facturas.filter((f) => f.tipo === "recibida").length,
         baseImponible: facturas.reduce((sum, f) => sum + f.baseImponible, 0),
         iva: facturas.reduce((sum, f) => sum + f.importeIVA, 0),
         irpf: facturas.reduce((sum, f) => sum + f.importeIRPF, 0),
-        total: facturas.reduce((sum, f) => sum + f.total, 0)
+        total: facturas.reduce((sum, f) => sum + f.total, 0),
       };
 
       res.json({
         año,
         resumen,
-        trimestres
+        trimestres,
       });
     } catch (error) {
-      console.error('Error al generar reporte anual:', error);
+      console.error("Error al generar reporte anual:", error);
       res.status(500).json({
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al generar el reporte anual',
+        error: "INTERNAL_SERVER_ERROR",
+        message: "Error al generar el reporte anual",
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -197,26 +213,26 @@ export class ReportesController {
 
       if (!fechaDesde || !fechaHasta) {
         return res.status(400).json({
-          error: 'BAD_REQUEST',
-          message: 'Fecha desde y fecha hasta son requeridas',
+          error: "BAD_REQUEST",
+          message: "Fecha desde y fecha hasta son requeridas",
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
       const facturas = await prisma.factura.findMany({
         where: {
-          tipo: 'emitida',
+          tipo: "emitida",
           fecha: {
             gte: new Date(fechaDesde),
-            lte: new Date(fechaHasta)
-          }
+            lte: new Date(fechaHasta),
+          },
         },
         include: {
           cliente: true,
-          lineas: true
+          lineas: true,
         },
-        orderBy: { fecha: 'desc' }
+        orderBy: { fecha: "desc" },
       });
 
       const resumen = {
@@ -224,21 +240,21 @@ export class ReportesController {
         baseImponible: facturas.reduce((sum, f) => sum + f.baseImponible, 0),
         iva: facturas.reduce((sum, f) => sum + f.importeIVA, 0),
         irpf: facturas.reduce((sum, f) => sum + f.importeIRPF, 0),
-        total: facturas.reduce((sum, f) => sum + f.total, 0)
+        total: facturas.reduce((sum, f) => sum + f.total, 0),
       };
 
       res.json({
         periodo: { desde: fechaDesde, hasta: fechaHasta },
         resumen,
-        facturas
+        facturas,
       });
     } catch (error) {
-      console.error('Error al generar reporte de ventas:', error);
+      console.error("Error al generar reporte de ventas:", error);
       res.status(500).json({
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al generar el reporte de ventas',
+        error: "INTERNAL_SERVER_ERROR",
+        message: "Error al generar el reporte de ventas",
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -250,26 +266,26 @@ export class ReportesController {
 
       if (!fechaDesde || !fechaHasta) {
         return res.status(400).json({
-          error: 'BAD_REQUEST',
-          message: 'Fecha desde y fecha hasta son requeridas',
+          error: "BAD_REQUEST",
+          message: "Fecha desde y fecha hasta son requeridas",
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
       const facturas = await prisma.factura.findMany({
         where: {
-          tipo: 'recibida',
+          tipo: "recibida",
           fecha: {
             gte: new Date(fechaDesde),
-            lte: new Date(fechaHasta)
-          }
+            lte: new Date(fechaHasta),
+          },
         },
         include: {
           cliente: true,
-          lineas: true
+          lineas: true,
         },
-        orderBy: { fecha: 'desc' }
+        orderBy: { fecha: "desc" },
       });
 
       const resumen = {
@@ -277,21 +293,21 @@ export class ReportesController {
         baseImponible: facturas.reduce((sum, f) => sum + f.baseImponible, 0),
         iva: facturas.reduce((sum, f) => sum + f.importeIVA, 0),
         irpf: facturas.reduce((sum, f) => sum + f.importeIRPF, 0),
-        total: facturas.reduce((sum, f) => sum + f.total, 0)
+        total: facturas.reduce((sum, f) => sum + f.total, 0),
       };
 
       res.json({
         periodo: { desde: fechaDesde, hasta: fechaHasta },
         resumen,
-        facturas
+        facturas,
       });
     } catch (error) {
-      console.error('Error al generar reporte de gastos:', error);
+      console.error("Error al generar reporte de gastos:", error);
       res.status(500).json({
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al generar el reporte de gastos',
+        error: "INTERNAL_SERVER_ERROR",
+        message: "Error al generar el reporte de gastos",
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -301,47 +317,53 @@ export class ReportesController {
       const { formato } = req.params;
       const { tipo } = req.body;
 
-      if (!['pdf', 'excel', 'csv'].includes(formato)) {
+      if (!["pdf", "excel", "csv"].includes(formato)) {
         return res.status(400).json({
-          error: 'BAD_REQUEST',
-          message: 'Formato no válido. Formatos soportados: pdf, excel, csv',
+          error: "BAD_REQUEST",
+          message: "Formato no válido. Formatos soportados: pdf, excel, csv",
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
       // Implementar exportación según el formato
       res.json({
         tipo,
-        formato: req.body.formato || 'json',
-        mensaje: 'Funcionalidad de exportación en desarrollo'
+        formato: req.body.formato || "json",
+        mensaje: "Funcionalidad de exportación en desarrollo",
       });
       // Por ahora, devolver placeholder
       const nombreArchivo = `reporte-${tipo}-${Date.now()}.${formato}`;
-      
-      res.setHeader('Content-Disposition', `attachment; filename="${nombreArchivo}"`);
-      
+
+      res.setHeader(
+        "Content-Disposition",
+        `attachment; filename="${nombreArchivo}"`
+      );
+
       switch (formato) {
-        case 'pdf':
-          res.setHeader('Content-Type', 'application/pdf');
-          res.send(Buffer.from('PDF placeholder'));
+        case "pdf":
+          res.setHeader("Content-Type", "application/pdf");
+          res.send(Buffer.from("PDF placeholder"));
           break;
-        case 'excel':
-          res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-          res.send(Buffer.from('Excel placeholder'));
+        case "excel":
+          res.setHeader(
+            "Content-Type",
+            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+          );
+          res.send(Buffer.from("Excel placeholder"));
           break;
-        case 'csv':
-          res.setHeader('Content-Type', 'text/csv');
-          res.send('CSV placeholder');
+        case "csv":
+          res.setHeader("Content-Type", "text/csv");
+          res.send("CSV placeholder");
           break;
       }
     } catch (error) {
-      console.error('Error al exportar reporte:', error);
+      console.error("Error al exportar reporte:", error);
       res.status(500).json({
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al exportar el reporte',
+        error: "INTERNAL_SERVER_ERROR",
+        message: "Error al exportar el reporte",
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }

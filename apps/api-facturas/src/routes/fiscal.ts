@@ -1,5 +1,5 @@
-import express from 'express';
-import { FiscalController } from '../controllers/fiscal';
+import express from "express";
+import { FiscalController } from "../controllers/fiscal";
 
 const router = express.Router();
 const fiscalController = new FiscalController();
@@ -27,7 +27,7 @@ const fiscalController = new FiscalController();
  *                 data:
  *                   $ref: '#/components/schemas/ResultadoCalculoFiscal'
  */
-router.post('/calcular', fiscalController.calcular);
+router.post("/calcular", fiscalController.calcular);
 
 /**
  * @swagger
@@ -56,7 +56,7 @@ router.post('/calcular', fiscalController.calcular);
  *                       vigente:
  *                         type: boolean
  */
-router.get('/tipos-iva', fiscalController.getTiposIVA);
+router.get("/tipos-iva", fiscalController.getTiposIVA);
 
 /**
  * @swagger
@@ -90,6 +90,6 @@ router.get('/tipos-iva', fiscalController.getTiposIVA);
  *                 message:
  *                   type: string
  */
-router.post('/validar-nif', fiscalController.validarNIF);
+router.post("/validar-nif", fiscalController.validarNIF);
 
 export default router;

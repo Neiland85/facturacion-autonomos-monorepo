@@ -1,16 +1,25 @@
-import { detectSqlInjection, sanitizeObject, validateInvoiceData } from '../validators/invoice-validator';
+import { Request, Response, NextFunction } from "express";
+import {
+  detectSqlInjection,
+  sanitizeObject,
+  validateInvoiceData,
+} from "../validators/invoice-validator";
 
 /**
  * Middleware para validar datos de factura en Express
  */
-export function validateInvoiceMiddleware(req: Request, res: Response, next: NextFunction): void {
+export function validateInvoiceMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
   try {
     // Verificar que hay datos en el body
     if (!req.body || Object.keys(req.body).length === 0) {
       res.status(400).json({
         success: false,
-        message: 'Datos de factura requeridos',
-        errors: ['El cuerpo de la petición no puede estar vacío']
+        message: "Datos de factura requeridos",
+        errors: ["El cuerpo de la petición no puede estar vacío"],
       });
       return;
     }
@@ -22,8 +31,8 @@ export function validateInvoiceMiddleware(req: Request, res: Response, next: Nex
     if (!validation.success) {
       res.status(400).json({
         success: false,
-        message: 'Datos de factura inválidos',
-        errors: validation.errors
+        message: "Datos de factura inválidos",
+        errors: validation.errors,
       });
       return;
     }
@@ -31,12 +40,11 @@ export function validateInvoiceMiddleware(req: Request, res: Response, next: Nex
     // Asignar datos validados al request
     (req as any).validatedData = validation.data;
     next();
-
   } catch (error) {
-    console.error('Error en validación de factura:', error);
+    console.error("Error en validación de factura:", error);
     res.status(500).json({
       success: false,
-      message: 'Error interno de validación'
+      message: "Error interno de validación",
     });
   }
 }
@@ -44,7 +52,11 @@ export function validateInvoiceMiddleware(req: Request, res: Response, next: Nex
 /**
  * Middleware para sanitización básica de entrada
  */
-export function basicSanitizationMiddleware(req: Request, res: Response, next: NextFunction): void {
+export function basicSanitizationMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
   try {
     // Sanitizar body si existe
     if (req.body) {
@@ -55,16 +67,19 @@ export function basicSanitizationMiddleware(req: Request, res: Response, next: N
     if (req.query) {
       const sanitizedQuery: any = {};
       Object.entries(req.query).forEach(([key, value]) => {
-        if (typeof value === 'string') {
+        if (typeof value === "string") {
           // Verificar inyección SQL
           if (detectSqlInjection(value)) {
             res.status(400).json({
               success: false,
-              message: 'Datos de entrada inválidos'
+              message: "Datos de entrada inválidos",
             });
             return;
           }
-          sanitizedQuery[key] = value.replace(/[<>"'&]/g, '').trim().slice(0, 1000);
+          sanitizedQuery[key] = value
+            .replace(/[<>"'&]/g, "")
+            .trim()
+            .slice(0, 1000);
         } else {
           sanitizedQuery[key] = value;
         }
@@ -74,10 +89,10 @@ export function basicSanitizationMiddleware(req: Request, res: Response, next: N
 
     next();
   } catch (error) {
-    console.error('Error en sanitización:', error);
+    console.error("Error en sanitización:", error);
     res.status(500).json({
       success: false,
-      message: 'Error de procesamiento'
+      message: "Error de procesamiento",
     });
   }
 }
@@ -85,7 +100,11 @@ export function basicSanitizationMiddleware(req: Request, res: Response, next: N
 /**
  * Middleware para validar límites de datos
  */
-export function dataLimitsMiddleware(req: Request, res: Response, next: NextFunction): void {
+export function dataLimitsMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
   const MAX_BODY_SIZE = 1024 * 1024; // 1MB
   const MAX_QUERY_PARAMS = 50;
 
@@ -94,7 +113,7 @@ export function dataLimitsMiddleware(req: Request, res: Response, next: NextFunc
   if (bodySize > MAX_BODY_SIZE) {
     res.status(413).json({
       success: false,
-      message: `Datos demasiado grandes. Máximo ${MAX_BODY_SIZE} bytes`
+      message: `Datos demasiado grandes. Máximo ${MAX_BODY_SIZE} bytes`,
     });
     return;
   }
@@ -104,7 +123,7 @@ export function dataLimitsMiddleware(req: Request, res: Response, next: NextFunc
   if (queryCount > MAX_QUERY_PARAMS) {
     res.status(400).json({
       success: false,
-      message: `Demasiados parámetros. Máximo ${MAX_QUERY_PARAMS}`
+      message: `Demasiados parámetros. Máximo ${MAX_QUERY_PARAMS}`,
     });
     return;
   }
@@ -115,18 +134,24 @@ export function dataLimitsMiddleware(req: Request, res: Response, next: NextFunc
 /**
  * Middleware para logging de seguridad
  */
-export function securityLoggingMiddleware(req: Request, res: Response, next: NextFunction): void {
+export function securityLoggingMiddleware(
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void {
   // Log de peticiones sospechosas
-  const userAgent = req.get('User-Agent') || '';
-  const suspiciousAgents = ['curl', 'wget', 'python', 'bot', 'crawler'];
-  
-  if (suspiciousAgents.some(agent => userAgent.toLowerCase().includes(agent))) {
-    console.warn('Petición sospechosa detectada:', {
+  const userAgent = req.get("User-Agent") || "";
+  const suspiciousAgents = ["curl", "wget", "python", "bot", "crawler"];
+
+  if (
+    suspiciousAgents.some((agent) => userAgent.toLowerCase().includes(agent))
+  ) {
+    console.warn("Petición sospechosa detectada:", {
       ip: req.ip,
       userAgent,
       url: req.url,
       method: req.method,
-      timestamp: new Date().toISOString()
+      timestamp: new Date().toISOString(),
     });
   }
 
@@ -139,7 +164,7 @@ export function securityLoggingMiddleware(req: Request, res: Response, next: Nex
 export const completeValidationMiddleware = [
   dataLimitsMiddleware,
   basicSanitizationMiddleware,
-  securityLoggingMiddleware
+  securityLoggingMiddleware,
 ];
 
 /**
@@ -147,5 +172,5 @@ export const completeValidationMiddleware = [
  */
 export const invoiceValidationMiddleware = [
   ...completeValidationMiddleware,
-  validateInvoiceMiddleware
+  validateInvoiceMiddleware,
 ];

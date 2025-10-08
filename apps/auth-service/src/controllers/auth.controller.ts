@@ -1,12 +1,12 @@
-import bcrypt from 'bcryptjs';
-import { Request, Response } from 'express';
-import jwt from 'jsonwebtoken';
-import { AuthService } from '../services/auth.service';
-import { JWTService } from '../services/jwt.service';
-import { TwoFactorService } from '../services/two-factor.service';
+import bcrypt from "bcryptjs";
+import { Request, Response } from "express";
+import jwt from "jsonwebtoken";
+import { AuthService } from "../services/auth.service";
+import { JWTService } from "../services/jwt.service";
+import { TwoFactorService } from "../services/two-factor.service";
 
 // Extender tipos de Express para incluir session y user
-declare module 'express-session' {
+declare module "express-session" {
   interface SessionData {
     userId?: string;
     isAuthenticated?: boolean;
@@ -52,8 +52,8 @@ export class AuthController {
       if (existingUser) {
         res.status(400).json({
           success: false,
-          error: 'El usuario ya existe',
-          code: 'USER_EXISTS',
+          error: "El usuario ya existe",
+          code: "USER_EXISTS",
         });
         return;
       }
@@ -70,13 +70,13 @@ export class AuthController {
       req.session.isAuthenticated = true;
 
       // Generar JWT y almacenar en cookie httpOnly
-      const accessToken = this.jwtService.generateAccessToken({
+      const accessToken = await this.jwtService.generateAccessToken({
         userId: user.id,
         email: user.email,
         role: user.role,
       });
 
-      const refreshToken = this.jwtService.generateRefreshToken(user.id);
+      const refreshToken = await this.jwtService.generateRefreshToken(user.id);
 
       // Almacenar refresh token en Redis
       await this.jwtService.storeRefreshToken(user.id, refreshToken);
@@ -86,7 +86,7 @@ export class AuthController {
 
       res.status(201).json({
         success: true,
-        message: 'Usuario registrado exitosamente',
+        message: "Usuario registrado exitosamente",
         user: {
           id: user.id,
           email: user.email,
@@ -96,11 +96,11 @@ export class AuthController {
         },
       });
     } catch (error) {
-      console.error('Error en registro:', error);
+      console.error("Error en registro:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
-        code: 'INTERNAL_ERROR',
+        error: "Error interno del servidor",
+        code: "INTERNAL_ERROR",
       });
     }
   };
@@ -124,8 +124,8 @@ export class AuthController {
         res.status(429).json({
           success: false,
           error:
-            'Demasiados intentos de login. Intenta de nuevo en 15 minutos.',
-          code: 'TOO_MANY_ATTEMPTS',
+            "Demasiados intentos de login. Intenta de nuevo en 15 minutos.",
+          code: "TOO_MANY_ATTEMPTS",
           retryAfter: Math.ceil((15 * 60 * 1000 - (now - lastAttempt)) / 1000),
         });
         return;
@@ -137,8 +137,8 @@ export class AuthController {
         this.handleFailedLogin(req);
         res.status(401).json({
           success: false,
-          error: 'Credenciales inválidas',
-          code: 'INVALID_CREDENTIALS',
+          error: "Credenciales inválidas",
+          code: "INVALID_CREDENTIALS",
         });
         return;
       }
@@ -149,8 +149,8 @@ export class AuthController {
         this.handleFailedLogin(req);
         res.status(401).json({
           success: false,
-          error: 'Credenciales inválidas',
-          code: 'INVALID_CREDENTIALS',
+          error: "Credenciales inválidas",
+          code: "INVALID_CREDENTIALS",
         });
         return;
       }
@@ -161,7 +161,7 @@ export class AuthController {
         req.session.twoFactorPending = true;
         res.json({
           success: true,
-          message: 'Se requiere verificación de dos factores',
+          message: "Se requiere verificación de dos factores",
           requiresTwoFactor: true,
         });
         return;
@@ -187,7 +187,7 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: 'Login exitoso',
+        message: "Login exitoso",
         user: {
           id: user.id,
           email: user.email,
@@ -198,11 +198,11 @@ export class AuthController {
         requiresTwoFactor: false,
       });
     } catch (error) {
-      console.error('Error en login:', error);
+      console.error("Error en login:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
-        code: 'INTERNAL_ERROR',
+        error: "Error interno del servidor",
+        code: "INTERNAL_ERROR",
       });
     }
   };
@@ -223,14 +223,14 @@ export class AuthController {
           ) as { userId: string };
           await this.jwtService.revokeRefreshToken(decoded.userId);
         } catch (error) {
-          console.error('Error invalidating refresh token:', error);
+          console.error("Error invalidating refresh token:", error);
         }
       }
 
       // Destruir sesión
-      req.session.destroy(err => {
+      req.session.destroy((err) => {
         if (err) {
-          console.error('Error destroying session:', err);
+          console.error("Error destroying session:", err);
         }
       });
 
@@ -239,13 +239,13 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: 'Logout exitoso',
+        message: "Logout exitoso",
       });
     } catch (error) {
-      console.error('Error en logout:', error);
+      console.error("Error en logout:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
       });
     }
   };
@@ -260,8 +260,8 @@ export class AuthController {
       if (!refreshToken) {
         res.status(401).json({
           success: false,
-          error: 'Refresh token requerido',
-          code: 'MISSING_REFRESH_TOKEN',
+          error: "Refresh token requerido",
+          code: "MISSING_REFRESH_TOKEN",
         });
         return;
       }
@@ -278,8 +278,8 @@ export class AuthController {
         if (!isValidRefreshToken) {
           res.status(401).json({
             success: false,
-            error: 'Refresh token inválido',
-            code: 'INVALID_REFRESH_TOKEN',
+            error: "Refresh token inválido",
+            code: "INVALID_REFRESH_TOKEN",
           });
           return;
         }
@@ -289,8 +289,8 @@ export class AuthController {
         if (!user) {
           res.status(401).json({
             success: false,
-            error: 'Usuario no encontrado',
-            code: 'USER_NOT_FOUND',
+            error: "Usuario no encontrado",
+            code: "USER_NOT_FOUND",
           });
           return;
         }
@@ -300,30 +300,30 @@ export class AuthController {
           await this.jwtService.refreshAccessToken(refreshToken);
 
         // Actualizar cookie
-        res.cookie('accessToken', accessToken, {
+        res.cookie("accessToken", accessToken, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: 'strict',
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "strict",
           maxAge: 15 * 60 * 1000, // 15 minutos
           domain: process.env.COOKIE_DOMAIN,
         });
 
         res.json({
           success: true,
-          message: 'Token renovado exitosamente',
+          message: "Token renovado exitosamente",
         });
       } catch (error) {
         res.status(401).json({
           success: false,
-          error: 'Refresh token inválido',
-          code: 'INVALID_REFRESH_TOKEN',
+          error: "Refresh token inválido",
+          code: "INVALID_REFRESH_TOKEN",
         });
       }
     } catch (error) {
-      console.error('Error en refresh:', error);
+      console.error("Error en refresh:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
       });
     }
   };
@@ -337,7 +337,7 @@ export class AuthController {
       if (!user) {
         res.status(401).json({
           success: false,
-          error: 'Usuario no autenticado',
+          error: "Usuario no autenticado",
         });
         return;
       }
@@ -352,10 +352,10 @@ export class AuthController {
         },
       });
     } catch (error) {
-      console.error('Error en me:', error);
+      console.error("Error en me:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
       });
     }
   };
@@ -367,13 +367,13 @@ export class AuthController {
     try {
       const userId = req.user?.id;
       if (!userId) {
-        res.status(401).json({ success: false, error: 'No autenticado' });
+        res.status(401).json({ success: false, error: "No autenticado" });
         return;
       }
 
       const user = req.user;
       if (!user) {
-        res.status(401).json({ success: false, error: 'No autenticado' });
+        res.status(401).json({ success: false, error: "No autenticado" });
         return;
       }
 
@@ -390,10 +390,10 @@ export class AuthController {
         backupCodes: secret.backupCodes,
       });
     } catch (error) {
-      console.error('Error en setup2FA:', error);
+      console.error("Error en setup2FA:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
       });
     }
   };
@@ -407,7 +407,7 @@ export class AuthController {
       const userId = req.user?.id;
 
       if (!userId) {
-        res.status(401).json({ success: false, error: 'No autenticado' });
+        res.status(401).json({ success: false, error: "No autenticado" });
         return;
       }
 
@@ -415,8 +415,8 @@ export class AuthController {
       if (!isValid) {
         res.status(400).json({
           success: false,
-          error: 'Código 2FA inválido',
-          code: 'INVALID_2FA_TOKEN',
+          error: "Código 2FA inválido",
+          code: "INVALID_2FA_TOKEN",
         });
         return;
       }
@@ -426,13 +426,13 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: 'Autenticación de dos factores habilitada exitosamente',
+        message: "Autenticación de dos factores habilitada exitosamente",
       });
     } catch (error) {
-      console.error('Error en verify2FA:', error);
+      console.error("Error en verify2FA:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
       });
     }
   };
@@ -444,7 +444,7 @@ export class AuthController {
     try {
       const userId = req.user?.id;
       if (!userId) {
-        res.status(401).json({ success: false, error: 'No autenticado' });
+        res.status(401).json({ success: false, error: "No autenticado" });
         return;
       }
 
@@ -452,13 +452,13 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: 'Autenticación de dos factores deshabilitada',
+        message: "Autenticación de dos factores deshabilitada",
       });
     } catch (error) {
-      console.error('Error en disable2FA:', error);
+      console.error("Error en disable2FA:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
       });
     }
   };
@@ -472,7 +472,7 @@ export class AuthController {
       const userId = req.user?.id;
 
       if (!userId) {
-        res.status(401).json({ success: false, error: 'No autenticado' });
+        res.status(401).json({ success: false, error: "No autenticado" });
         return;
       }
 
@@ -480,7 +480,7 @@ export class AuthController {
       if (!user) {
         res
           .status(404)
-          .json({ success: false, error: 'Usuario no encontrado' });
+          .json({ success: false, error: "Usuario no encontrado" });
         return;
       }
 
@@ -492,8 +492,8 @@ export class AuthController {
       if (!isValidPassword) {
         res.status(400).json({
           success: false,
-          error: 'Contraseña actual incorrecta',
-          code: 'INVALID_CURRENT_PASSWORD',
+          error: "Contraseña actual incorrecta",
+          code: "INVALID_CURRENT_PASSWORD",
         });
         return;
       }
@@ -502,10 +502,10 @@ export class AuthController {
       await this.authService.changePassword(userId, newPassword);
 
       // Regenerar sesión por seguridad
-      req.session.regenerate(err => {
+      req.session.regenerate((err) => {
         if (err) {
           console.error(
-            'Error regenerating session after password change:',
+            "Error regenerating session after password change:",
             err
           );
         }
@@ -513,13 +513,13 @@ export class AuthController {
 
       res.json({
         success: true,
-        message: 'Contraseña cambiada exitosamente',
+        message: "Contraseña cambiada exitosamente",
       });
     } catch (error) {
-      console.error('Error en changePassword:', error);
+      console.error("Error en changePassword:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
       });
     }
   };
@@ -535,19 +535,19 @@ export class AuthController {
   ): void {
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict' as const,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict" as const,
       domain: process.env.COOKIE_DOMAIN,
     };
 
     // Access token (15 minutos)
-    res.cookie('accessToken', accessToken, {
+    res.cookie("accessToken", accessToken, {
       ...cookieOptions,
       maxAge: 15 * 60 * 1000,
     });
 
     // Refresh token (7 días o 30 días si remember=true)
-    res.cookie('refreshToken', refreshToken, {
+    res.cookie("refreshToken", refreshToken, {
       ...cookieOptions,
       maxAge: remember ? 30 * 24 * 60 * 60 * 1000 : 7 * 24 * 60 * 60 * 1000,
     });
@@ -559,13 +559,13 @@ export class AuthController {
   private clearSecureCookies(res: Response): void {
     const cookieOptions = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === 'production',
-      sameSite: 'strict' as const,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict" as const,
       domain: process.env.COOKIE_DOMAIN,
     };
 
-    res.clearCookie('accessToken', cookieOptions);
-    res.clearCookie('refreshToken', cookieOptions);
+    res.clearCookie("accessToken", cookieOptions);
+    res.clearCookie("refreshToken", cookieOptions);
   }
 
   /**

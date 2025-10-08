@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client';
-import { Request, Response } from 'express';
-import { v4 as uuidv4 } from 'uuid';
-import { validarNIF } from '../utils/fiscal';
+import { PrismaClient } from "@prisma/client";
+import { Request, Response } from "express";
+import { v4 as uuidv4 } from "uuid";
+import { validarNIF } from "../utils/fiscal";
 
 const prisma = new PrismaClient();
 
@@ -16,12 +16,12 @@ export class ClienteController {
 
       // Construir filtros
       const where: any = {};
-      
+
       if (buscar) {
         where.OR = [
-          { nombre: { contains: buscar, mode: 'insensitive' } },
-          { nif: { contains: buscar, mode: 'insensitive' } },
-          { email: { contains: buscar, mode: 'insensitive' } }
+          { nombre: { contains: buscar, mode: "insensitive" } },
+          { nif: { contains: buscar, mode: "insensitive" } },
+          { email: { contains: buscar, mode: "insensitive" } },
         ];
       }
 
@@ -31,9 +31,9 @@ export class ClienteController {
           where,
           skip,
           take: limit,
-          orderBy: { nombre: 'asc' }
+          orderBy: { nombre: "asc" },
         }),
-        prisma.cliente.count({ where })
+        prisma.cliente.count({ where }),
       ]);
 
       const totalPages = Math.ceil(total / limit);
@@ -46,16 +46,16 @@ export class ClienteController {
           totalItems: total,
           itemsPerPage: limit,
           hasNextPage: page < totalPages,
-          hasPreviousPage: page > 1
-        }
+          hasPreviousPage: page > 1,
+        },
       });
     } catch (error) {
-      console.error('Error al obtener clientes:', error);
+      console.error("Error al obtener clientes:", error);
       res.status(500).json({
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al obtener los clientes',
+        error: "INTERNAL_SERVER_ERROR",
+        message: "Error al obtener los clientes",
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -73,31 +73,31 @@ export class ClienteController {
               numero: true,
               fecha: true,
               estado: true,
-              total: true
+              total: true,
             },
-            orderBy: { fecha: 'desc' },
-            take: 10
-          }
-        }
+            orderBy: { fecha: "desc" },
+            take: 10,
+          },
+        },
       });
 
       if (!cliente) {
         return res.status(404).json({
-          error: 'NOT_FOUND',
-          message: 'Cliente no encontrado',
+          error: "NOT_FOUND",
+          message: "Cliente no encontrado",
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
       res.json({ data: cliente });
     } catch (error) {
-      console.error('Error al obtener cliente:', error);
+      console.error("Error al obtener cliente:", error);
       res.status(500).json({
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al obtener el cliente',
+        error: "INTERNAL_SERVER_ERROR",
+        message: "Error al obtener el cliente",
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -113,35 +113,37 @@ export class ClienteController {
         codigoPostal,
         ciudad,
         provincia,
-        pais = 'España'
+        pais = "España",
       } = req.body;
 
       // Validar NIF
       if (!validarNIF(nif)) {
         return res.status(422).json({
-          error: 'VALIDATION_ERROR',
-          message: 'Los datos enviados no son válidos',
-          details: [{
-            field: 'nif',
-            message: 'El NIF/CIF no tiene un formato válido',
-            code: 'INVALID_NIF'
-          }],
+          error: "VALIDATION_ERROR",
+          message: "Los datos enviados no son válidos",
+          details: [
+            {
+              field: "nif",
+              message: "El NIF/CIF no tiene un formato válido",
+              code: "INVALID_NIF",
+            },
+          ],
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
       // Verificar que el NIF no existe
       const clienteExistente = await prisma.cliente.findFirst({
-        where: { nif }
+        where: { nif },
       });
 
       if (clienteExistente) {
         return res.status(409).json({
-          error: 'CONFLICT',
-          message: 'Ya existe un cliente con ese NIF',
+          error: "CONFLICT",
+          message: "Ya existe un cliente con ese NIF",
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
@@ -158,21 +160,21 @@ export class ClienteController {
           ciudad,
           provincia,
           pais,
-          activo: true
-        }
+          activo: true,
+        },
       });
 
       res.status(201).json({
         data: cliente,
-        message: 'Cliente creado correctamente'
+        message: "Cliente creado correctamente",
       });
     } catch (error) {
-      console.error('Error al crear cliente:', error);
+      console.error("Error al crear cliente:", error);
       res.status(500).json({
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al crear el cliente',
+        error: "INTERNAL_SERVER_ERROR",
+        message: "Error al crear el cliente",
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -184,15 +186,15 @@ export class ClienteController {
 
       // Verificar que el cliente existe
       const clienteExistente = await prisma.cliente.findUnique({
-        where: { id }
+        where: { id },
       });
 
       if (!clienteExistente) {
         return res.status(404).json({
-          error: 'NOT_FOUND',
-          message: 'Cliente no encontrado',
+          error: "NOT_FOUND",
+          message: "Cliente no encontrado",
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
@@ -200,32 +202,34 @@ export class ClienteController {
       if (updateData.nif && updateData.nif !== clienteExistente.nif) {
         if (!validarNIF(updateData.nif)) {
           return res.status(422).json({
-            error: 'VALIDATION_ERROR',
-            message: 'Los datos enviados no son válidos',
-            details: [{
-              field: 'nif',
-              message: 'El NIF/CIF no tiene un formato válido',
-              code: 'INVALID_NIF'
-            }],
+            error: "VALIDATION_ERROR",
+            message: "Los datos enviados no son válidos",
+            details: [
+              {
+                field: "nif",
+                message: "El NIF/CIF no tiene un formato válido",
+                code: "INVALID_NIF",
+              },
+            ],
             timestamp: new Date().toISOString(),
-            path: req.path
+            path: req.path,
           });
         }
 
         // Verificar que el NIF no existe
         const clienteConNIF = await prisma.cliente.findFirst({
-          where: { 
+          where: {
             nif: updateData.nif,
-            id: { not: id }
-          }
+            id: { not: id },
+          },
         });
 
         if (clienteConNIF) {
           return res.status(409).json({
-            error: 'CONFLICT',
-            message: 'Ya existe un cliente con ese NIF',
+            error: "CONFLICT",
+            message: "Ya existe un cliente con ese NIF",
             timestamp: new Date().toISOString(),
-            path: req.path
+            path: req.path,
           });
         }
       }
@@ -235,21 +239,21 @@ export class ClienteController {
         where: { id },
         data: {
           ...updateData,
-          updatedAt: new Date()
-        }
+          updatedAt: new Date(),
+        },
       });
 
       res.json({
         data: cliente,
-        message: 'Cliente actualizado correctamente'
+        message: "Cliente actualizado correctamente",
       });
     } catch (error) {
-      console.error('Error al actualizar cliente:', error);
+      console.error("Error al actualizar cliente:", error);
       res.status(500).json({
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al actualizar el cliente',
+        error: "INTERNAL_SERVER_ERROR",
+        message: "Error al actualizar el cliente",
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }
@@ -262,42 +266,42 @@ export class ClienteController {
       const cliente = await prisma.cliente.findUnique({
         where: { id },
         include: {
-          facturas: true
-        }
+          facturas: true,
+        },
       });
 
       if (!cliente) {
         return res.status(404).json({
-          error: 'NOT_FOUND',
-          message: 'Cliente no encontrado',
+          error: "NOT_FOUND",
+          message: "Cliente no encontrado",
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
       // Verificar que no tiene facturas
       if (cliente.facturas.length > 0) {
         return res.status(409).json({
-          error: 'CONFLICT',
-          message: 'No se puede eliminar un cliente con facturas asociadas',
+          error: "CONFLICT",
+          message: "No se puede eliminar un cliente con facturas asociadas",
           timestamp: new Date().toISOString(),
-          path: req.path
+          path: req.path,
         });
       }
 
       // Eliminar cliente
       await prisma.cliente.delete({
-        where: { id }
+        where: { id },
       });
 
       res.status(204).send();
     } catch (error) {
-      console.error('Error al eliminar cliente:', error);
+      console.error("Error al eliminar cliente:", error);
       res.status(500).json({
-        error: 'INTERNAL_SERVER_ERROR',
-        message: 'Error al eliminar el cliente',
+        error: "INTERNAL_SERVER_ERROR",
+        message: "Error al eliminar el cliente",
         timestamp: new Date().toISOString(),
-        path: req.path
+        path: req.path,
       });
     }
   }

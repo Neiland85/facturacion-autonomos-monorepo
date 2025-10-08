@@ -1,5 +1,6 @@
-import DOMPurify from 'isomorphic-dompurify';
-import { z, ZodError, ZodSchema } from 'zod';
+import DOMPurify from "isomorphic-dompurify";
+import { Request, Response, NextFunction } from "express";
+import { z, ZodError, ZodSchema } from "zod";
 
 /**
  * Interfaz para opciones de validación
@@ -29,7 +30,7 @@ interface ValidationError {
     message: string;
     received?: any;
   }>;
-  code: 'VALIDATION_ERROR';
+  code: "VALIDATION_ERROR";
 }
 
 /**
@@ -44,14 +45,14 @@ export const validateRequest = <T>(
       const {
         sanitizeHtml = true,
         stripUnknown = true,
-        allowPartial = false
+        allowPartial = false,
       } = options;
 
       // Construir objeto de datos a validar
       const dataToValidate = {
         body: req.body || {},
         query: req.query || {},
-        params: req.params || {}
+        params: req.params || {},
       };
 
       // Sanitización HTML si está habilitada
@@ -65,12 +66,12 @@ export const validateRequest = <T>(
 
       if (!validationResult.success) {
         const formattedErrors = formatZodErrors(validationResult.error);
-        
+
         res.status(400).json({
           success: false,
-          message: 'Datos de entrada inválidos',
+          message: "Datos de entrada inválidos",
           errors: formattedErrors,
-          code: 'VALIDATION_ERROR'
+          code: "VALIDATION_ERROR",
         } as ValidationError);
         return;
       }
@@ -81,11 +82,11 @@ export const validateRequest = <T>(
 
       next();
     } catch (error) {
-      console.error('Error en validación:', error);
+      console.error("Error en validación:", error);
       res.status(500).json({
         success: false,
-        message: 'Error interno de validación',
-        code: 'INTERNAL_VALIDATION_ERROR'
+        message: "Error interno de validación",
+        code: "INTERNAL_VALIDATION_ERROR",
       });
     }
   };
@@ -129,10 +130,9 @@ function formatZodErrors(error: ZodError): Array<{
   message: string;
   received?: any;
 }> {
-  return error.errors.map(err => ({
-    field: err.path.join('.'),
+  return error.errors.map((err) => ({
+    field: err.path.join("."),
     message: err.message,
-    received: err.received
   }));
 }
 
@@ -140,10 +140,10 @@ function formatZodErrors(error: ZodError): Array<{
  * Sanitización profunda de HTML en objetos
  */
 function deepSanitizeHtml(obj: any): any {
-  if (typeof obj === 'string') {
-    return DOMPurify.sanitize(obj, { 
+  if (typeof obj === "string") {
+    return DOMPurify.sanitize(obj, {
       ALLOWED_TAGS: [], // No permitir ningún tag HTML
-      ALLOWED_ATTR: []  // No permitir ningún atributo
+      ALLOWED_ATTR: [], // No permitir ningún atributo
     });
   }
 
@@ -151,7 +151,7 @@ function deepSanitizeHtml(obj: any): any {
     return obj.map(deepSanitizeHtml);
   }
 
-  if (obj !== null && typeof obj === 'object') {
+  if (obj !== null && typeof obj === "object") {
     const sanitized: any = {};
     for (const [key, value] of Object.entries(obj)) {
       sanitized[key] = deepSanitizeHtml(value);
@@ -165,7 +165,11 @@ function deepSanitizeHtml(obj: any): any {
 /**
  * Middleware para sanitizar específicamente campos de entrada peligrosos
  */
-export const sanitizeInput = (req: Request, res: Response, next: NextFunction): void => {
+export const sanitizeInput = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   try {
     // Sanitizar body
     if (req.body) {
@@ -178,22 +182,25 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction): 
     }
 
     // Sanitizar headers específicos (si es necesario)
-    const dangerousHeaders = ['x-forwarded-for', 'user-agent', 'referer'];
-    dangerousHeaders.forEach(header => {
-      if (req.headers[header] && typeof req.headers[header] === 'string') {
-        req.headers[header] = DOMPurify.sanitize(req.headers[header] as string, {
-          ALLOWED_TAGS: [],
-          ALLOWED_ATTR: []
-        });
+    const dangerousHeaders = ["x-forwarded-for", "user-agent", "referer"];
+    dangerousHeaders.forEach((header) => {
+      if (req.headers[header] && typeof req.headers[header] === "string") {
+        req.headers[header] = DOMPurify.sanitize(
+          req.headers[header] as string,
+          {
+            ALLOWED_TAGS: [],
+            ALLOWED_ATTR: [],
+          }
+        );
       }
     });
 
     next();
   } catch (error) {
-    console.error('Error en sanitización:', error);
+    console.error("Error en sanitización:", error);
     res.status(500).json({
       success: false,
-      message: 'Error de procesamiento de datos'
+      message: "Error de procesamiento de datos",
     });
   }
 };
@@ -202,11 +209,11 @@ export const sanitizeInput = (req: Request, res: Response, next: NextFunction): 
  * Sanitizar objeto recursivamente
  */
 function sanitizeObject(obj: any): any {
-  if (typeof obj === 'string') {
+  if (typeof obj === "string") {
     return DOMPurify.sanitize(obj.trim(), {
       ALLOWED_TAGS: [],
       ALLOWED_ATTR: [],
-      KEEP_CONTENT: true
+      KEEP_CONTENT: true,
     });
   }
 
@@ -214,13 +221,13 @@ function sanitizeObject(obj: any): any {
     return obj.map(sanitizeObject);
   }
 
-  if (obj !== null && typeof obj === 'object') {
+  if (obj !== null && typeof obj === "object") {
     const sanitized: any = {};
     for (const [key, value] of Object.entries(obj)) {
       // Sanitizar también las claves del objeto
       const sanitizedKey = DOMPurify.sanitize(key, {
         ALLOWED_TAGS: [],
-        ALLOWED_ATTR: []
+        ALLOWED_ATTR: [],
       });
       sanitized[sanitizedKey] = sanitizeObject(value);
     }
@@ -242,7 +249,7 @@ export const validateDataLimits = (options: {
     const {
       maxBodySize = 1024 * 1024, // 1MB por defecto
       maxQueryParams = 50,
-      maxHeaderSize = 8192 // 8KB por defecto
+      maxHeaderSize = 8192, // 8KB por defecto
     } = options;
 
     // Validar tamaño del body
@@ -251,7 +258,7 @@ export const validateDataLimits = (options: {
       res.status(413).json({
         success: false,
         message: `Payload demasiado grande. Máximo: ${maxBodySize} bytes`,
-        code: 'PAYLOAD_TOO_LARGE'
+        code: "PAYLOAD_TOO_LARGE",
       });
       return;
     }
@@ -262,7 +269,7 @@ export const validateDataLimits = (options: {
       res.status(400).json({
         success: false,
         message: `Demasiados parámetros de consulta. Máximo: ${maxQueryParams}`,
-        code: 'TOO_MANY_QUERY_PARAMS'
+        code: "TOO_MANY_QUERY_PARAMS",
       });
       return;
     }
@@ -272,8 +279,8 @@ export const validateDataLimits = (options: {
     if (headerSize > maxHeaderSize) {
       res.status(431).json({
         success: false,
-        message: 'Headers demasiado grandes',
-        code: 'HEADERS_TOO_LARGE'
+        message: "Headers demasiado grandes",
+        code: "HEADERS_TOO_LARGE",
       });
       return;
     }
@@ -285,7 +292,11 @@ export const validateDataLimits = (options: {
 /**
  * Middleware para prevenir inyección SQL en parámetros
  */
-export const preventSqlInjection = (req: Request, res: Response, next: NextFunction): void => {
+export const preventSqlInjection = (
+  req: Request,
+  res: Response,
+  next: NextFunction
+): void => {
   const sqlInjectionPatterns = [
     /(\%27)|(\')|(\-\-)|(\%23)|(#)/i,
     /((\%3D)|(=))[^\n]*((\%27)|(\')|(\-\-)|(\%23)|(#))/i,
@@ -299,22 +310,22 @@ export const preventSqlInjection = (req: Request, res: Response, next: NextFunct
     /UPDATE[^a-zA-Z]/i,
     /DROP[^a-zA-Z]/i,
     /CREATE[^a-zA-Z]/i,
-    /ALTER[^a-zA-Z]/i
+    /ALTER[^a-zA-Z]/i,
   ];
 
-  const checkForSqlInjection = (obj: any, path = ''): boolean => {
-    if (typeof obj === 'string') {
-      return sqlInjectionPatterns.some(pattern => pattern.test(obj));
+  const checkForSqlInjection = (obj: any, path = ""): boolean => {
+    if (typeof obj === "string") {
+      return sqlInjectionPatterns.some((pattern) => pattern.test(obj));
     }
 
     if (Array.isArray(obj)) {
-      return obj.some((item, index) => 
+      return obj.some((item, index) =>
         checkForSqlInjection(item, `${path}[${index}]`)
       );
     }
 
-    if (obj !== null && typeof obj === 'object') {
-      return Object.entries(obj).some(([key, value]) => 
+    if (obj !== null && typeof obj === "object") {
+      return Object.entries(obj).some(([key, value]) =>
         checkForSqlInjection(value, path ? `${path}.${key}` : key)
       );
     }
@@ -326,22 +337,22 @@ export const preventSqlInjection = (req: Request, res: Response, next: NextFunct
   const dataToCheck = {
     ...req.body,
     ...req.query,
-    ...req.params
+    ...req.params,
   };
 
   if (checkForSqlInjection(dataToCheck)) {
-    console.warn('Intento de inyección SQL detectado:', {
+    console.warn("Intento de inyección SQL detectado:", {
       ip: req.ip,
-      userAgent: req.get('User-Agent'),
+      userAgent: req.get("User-Agent"),
       url: req.url,
       method: req.method,
-      suspiciousData: dataToCheck
+      suspiciousData: dataToCheck,
     });
 
     res.status(400).json({
       success: false,
-      message: 'Datos de entrada inválidos',
-      code: 'INVALID_INPUT'
+      message: "Datos de entrada inválidos",
+      code: "INVALID_INPUT",
     });
     return;
   }

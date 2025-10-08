@@ -1,5 +1,5 @@
-import { Request, Response } from 'express';
-import { prisma } from '@facturacion/database';
+import { Request, Response } from "express";
+import { prisma } from "@facturacion/database";
 
 export class FacturasController {
   /**
@@ -13,7 +13,7 @@ export class FacturasController {
           items: true,
         },
         orderBy: {
-          fechaCreacion: 'desc',
+          fechaCreacion: "desc",
         },
       });
 
@@ -23,12 +23,12 @@ export class FacturasController {
         total: facturas.length,
       });
     } catch (error) {
-      console.error('Error al obtener facturas:', error);
+      console.error("Error al obtener facturas:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
         details:
-          process.env.NODE_ENV === 'development'
+          process.env.NODE_ENV === "development"
             ? (error as Error).message
             : undefined,
       });
@@ -53,7 +53,7 @@ export class FacturasController {
       if (!factura) {
         res.status(404).json({
           success: false,
-          error: 'Factura no encontrada',
+          error: "Factura no encontrada",
         });
         return;
       }
@@ -63,12 +63,12 @@ export class FacturasController {
         data: factura,
       });
     } catch (error) {
-      console.error('Error al obtener factura:', error);
+      console.error("Error al obtener factura:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
         details:
-          process.env.NODE_ENV === 'development'
+          process.env.NODE_ENV === "development"
             ? (error as Error).message
             : undefined,
       });
@@ -87,7 +87,7 @@ export class FacturasController {
         res.status(400).json({
           success: false,
           error:
-            'Datos requeridos faltantes: numeroFactura y clienteId son obligatorios',
+            "Datos requeridos faltantes: numeroFactura y clienteId son obligatorios",
         });
         return;
       }
@@ -103,15 +103,15 @@ export class FacturasController {
       res.status(201).json({
         success: true,
         data: factura,
-        message: 'Factura creada exitosamente',
+        message: "Factura creada exitosamente",
       });
     } catch (error) {
-      console.error('Error al crear factura:', error);
+      console.error("Error al crear factura:", error);
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
         details:
-          process.env.NODE_ENV === 'development'
+          process.env.NODE_ENV === "development"
             ? (error as Error).message
             : undefined,
       });
@@ -138,24 +138,24 @@ export class FacturasController {
       res.json({
         success: true,
         data: factura,
-        message: 'Factura actualizada exitosamente',
+        message: "Factura actualizada exitosamente",
       });
     } catch (error) {
-      console.error('Error al actualizar factura:', error);
+      console.error("Error al actualizar factura:", error);
 
-      if ((error as any).code === 'P2025') {
+      if ((error as any).code === "P2025") {
         res.status(404).json({
           success: false,
-          error: 'Factura no encontrada',
+          error: "Factura no encontrada",
         });
         return;
       }
 
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
         details:
-          process.env.NODE_ENV === 'development'
+          process.env.NODE_ENV === "development"
             ? (error as Error).message
             : undefined,
       });
@@ -175,24 +175,24 @@ export class FacturasController {
 
       res.json({
         success: true,
-        message: 'Factura eliminada exitosamente',
+        message: "Factura eliminada exitosamente",
       });
     } catch (error) {
-      console.error('Error al eliminar factura:', error);
+      console.error("Error al eliminar factura:", error);
 
-      if ((error as any).code === 'P2025') {
+      if ((error as any).code === "P2025") {
         res.status(404).json({
           success: false,
-          error: 'Factura no encontrada',
+          error: "Factura no encontrada",
         });
         return;
       }
 
       res.status(500).json({
         success: false,
-        error: 'Error interno del servidor',
+        error: "Error interno del servidor",
         details:
-          process.env.NODE_ENV === 'development'
+          process.env.NODE_ENV === "development"
             ? (error as Error).message
             : undefined,
       });

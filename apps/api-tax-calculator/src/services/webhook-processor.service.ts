@@ -1,4 +1,5 @@
 import { prisma } from "../../../../packages/database/src/client";
+import { randomUUID } from "crypto";
 import {
   AEATWebhookPayload,
   WebhookSignatureService,
@@ -64,7 +65,7 @@ export class WebhookProcessorService {
       const payload: AEATWebhookPayload = JSON.parse(rawPayload);
 
       // Generar ID único para el webhook
-      const webhookId = `wh_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`;
+      const webhookId = randomUUID();
 
       // Verificar firma si está presente
       let firmaVerificada = false;
@@ -301,7 +302,17 @@ export class WebhookProcessorService {
     const trimestre = trimestreMatch?.[1] ? parseInt(trimestreMatch[1]) : null;
 
     // Usar referencia como usuarioId por ahora (debería extraerse del JWT o similar)
-    const usuarioId = payload.referencia.split("-")[0] ?? "unknown";
+    // Validar formato de referencia antes de extraer usuarioId
+    // Ejemplo de formato esperado: "userId-modelo-ejercicio-periodo"
+    const referenciaRegex =
+      /^([a-zA-Z0-9_]+)-[a-zA-Z0-9_]+-[a-zA-Z0-9_]+-[a-zA-Z0-9_]+$/;
+    let usuarioId: string;
+    if (referenciaRegex.test(payload.referencia)) {
+      usuarioId = payload.referencia.split("-")[0] ?? "unknown";
+    } else {
+      console.error("Formato de referencia inválido:", payload.referencia);
+      return;
+    }
 
     // Crear o actualizar presentación
     const presentacion = await prisma.presentacionModelo.upsert({
