@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 'use client';
 
 import { motion } from 'framer-motion';
@@ -101,7 +102,7 @@ interface MobileNavigationProps {
   items: NavItem[];
   activePath?: string;
   onNavigate?: (href: string) => void;
-  trigger?: React.ReactNode;
+  trigger?: ReactNode;
 }
 
 export function MobileNavigation({
@@ -189,7 +190,7 @@ interface BreadcrumbItem {
 
 interface BreadcrumbsProps {
   items: BreadcrumbItem[];
-  separator?: React.ReactNode;
+  separator?: ReactNode;
   className?: string;
 }
 

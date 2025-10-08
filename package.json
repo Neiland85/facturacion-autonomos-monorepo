@@ -2,69 +2,19 @@
   "name": "facturacion-autonomos-monorepo",
   "version": "1.0.0",
   "private": true,
-  "description": "Plataforma unificada para gestión y facturación de autónomos - Monorepo modular con Next.js frontend y backend desacoplado Node.js",
-  "keywords": [
-    "monorepo",
-    "facturas",
-    "autonomos",
-    "typescript",
-    "nextjs",
-    "express",
-    "prisma"
-  ],
-  "homepage": "https://github.com/Neiland85/facturacion-autonomos-monorepo",
-  "bugs": {
-    "url": "https://github.com/Neiland85/facturacion-autonomos-monorepo/issues"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/Neiland85/facturacion-autonomos-monorepo.git"
-  },
-  "license": "Apache-2.0",
-  "author": "Neil Muñoz Lago <neiland85@gmail.com>",
-  "engines": {
-    "node": ">=20.0.0",
-    "pnpm": ">=8.0.0"
-  },
-  "packageManager": "pnpm@8.15.0",
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
   "scripts": {
     "dev": "turbo run dev",
-    "build": "turbo run build --continue",
-    "lint": "turbo run lint",
-    "lint:check": "turbo run lint:check",
-    "lint:fix": "turbo run lint:fix",
+    "build": "turbo run build",
     "test": "turbo run test",
+    "lint": "turbo run lint",
     "type-check": "turbo run type-check",
-    "validate-tsconfig": "node scripts/validate-tsconfig.js",
-    "db:generate": "turbo run db:generate",
-    "db:push": "turbo run db:push",
-    "db:studio": "turbo run db:studio",
-    "db:migrate": "./db/run-migrations.sh",
-    "db:migrate:test": "DATABASE_URL=postgresql://postgres:postgres_test@localhost:5432/facturacion_test ./db/run-migrations.sh",
-    "format": "turbo run format",
-    "format:check": "turbo run format:check",
-    "audit": "npm audit"
+    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
-    "@testing-library/react": "^16.2.0",
-    "@types/compression": "^1.8.1",
-    "@types/cors": "^2.8.19",
-    "@types/express": "^5.0.3",
-    "@types/jest": "^30.0.0",
-    "@types/morgan": "^1.9.10",
-    "@types/node": "^20.0.0",
-    "@types/react": "^18.3.12",
-    "@types/react-dom": "^18.3.1",
-    "@types/supertest": "^6.0.3",
-    "@types/swagger-jsdoc": "^6.0.4",
-    "@types/swagger-ui-express": "^4.1.8",
-    "@types/uuid": "^10.0.0",
-    "@types/yamljs": "^0.2.34",
+    "@types/node": "^20.19.8",
+    "@types/react": "18.3.12",
+    "@types/react-dom": "18.3.7",
     "@typescript-eslint/eslint-plugin": "^8.43.0",
     "@typescript-eslint/parser": "^8.43.0",
     "concurrently": "^8.2.2",
@@ -75,23 +25,21 @@
     "jest": "^30.1.3",
     "lint-staged": "^15.5.2",
     "prettier": "^3.6.2",
-    "react": "^18.3.1",
+    "react": "18.3.1",
     "tailwindcss-animate": "^1.0.7",
     "turbo": "^2.5.6",
     "typescript": "^5.9.2"
   },
-  "dependencies": {
-    "@testing-library/dom": "^10.4.0",
-    "@testing-library/jest-dom": "^6.6.3",
-    "@testing-library/react": "^16.3.0"
+  "packageManager": "pnpm@8.15.0",
+  "engines": {
+    "node": ">=20.0.0"
   },
-  "lint-staged": {
-    "*.{js,ts,tsx}": [
-      "eslint --fix",
-      "prettier --write"
-    ],
-    "*.{json,md}": [
-      "prettier --write"
-    ]
+  "pnpm": {
+    "overrides": {
+      "react": "18.3.1",
+      "react-dom": "18.3.1",
+      "@types/react": "18.3.12",
+      "@types/react-dom": "18.3.7"
+    }
   }
 }

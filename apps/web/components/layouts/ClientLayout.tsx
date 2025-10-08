@@ -1,6 +1,7 @@
+import type { ReactNode } from 'react';
 import React from 'react';
 
-const ClientLayout: React.FC<{ children: React.ReactNode }> = ({
+const ClientLayout: React.FC<{ children: ReactNode }> = ({
   children,
 }) => {
   return (

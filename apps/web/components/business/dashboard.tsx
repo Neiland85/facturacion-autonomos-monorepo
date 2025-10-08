@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 "use client";
 
 import { motion } from "framer-motion";
@@ -106,7 +107,7 @@ interface MetricCardProps {
     label: string;
     isPositive: boolean;
   };
-  icon: React.ReactNode;
+  icon: ReactNode;
   color: string;
   bgColor: string;
   className?: string;

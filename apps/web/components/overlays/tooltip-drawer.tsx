@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 'use client';
 
 import { AnimatePresence, motion } from 'framer-motion';
@@ -38,8 +39,8 @@ const ChevronRightIcon = ({ className }: { className?: string }) => (
 );
 
 interface TooltipProps {
-  content: string | React.ReactNode;
-  children: React.ReactNode;
+  content: string | ReactNode;
+  children: ReactNode;
   position?: 'top' | 'bottom' | 'left' | 'right';
   delay?: number;
   className?: string;
@@ -151,7 +152,7 @@ export function Tooltip({
 interface DrawerProps {
   isOpen: boolean;
   onClose: () => void;
-  children: React.ReactNode;
+  children: ReactNode;
   position?: 'left' | 'right' | 'top' | 'bottom';
   size?: 'sm' | 'md' | 'lg' | 'xl' | 'full';
   title?: string;
@@ -303,8 +304,8 @@ export function Drawer({
 interface PopoverProps {
   isOpen: boolean;
   onClose: () => void;
-  trigger: React.ReactNode;
-  children: React.ReactNode;
+  trigger: ReactNode;
+  children: ReactNode;
   position?: 'top' | 'bottom' | 'left' | 'right';
   className?: string;
 }
@@ -405,8 +406,8 @@ export function Popover({
 }
 
 interface DropdownProps {
-  trigger: React.ReactNode;
-  children: React.ReactNode;
+  trigger: ReactNode;
+  children: ReactNode;
   isOpen: boolean;
   onToggle: () => void;
   position?: 'top' | 'bottom' | 'left' | 'right';

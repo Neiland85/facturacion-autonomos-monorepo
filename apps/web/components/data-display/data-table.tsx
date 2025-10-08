@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react';
 'use client';
 
 import { Input } from '@/components/ui/input';
@@ -58,7 +59,7 @@ interface DataTableColumn<T> {
   key: keyof T;
   label: string;
   sortable?: boolean;
-  render?: (value: any, item: T) => React.ReactNode;
+  render?: (value: any, item: T) => ReactNode;
 }
 
 interface DataTableProps<T> {
