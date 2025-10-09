@@ -232,8 +232,8 @@ const generalLimiter = rateLimit({
   },
 });
 
-app.use('/api/auth', authLimiter);
-app.use('/api/', generalLimiter);
+app.use('/api/auth', authLimiter as any);
+app.use('/api/', generalLimiter as any);
 
 // Middleware para parsing JSON
 app.use(express.json({ limit: '1mb' }));

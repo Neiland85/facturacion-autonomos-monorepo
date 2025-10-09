@@ -1,4 +1,4 @@
-import { prisma } from "../../../../packages/database/src/client";
+import { prisma } from "@facturacion/database";
 import { randomUUID } from "crypto";
 import {
   AEATWebhookPayload,

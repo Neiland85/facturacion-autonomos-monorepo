@@ -36,7 +36,7 @@ const limiter = rateLimit({
   max: 100, // 100 requests por ventana
   message: "Demasiadas solicitudes, inténtalo de nuevo más tarde.",
 });
-app.use(limiter);
+app.use(limiter as any);
 
 // Middleware para parsing
 app.use(express.json({ limit: "10mb" }));

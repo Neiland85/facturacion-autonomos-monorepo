@@ -19,40 +19,48 @@ export class WebhookRateLimitMiddleware {
       },
       standardHeaders: true,
       legacyHeaders: false,
-      // Usar IP real del cliente
-      keyGenerator: (req: Request) => {
+      keyGenerator: ((req: Request) => {
         return this.getClientIP(req);
-      },
-      // Configuración específica para webhooks
-      skip: (_req: Request) => {
-        // Saltar rate limit en desarrollo
+      }) as any,
+      skip: ((_req: Request) => {
         if (process.env.NODE_ENV === 'development') {
           return true;
         }
         return false;
-      },
+      }) as any,
     });
   }
 
-  /**
-   * Middleware para aplicar rate limit a webhooks
-   */
-  public limitWebhookRequests = (
-    req: Request,
-    res: Response,
-    next: NextFunction
-  ): void => {
-    this.rateLimiter(req, res, next);
-  };
-
-  /**
-   * Obtiene la IP real del cliente
-   */
   private getClientIP(req: Request): string {
     const forwarded = req.headers['x-forwarded-for'];
-    if (typeof forwarded === 'string') {
-      return forwarded.split(',')[0]?.trim() || 'unknown';
+    const forwardedStr = Array.isArray(forwarded) ? forwarded[0] : forwarded;
+    
+    if (forwardedStr && typeof forwardedStr === 'string') {
+      return forwardedStr.split(',')[0].trim();
     }
-    return req.socket.remoteAddress || 'unknown';
+    
+    return req.socket?.remoteAddress || req.ip || 'unknown';
+  }
+
+  public apply(req: Request, res: Response, next: NextFunction): void {
+    if (!this.rateLimiter) {
+      next();
+      return;
+    }
+    (this.rateLimiter as any)(req, res, next);
+  }
+
+  public limitWebhookRequests = (req: Request, res: Response, next: NextFunction): void => {
+    this.apply(req, res, next);
+  };
+
+  public async resetLimit(ip: string): Promise<void> {
+    try {
+      if (this.rateLimiter && 'resetKey' in this.rateLimiter) {
+        (this.rateLimiter as any).resetKey(ip);
+      }
+    } catch (error) {
+      console.error('Error resetting rate limit:', error);
+    }
   }
 }

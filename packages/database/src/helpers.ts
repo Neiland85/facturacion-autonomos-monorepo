@@ -1,5 +1,5 @@
 // Database helper functions for Prisma operations
-import { PrismaClient } from "@prisma/client";
+import type { PrismaClient } from "./generated";
 
 // Helper to handle database connection errors
 export function handleDatabaseError(error: any): never {
@@ -8,15 +8,11 @@ export function handleDatabaseError(error: any): never {
 }
 
 // Helper to safely disconnect from database
-export async function disconnectPrisma(prisma: PrismaClient): Promise<void> {
-  try {
-    await prisma.$disconnect();
-  } catch (error) {
-    console.error("Error disconnecting from database:", error);
-  }
+export async function disconnectDatabase(prisma: PrismaClient): Promise<void> {
+  await prisma.$disconnect();
 }
 
-// Helper to check if database is connected
+// Helper to check database connection
 export async function checkDatabaseConnection(
   prisma: PrismaClient
 ): Promise<boolean> {
@@ -29,57 +25,53 @@ export async function checkDatabaseConnection(
   }
 }
 
-// Helper to execute database operations with error handling
-export async function executeWithErrorHandling<T>(
-  operation: () => Promise<T>,
-  errorMessage: string = "Database operation failed"
-): Promise<T> {
-  try {
-    return await operation();
-  } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : "Unknown error";
-    console.error(`${errorMessage}:`, error);
-    throw new Error(`${errorMessage}: ${errorMsg}`);
-  }
-}
-
-// Helper to create a transaction wrapper
+// Helper to create a transaction
 export async function withTransaction<T>(
   prisma: PrismaClient,
-  operation: (
-    tx: Omit<
-      PrismaClient,
-      "$connect" | "$disconnect" | "$on" | "$transaction" | "$use" | "$extends"
-    >
-  ) => Promise<T>
+  callback: (tx: PrismaClient) => Promise<T>
 ): Promise<T> {
-  return await prisma.$transaction(
-    async (tx: Parameters<typeof operation>[0]) => {
-      return await operation(tx);
-    }
+  return await prisma.$transaction(async (tx) => {
+    return await callback(tx as PrismaClient);
+  });
+}
+
+// Helper to batch operations
+export async function batchOperations<T>(
+  prisma: PrismaClient,
+  operations: Array<Promise<T>>
+): Promise<T[]> {
+  return await Promise.all(operations);
+}
+
+// Helper to handle unique constraint violations
+export function isUniqueConstraintError(error: any): boolean {
+  return error.code === "P2002";
+}
+
+// Helper to handle foreign key constraint violations
+export function isForeignKeyConstraintError(error: any): boolean {
+  return error.code === "P2003";
+}
+
+// Helper to handle record not found errors
+export function isRecordNotFoundError(error: any): boolean {
+  return error.code === "P2025";
+}
+
+// Helper to get error message
+export function getDatabaseErrorMessage(error: any): string {
+  if (error.code) {
+    return `Database error (${error.code}): ${error.message}`;
+  }
+  return error.message || "Unknown database error";
+}
+
+// Helper to validate Prisma client instance
+export function validatePrismaClient(prisma: any): prisma is PrismaClient {
+  return (
+    prisma !== null &&
+    typeof prisma === "object" &&
+    "$connect" in prisma &&
+    "$disconnect" in prisma
   );
 }
-
-// Helper to safely execute raw queries
-export async function executeRawQuery(
-  prisma: PrismaClient,
-  query: string,
-  params: any[] = []
-): Promise<any> {
-  try {
-    return await prisma.$queryRawUnsafe(query, ...params);
-  } catch (error) {
-    const errorMsg = error instanceof Error ? error.message : "Unknown error";
-    console.error("Raw query execution failed:", error);
-    throw new Error(`Raw query failed: ${errorMsg}`);
-  }
-}
-
-// Helper to get database connection info
-export function getDatabaseInfo(prisma: PrismaClient): string {
-  // This is a basic implementation - you might want to extend this
-  return "Database connection active";
-}
-
-// Export types for convenience
-export type { PrismaClient } from "@prisma/client";
