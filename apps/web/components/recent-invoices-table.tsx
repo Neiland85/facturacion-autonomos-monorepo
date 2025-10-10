@@ -1,61 +1,45 @@
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "./ui/table";
 
-interface Invoice {
-  id: string
-  client: string
-  amount: number
-  date: string
-  status: "paid" | "pending"
-}
+const mockInvoices = [
+  { id: "F-2024-001", client: "Empresa ABC S.L.", date: "2024-10-05", amount: "1.250,00 €", status: "Pagada" },
+  { id: "F-2024-002", client: "Freelance Juan", date: "2024-10-03", amount: "850,00 €", status: "Pendiente" },
+  { id: "F-2024-003", client: "Startup XYZ", date: "2024-10-01", amount: "2.100,00 €", status: "Pagada" },
+  { id: "F-2024-004", client: "Consultoría Pro", date: "2024-09-28", amount: "3.500,00 €", status: "Vencida" },
+];
 
-interface RecentInvoicesTableProps {
-  invoices: Invoice[]
-}
-
-export function RecentInvoicesTable({ invoices }: RecentInvoicesTableProps) {
+export function RecentInvoicesTable() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Últimas Facturas</CardTitle>
-        <CardDescription>Las 5 facturas más recientes de tu negocio</CardDescription>
+        <CardTitle>Facturas Recientes</CardTitle>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead>Número</TableHead>
               <TableHead>Cliente</TableHead>
-              <TableHead>Monto</TableHead>
               <TableHead>Fecha</TableHead>
+              <TableHead>Importe</TableHead>
               <TableHead>Estado</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {invoices.map((invoice) => (
+            {mockInvoices.map((invoice) => (
               <TableRow key={invoice.id}>
-                <TableCell className="font-medium">{invoice.client}</TableCell>
-                <TableCell className="font-mono">
-                  €{invoice.amount.toLocaleString("es-ES", { minimumFractionDigits: 2 })}
-                </TableCell>
-                <TableCell className="text-muted-foreground">
-                  {new Date(invoice.date).toLocaleDateString("es-ES", {
-                    day: "2-digit",
-                    month: "short",
-                    year: "numeric",
-                  })}
-                </TableCell>
+                <TableCell className="font-medium">{invoice.id}</TableCell>
+                <TableCell>{invoice.client}</TableCell>
+                <TableCell>{invoice.date}</TableCell>
+                <TableCell>{invoice.amount}</TableCell>
                 <TableCell>
-                  <Badge
-                    variant={invoice.status === "paid" ? "default" : "secondary"}
-                    className={
-                      invoice.status === "paid"
-                        ? "bg-success text-white hover:bg-success/90"
-                        : "bg-warning text-white hover:bg-warning/90"
-                    }
-                  >
-                    {invoice.status === "paid" ? "Pagada" : "Pendiente"}
-                  </Badge>
+                  <span className={`px-2 py-1 rounded text-xs ${
+                    invoice.status === 'Pagada' ? 'bg-green-100 text-green-800' :
+                    invoice.status === 'Pendiente' ? 'bg-yellow-100 text-yellow-800' :
+                    'bg-red-100 text-red-800'
+                  }`}>
+                    {invoice.status}
+                  </span>
                 </TableCell>
               </TableRow>
             ))}
@@ -63,5 +47,5 @@ export function RecentInvoicesTable({ invoices }: RecentInvoicesTableProps) {
         </Table>
       </CardContent>
     </Card>
-  )
+  );
 }

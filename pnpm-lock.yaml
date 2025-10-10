@@ -435,6 +435,9 @@ importers:
       supertest:
         specifier: ^7.0.0
         version: 7.1.4
+      ts-node:
+        specifier: ^10.9.2
+        version: 10.9.2(@types/node@20.19.14)(typescript@5.9.2)
       tsx:
         specifier: ^4.20.4
         version: 4.20.5

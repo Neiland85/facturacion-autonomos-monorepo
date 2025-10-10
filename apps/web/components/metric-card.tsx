@@ -1,53 +1,24 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import type { LucideIcon } from "lucide-react"
-import { cn } from "@/lib/utils"
+import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 
 interface MetricCardProps {
-  title: string
-  value: string | number
-  change?: string
-  changeType?: "positive" | "negative" | "neutral"
-  icon: LucideIcon
-  loading?: boolean
+  title: string;
+  value: string;
+  trend: string;
+  trendUp: boolean;
 }
 
-export function MetricCard({
-  title,
-  value,
-  change,
-  changeType = "neutral",
-  icon: Icon,
-  loading = false,
-}: MetricCardProps) {
+export function MetricCard({ title, value, trend, trendUp }: MetricCardProps) {
   return (
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-        <CardTitle className="text-sm font-medium text-muted-foreground">{title}</CardTitle>
-        <div className="rounded-lg bg-primary/10 p-2">
-          <Icon className="h-4 w-4 text-primary" />
-        </div>
+        <CardTitle className="text-sm font-medium">{title}</CardTitle>
       </CardHeader>
       <CardContent>
-        {loading ? (
-          <div className="h-8 w-24 animate-pulse rounded bg-muted" />
-        ) : (
-          <>
-            <div className="text-2xl font-bold text-foreground">{value}</div>
-            {change && (
-              <p
-                className={cn(
-                  "text-xs font-medium",
-                  changeType === "positive" && "text-success",
-                  changeType === "negative" && "text-destructive",
-                  changeType === "neutral" && "text-muted-foreground",
-                )}
-              >
-                {change}
-              </p>
-            )}
-          </>
-        )}
+        <div className="text-2xl font-bold">{value}</div>
+        <p className={`text-xs ${trendUp ? 'text-green-600' : 'text-red-600'}`}>
+          {trend}
+        </p>
       </CardContent>
     </Card>
-  )
+  );
 }

@@ -12,7 +12,7 @@ import Redis from 'ioredis';
 import morgan from 'morgan';
 import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerUi from 'swagger-ui-express';
-import { errorHandler } from './middleware/errorHandler';
+// import { errorHandler } from './middleware/errorHandler';
 import { requestLogger } from './middleware/logger.middleware';
 import { authRoutes } from './routes/auth.routes';
 import healthRoutes from './routes/health.routes';
@@ -294,7 +294,7 @@ app.use('*', (req, res) => {
 });
 
 // Error handler
-app.use(errorHandler);
+// app.use(errorHandler);
 
 // Graceful shutdown
 process.on('SIGTERM', () => {
