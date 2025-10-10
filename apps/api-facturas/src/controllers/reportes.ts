@@ -1,26 +1,39 @@
 import { prisma } from "@facturacion/database";
+import type { Client, InvoiceLine } from "@facturacion/database";
 import { Request, Response } from "express";
 
 // Tipo para el select de facturas en reportes
 type FacturaReporte = {
-  tipo: string;
-  fecha: Date;
-  baseImponible: number;
-  importeIVA: number;
-  importeIRPF: number;
+  number: string;
+  issueDate: Date;
+  subtotal: number;
+  vatAmount: number;
   total: number;
+  status: string;
 };
 
 // Tipo para facturas completas con includes
 type FacturaCompleta = {
-  tipo: string;
-  fecha: Date;
-  baseImponible: number;
-  importeIVA: number;
-  importeIRPF: number;
+  number: string;
+  issueDate: Date;
+  subtotal: number;
+  vatAmount: number;
   total: number;
-  cliente?: any;
-  lineas?: any[];
+  status: string;
+  client?: Client;
+  lines?: InvoiceLine[];
+};
+
+// Tipo para respuesta al frontend (con números en lugar de Decimal)
+type FacturaRespuesta = {
+  number: string;
+  issueDate: Date;
+  subtotal: number;
+  vatAmount: number;
+  total: number;
+  status: string;
+  client?: Client;
+  lines?: InvoiceLine[];
 };
 
 export class ReportesController {
@@ -62,67 +75,48 @@ export class ReportesController {
       const fechaFin = new Date(año, mesFin, 0);
 
       // Obtener facturas del trimestre
-      const facturas: FacturaReporte[] = await prisma.factura.findMany({
-        where: {
-          fecha: {
-            gte: fechaInicio,
-            lte: fechaFin,
-          },
-        },
-        select: {
-          tipo: true,
-          fecha: true,
-          baseImponible: true,
-          importeIVA: true,
-          importeIRPF: true,
-          total: true,
-        },
-      });
+      const facturas: FacturaReporte[] = await prisma.$queryRaw`
+        SELECT number, "issueDate", CAST(subtotal AS FLOAT) as subtotal,
+               CAST("vatAmount" AS FLOAT) as "vatAmount", CAST(total AS FLOAT) as total, status
+        FROM "Invoice"
+        WHERE "issueDate" >= ${fechaInicio} AND "issueDate" <= ${fechaFin}
+      `;
 
       // Procesar datos
-      const facturasEmitidas = facturas.filter(
-        (f: FacturaReporte) => f.tipo === "emitida"
-      );
-      const facturasRecibidas = facturas.filter(
-        (f: FacturaReporte) => f.tipo === "recibida"
-      );
+      // Por ahora asumimos que todas las facturas son emitidas
+      const facturasEmitidas = facturas;
+      const facturasRecibidas: FacturaReporte[] = [];
 
       const resumen = {
         facturasEmitidas: {
           cantidad: facturasEmitidas.length,
           baseImponible: facturasEmitidas.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.baseImponible,
+            (sum: number, f: FacturaReporte) => sum + Number(f.subtotal),
             0
           ),
           iva: facturasEmitidas.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.importeIVA,
+            (sum: number, f: FacturaReporte) => sum + Number(f.vatAmount),
             0
           ),
-          irpf: facturasEmitidas.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.importeIRPF,
-            0
-          ),
+          irpf: 0, // No hay IRPF en el esquema actual
           total: facturasEmitidas.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.total,
+            (sum: number, f: FacturaReporte) => sum + Number(f.total),
             0
           ),
         },
         facturasRecibidas: {
           cantidad: facturasRecibidas.length,
           baseImponible: facturasRecibidas.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.baseImponible,
+            (sum: number, f: FacturaReporte) => sum + Number(f.subtotal),
             0
           ),
           iva: facturasRecibidas.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.importeIVA,
+            (sum: number, f: FacturaReporte) => sum + Number(f.vatAmount),
             0
           ),
-          irpf: facturasRecibidas.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.importeIRPF,
-            0
-          ),
+          irpf: 0, // No hay IRPF en el esquema actual
           total: facturasRecibidas.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.total,
+            (sum: number, f: FacturaReporte) => sum + Number(f.total),
             0
           ),
         },
@@ -131,31 +125,24 @@ export class ReportesController {
       // Detalles por mes
       const detalles = meses.map((mes: number) => {
         const facturasMes = facturas.filter(
-          (f: FacturaReporte) => f.fecha.getMonth() + 1 === mes
+          (f: FacturaReporte) => f.issueDate.getMonth() + 1 === mes
         );
-        const emitidas = facturasMes.filter(
-          (f: FacturaReporte) => f.tipo === "emitida"
-        );
-        const recibidas = facturasMes.filter(
-          (f: FacturaReporte) => f.tipo === "recibida"
-        );
+        const emitidas = facturasMes; // Por ahora todas son emitidas
+        const recibidas: FacturaReporte[] = [];
 
         return {
           mes,
           facturasEmitidas: emitidas.length,
           facturasRecibidas: recibidas.length,
           baseImponible: facturasMes.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.baseImponible,
+            (sum: number, f: FacturaReporte) => sum + Number(f.subtotal),
             0
           ),
           iva: facturasMes.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.importeIVA,
+            (sum: number, f: FacturaReporte) => sum + Number(f.vatAmount),
             0
           ),
-          irpf: facturasMes.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.importeIRPF,
-            0
-          ),
+          irpf: 0, // No hay IRPF en el esquema actual
         };
       });
 
@@ -193,22 +180,12 @@ export class ReportesController {
       const fechaFin = new Date(año, 11, 31);
 
       // Obtener facturas del año
-      const facturas: FacturaReporte[] = await prisma.factura.findMany({
-        where: {
-          fecha: {
-            gte: fechaInicio,
-            lte: fechaFin,
-          },
-        },
-        select: {
-          tipo: true,
-          fecha: true,
-          baseImponible: true,
-          importeIVA: true,
-          importeIRPF: true,
-          total: true,
-        },
-      });
+      const facturas: FacturaReporte[] = await prisma.$queryRaw`
+        SELECT number, "issueDate", CAST(subtotal AS FLOAT) as subtotal,
+               CAST("vatAmount" AS FLOAT) as "vatAmount", CAST(total AS FLOAT) as total, status
+        FROM "Invoice"
+        WHERE "issueDate" >= ${fechaInicio} AND "issueDate" <= ${fechaFin}
+      `;
 
       // Procesar datos por trimestre
       const trimestres = [1, 2, 3, 4].map((trimestre: number) => {
@@ -225,34 +202,27 @@ export class ReportesController {
         }
 
         const facturasTrimestre = facturas.filter((f: FacturaReporte) =>
-          meses.includes(f.fecha.getMonth() + 1)
+          meses.includes(f.issueDate.getMonth() + 1)
         );
 
-        const emitidas = facturasTrimestre.filter(
-          (f: FacturaReporte) => f.tipo === "emitida"
-        );
-        const recibidas = facturasTrimestre.filter(
-          (f: FacturaReporte) => f.tipo === "recibida"
-        );
+        const emitidas = facturasTrimestre; // Por ahora todas son emitidas
+        const recibidas: FacturaReporte[] = [];
 
         return {
           trimestre,
           facturasEmitidas: emitidas.length,
           facturasRecibidas: recibidas.length,
           baseImponible: facturasTrimestre.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.baseImponible,
+            (sum: number, f: FacturaReporte) => sum + Number(f.subtotal),
             0
           ),
           iva: facturasTrimestre.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.importeIVA,
+            (sum: number, f: FacturaReporte) => sum + Number(f.vatAmount),
             0
           ),
-          irpf: facturasTrimestre.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.importeIRPF,
-            0
-          ),
+          irpf: 0, // No hay IRPF en el esquema actual
           total: facturasTrimestre.reduce(
-            (sum: number, f: FacturaReporte) => sum + f.total,
+            (sum: number, f: FacturaReporte) => sum + Number(f.total),
             0
           ),
         };
@@ -260,26 +230,19 @@ export class ReportesController {
 
       const resumen = {
         totalFacturas: facturas.length,
-        totalEmitidas: facturas.filter(
-          (f: FacturaReporte) => f.tipo === "emitida"
-        ).length,
-        totalRecibidas: facturas.filter(
-          (f: FacturaReporte) => f.tipo === "recibida"
-        ).length,
+        totalEmitidas: facturas.length, // Por ahora todas son emitidas
+        totalRecibidas: 0,
         baseImponible: facturas.reduce(
-          (sum: number, f: FacturaReporte) => sum + f.baseImponible,
+          (sum: number, f: FacturaReporte) => sum + Number(f.subtotal),
           0
         ),
         iva: facturas.reduce(
-          (sum: number, f: FacturaReporte) => sum + f.importeIVA,
+          (sum: number, f: FacturaReporte) => sum + Number(f.vatAmount),
           0
         ),
-        irpf: facturas.reduce(
-          (sum: number, f: FacturaReporte) => sum + f.importeIRPF,
-          0
-        ),
+        irpf: 0, // No hay IRPF en el esquema actual
         total: facturas.reduce(
-          (sum: number, f: FacturaReporte) => sum + f.total,
+          (sum: number, f: FacturaReporte) => sum + Number(f.total),
           0
         ),
       };
@@ -314,36 +277,51 @@ export class ReportesController {
         });
       }
 
-      const facturas = await prisma.factura.findMany({
+      const facturas = await prisma.invoice.findMany({
         where: {
-          tipo: "emitida",
-          fecha: {
+          issueDate: {
             gte: new Date(fechaDesde),
             lte: new Date(fechaHasta),
           },
         },
         include: {
-          cliente: true,
-          lineas: true,
+          client: true,
+          lines: true,
         },
-        orderBy: { fecha: "desc" },
+        orderBy: { issueDate: "desc" },
       });
+
+      // Convertir Decimal a number para la respuesta
+      const facturasRespuesta: FacturaRespuesta[] = facturas.map(
+        (factura: any) => ({
+          ...factura,
+          subtotal: Number(factura.subtotal),
+          vatAmount: Number(factura.vatAmount),
+          total: Number(factura.total),
+        })
+      );
 
       const resumen = {
         totalFacturas: facturas.length,
         baseImponible: facturas.reduce(
-          (sum: number, f: any) => sum + f.baseImponible,
+          (sum: number, f: FacturaCompleta) => sum + Number(f.subtotal),
           0
         ),
-        iva: facturas.reduce((sum: number, f: any) => sum + f.importeIVA, 0),
-        irpf: facturas.reduce((sum: number, f: any) => sum + f.importeIRPF, 0),
-        total: facturas.reduce((sum: number, f: any) => sum + f.total, 0),
+        iva: facturas.reduce(
+          (sum: number, f: FacturaCompleta) => sum + Number(f.vatAmount),
+          0
+        ),
+        irpf: 0, // No hay IRPF en el esquema actual
+        total: facturas.reduce(
+          (sum: number, f: FacturaCompleta) => sum + Number(f.total),
+          0
+        ),
       };
 
       res.json({
         periodo: { desde: fechaDesde, hasta: fechaHasta },
         resumen,
-        facturas,
+        facturas: facturasRespuesta,
       });
     } catch (error) {
       console.error("Error al generar reporte de ventas:", error);
@@ -370,37 +348,41 @@ export class ReportesController {
         });
       }
 
-      const facturas: FacturaCompleta[] = await prisma.factura.findMany({
+      const facturas: FacturaCompleta[] = await prisma.invoice.findMany({
         where: {
-          tipo: "recibida",
-          fecha: {
+          issueDate: {
             gte: new Date(fechaDesde),
             lte: new Date(fechaHasta),
           },
         },
         include: {
-          cliente: true,
-          lineas: true,
+          client: true,
+          lines: true,
         },
-        orderBy: { fecha: "desc" },
+        orderBy: { issueDate: "desc" },
       });
+
+      // Convertir Decimal a number para la respuesta
+      const facturasRespuesta: FacturaRespuesta[] = facturas.map((factura) => ({
+        ...factura,
+        subtotal: Number(factura.subtotal),
+        vatAmount: Number(factura.vatAmount),
+        total: Number(factura.total),
+      }));
 
       const resumen = {
         totalFacturas: facturas.length,
         baseImponible: facturas.reduce(
-          (sum: number, f: FacturaCompleta) => sum + f.baseImponible,
+          (sum: number, f: FacturaCompleta) => sum + Number(f.subtotal),
           0
         ),
         iva: facturas.reduce(
-          (sum: number, f: FacturaCompleta) => sum + f.importeIVA,
+          (sum: number, f: FacturaCompleta) => sum + Number(f.vatAmount),
           0
         ),
-        irpf: facturas.reduce(
-          (sum: number, f: FacturaCompleta) => sum + f.importeIRPF,
-          0
-        ),
+        irpf: 0, // No hay IRPF en el esquema actual
         total: facturas.reduce(
-          (sum: number, f: FacturaCompleta) => sum + f.total,
+          (sum: number, f: FacturaCompleta) => sum + Number(f.total),
           0
         ),
       };
@@ -408,7 +390,7 @@ export class ReportesController {
       res.json({
         periodo: { desde: fechaDesde, hasta: fechaHasta },
         resumen,
-        facturas,
+        facturas: facturasRespuesta,
       });
     } catch (error) {
       console.error("Error al generar reporte de gastos:", error);
@@ -438,7 +420,7 @@ export class ReportesController {
       // Implementar exportación según el formato
       res.json({
         tipo,
-        formato: req.body.formato || "json",
+        formato: req.body.formato ?? "json",
         mensaje: "Funcionalidad de exportación en desarrollo",
       });
       // Por ahora, devolver placeholder

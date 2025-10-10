@@ -10,7 +10,7 @@ import facturasRoutes from "./routes/facturas-simple";
 
 // Configurar documentación API
 const { setupSwagger } = require(
-  path.join(__dirname, "../../config/api-facturas-swagger")
+//   path.join(__dirname, "../../config/api-facturas-swagger")
 );
 
 const app: express.Application = express();

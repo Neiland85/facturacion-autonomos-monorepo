@@ -1,7 +1,6 @@
-export { prisma } from './client';
-export * from './helpers';
-export * from './types';
+export { prisma } from "./client";
+export * from "./helpers";
+export * from "./types";
 
 // Re-export Prisma types for convenience
-export type { PrismaClient } from './generated';
-export * from './generated';
+export type { PrismaClient } from "./generated";
