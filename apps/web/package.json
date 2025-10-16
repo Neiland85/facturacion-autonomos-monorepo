@@ -3,8 +3,8 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev --port 3004",
-    "dev:direct": "node node_modules/.bin/next dev --port 3004",
+    "dev": "next dev --port 3000",
+    "dev:direct": "node node_modules/.bin/next dev --port 3000",
     "build": "next build --no-lint",
     "start": "next start",
     "lint": "next lint",

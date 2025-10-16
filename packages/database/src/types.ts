@@ -1,4 +1,8 @@
-import type { $Enums, Prisma } from './generated';
+import type { $Enums, Prisma } from "./generated";
+
+// Re-export basic Prisma types
+export type Client = Prisma.ClientGetPayload<{}>;
+export type InvoiceLine = Prisma.InvoiceLineGetPayload<{}>;
 
 // Tipos extendidos para la aplicación
 export type InvoiceWithDetails = Prisma.InvoiceGetPayload<{

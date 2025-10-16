@@ -1,0 +1,53 @@
+{
+  "name": "@facturacion/subscription-service",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Subscription service with Stripe integration for TributariApp",
+  "main": "dist/index.js",
+  "scripts": {
+    "dev": "ts-node-dev --respawn --transpile-only src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "type-check": "tsc --noEmit",
+    "lint": "eslint src --ext .ts",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@facturacion/database": "workspace:*",
+    "@facturacion/core": "workspace:*",
+    "stripe": "^16.10.0",
+    "express": "^4.21.1",
+    "cors": "^2.8.5",
+    "helmet": "^8.0.0",
+    "compression": "^1.8.0",
+    "morgan": "^1.10.0",
+    "express-rate-limit": "^7.4.1",
+    "joi": "^17.13.3",
+    "dotenv": "^16.4.7",
+    "express-session": "^1.18.1",
+    "connect-redis": "^7.1.1",
+    "ioredis": "^5.4.1",
+    "swagger-jsdoc": "^6.2.8",
+    "swagger-ui-express": "^5.0.1"
+  },
+  "devDependencies": {
+    "@types/express": "^4.17.21",
+    "@types/cors": "^2.8.17",
+    "@types/compression": "^1.7.5",
+    "@types/morgan": "^1.9.9",
+    "@types/express-session": "^1.18.0",
+    "@types/connect-redis": "^0.0.23",
+    "@types/jest": "^29.5.13",
+    "@types/supertest": "^6.0.2",
+    "@types/swagger-jsdoc": "^6.0.4",
+    "@types/swagger-ui-express": "^4.1.6",
+    "@types/node": "^22.7.5",
+    "jest": "^29.7.0",
+    "supertest": "^7.0.0",
+    "ts-jest": "^29.2.5",
+    "ts-node-dev": "^2.0.0",
+    "typescript": "^5.6.3"
+  }
+}

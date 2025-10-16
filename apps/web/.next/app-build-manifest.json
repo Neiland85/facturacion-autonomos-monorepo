@@ -1,47 +1,19 @@
 {
   "pages": {
-    "/_not-found/page": [
-      "static/chunks/webpack-30b9dd9193356b11.js",
-      "static/chunks/3245bb66-56f9c8bac99989dc.js",
-      "static/chunks/631-f3dc5297197a57e2.js",
-      "static/chunks/main-app-fb04d5c323badd17.js",
-      "static/chunks/app/_not-found/page-e3a4ae2fc2a4ce0f.js"
-    ],
     "/layout": [
-      "static/chunks/webpack-30b9dd9193356b11.js",
-      "static/chunks/3245bb66-56f9c8bac99989dc.js",
-      "static/chunks/631-f3dc5297197a57e2.js",
-      "static/chunks/main-app-fb04d5c323badd17.js",
-      "static/chunks/app/layout-e4974c73f990d917.js"
-    ],
-    "/api/health/route": [
-      "static/chunks/webpack-30b9dd9193356b11.js",
-      "static/chunks/3245bb66-56f9c8bac99989dc.js",
-      "static/chunks/631-f3dc5297197a57e2.js",
-      "static/chunks/main-app-fb04d5c323badd17.js",
-      "static/chunks/app/api/health/route-e4974c73f990d917.js"
-    ],
-    "/dashboard/page": [
-      "static/chunks/webpack-30b9dd9193356b11.js",
-      "static/chunks/3245bb66-56f9c8bac99989dc.js",
-      "static/chunks/631-f3dc5297197a57e2.js",
-      "static/chunks/main-app-fb04d5c323badd17.js",
-      "static/chunks/app/dashboard/page-e4974c73f990d917.js"
-    ],
-    "/login/page": [
-      "static/chunks/webpack-30b9dd9193356b11.js",
-      "static/chunks/3245bb66-56f9c8bac99989dc.js",
-      "static/chunks/631-f3dc5297197a57e2.js",
-      "static/chunks/main-app-fb04d5c323badd17.js",
-      "static/chunks/672-e9f002d827734d7c.js",
-      "static/chunks/app/login/page-f95631fffadb5393.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/layout.js"
     ],
     "/page": [
-      "static/chunks/webpack-30b9dd9193356b11.js",
-      "static/chunks/3245bb66-56f9c8bac99989dc.js",
-      "static/chunks/631-f3dc5297197a57e2.js",
-      "static/chunks/main-app-fb04d5c323badd17.js",
-      "static/chunks/app/page-e4974c73f990d917.js"
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/page.js"
+    ],
+    "/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/dashboard/page.js"
     ]
   }
 }

@@ -1,12 +1,18 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   // Configuración optimizada para Vercel
-  output: 'standalone',
+  output: "standalone",
   trailingSlash: false,
 
   // Configuración de imágenes optimizada para Vercel
   images: {
-    domains: ['localhost'],
+    domains: [
+      "localhost",
+      "localhost:3001",
+      "localhost:3002",
+      "localhost:3003",
+      "localhost:3004",
+    ],
     unoptimized: false, // Vercel optimiza automáticamente
   },
 
@@ -24,7 +30,7 @@ const nextConfig = {
     if (!dev && !isServer) {
       config.resolve.alias = {
         ...config.resolve.alias,
-        '@': require('path').resolve(__dirname, './src'),
+        "@": require("path").resolve(__dirname, "./src"),
       };
     }
     return config;

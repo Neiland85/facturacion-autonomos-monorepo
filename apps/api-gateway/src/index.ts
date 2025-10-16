@@ -1,65 +1,56 @@
-import cors from "cors";
-import "dotenv/config";
-import express, { Application } from "express";
-import rateLimit from "express-rate-limit";
-import helmet from "helmet";
-import morgan from "morgan";
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
 
 // Import routes
-import healthRoutes from "./routes/health.routes";
+import gatewayRoutes from './routes/gateway.routes';
+import healthRoutes from './routes/health.routes';
 
-const app: Application = express();
-const PORT = process.env.PORT || 3001;
+const app = express();
+const PORT = process.env.PORT || 3000;
 
 // Middleware
 app.use(helmet());
 app.use(cors());
-app.use(morgan("combined"));
-app.use(express.json());
+app.use(compression());
+app.use(morgan('combined'));
+app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS || "900000"),
-  max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS || "100"),
-  message: "Too many requests from this IP, please try again later.",
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
 });
-
-app.use(limiter as any); // Type assertion para compatibilidad Express 4
+app.use(limiter);
 
 // Routes
-app.use("/api/health", healthRoutes);
+app.use('/api', gatewayRoutes);
+app.use('/api/health', healthRoutes);
 
-// Root endpoint
-app.get("/", (req, res) => {
-  res.json({
-    message: "API Gateway is running",
-    version: "1.0.0",
-    timestamp: new Date().toISOString(),
+// Error handling middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    error: 'Internal server error',
   });
 });
 
 // 404 handler
-app.use((req, res) => {
+app.use((req: express.Request, res: express.Response) => {
   res.status(404).json({
-    error: "Not Found",
-    message: `Route ${req.method} ${req.path} not found`,
+    success: false,
+    error: 'Route not found',
   });
 });
 
-// Error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error("Error:", err);
-  res.status(err.status || 500).json({
-    error: err.message || "Internal Server Error",
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
-  });
-});
-
-// Start server
 app.listen(PORT, () => {
-  console.log(`API Gateway running on port ${PORT}`);
-  console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
+  console.log(`🚀 API Gateway running on port ${PORT}`);
 });
 
 export default app;
