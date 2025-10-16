@@ -1,121 +1,132 @@
-import compression from 'compression';
-import RedisStore from 'connect-redis';
-import cookieParser from 'cookie-parser';
-import cors from 'cors';
-import crypto from 'crypto';
-import 'dotenv/config';
-import express from 'express';
-import rateLimit from 'express-rate-limit';
-import session from 'express-session';
-import helmet from 'helmet';
-import Redis from 'ioredis';
-import morgan from 'morgan';
-import swaggerJsdoc from 'swagger-jsdoc';
-import swaggerUi from 'swagger-ui-express';
+import compression from "compression";
+import RedisStore from "connect-redis";
+import cookieParser from "cookie-parser";
+import cors from "cors";
+import crypto from "crypto";
+import "dotenv/config";
+import express from "express";
+import rateLimit from "express-rate-limit";
+import session from "express-session";
+import helmet from "helmet";
+import Redis from "ioredis";
+import morgan from "morgan";
+import swaggerJsdoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
 // import { errorHandler } from './middleware/errorHandler';
-import { requestLogger } from './middleware/logger.middleware';
-import { authRoutes } from './routes/auth.routes';
-import healthRoutes from './routes/health.routes';
-import userRoutes from './routes/user.routes';
-const path = require('path');
+import { requestLogger } from "./middleware/logger.middleware";
+import { authRoutes } from "./routes/auth.routes";
+import healthRoutes from "./routes/health.routes";
+import userRoutes from "./routes/user.routes";
+const path = require("path");
+
+// Validar variables de entorno críticas en producción
+if (process.env.NODE_ENV === "production") {
+  if (!process.env.SESSION_SECRET) {
+    console.error("SESSION_SECRET is required in production");
+    process.exit(1);
+  }
+}
 
 // Configurar documentación API
 const swaggerOptions = {
   definition: {
-    openapi: '3.0.0',
+    openapi: "3.0.0",
     info: {
-      title: 'Auth Service API - TributariApp',
-      version: '1.0.0',
+      title: "Auth Service API - TributariApp",
+      version: "1.0.0",
       description:
-        'API de autenticación y autorización para autónomos - Sistema TributariApp',
+        "API de autenticación y autorización para autónomos - Sistema TributariApp",
       contact: {
-        name: 'TributariApp Support',
-        email: 'support@tributariapp.com',
+        name: "TributariApp Support",
+        email: "support@tributariapp.com",
       },
       license: {
-        name: 'Apache 2.0',
-        url: 'https://www.apache.org/licenses/LICENSE-2.0.html',
+        name: "Apache 2.0",
+        url: "https://www.apache.org/licenses/LICENSE-2.0.html",
       },
     },
     servers: [
       {
-        url: 'http://localhost:3003',
-        description: 'Development server',
+        url: "http://localhost:3003",
+        description: "Development server",
       },
       {
-        url: 'https://auth.tributariapp.com',
-        description: 'Production server',
+        url: "https://auth.tributariapp.com",
+        description: "Production server",
       },
     ],
     components: {
       securitySchemes: {
         cookieAuth: {
-          type: 'apiKey',
-          in: 'cookie',
-          name: 'accessToken',
-          description: 'JWT token almacenado en cookie httpOnly',
+          type: "apiKey",
+          in: "cookie",
+          name: "accessToken",
+          description: "JWT token almacenado en cookie httpOnly",
         },
         bearerAuth: {
-          type: 'http',
-          scheme: 'bearer',
-          bearerFormat: 'JWT',
-          description: 'JWT token en header Authorization',
+          type: "http",
+          scheme: "bearer",
+          bearerFormat: "JWT",
+          description: "JWT token en header Authorization",
         },
       },
       schemas: {
         User: {
-          type: 'object',
+          type: "object",
           properties: {
             id: {
-              type: 'string',
-              format: 'uuid',
-              description: 'ID único del usuario',
+              type: "string",
+              format: "uuid",
+              description: "ID único del usuario",
             },
             email: {
-              type: 'string',
-              format: 'email',
-              description: 'Correo electrónico del usuario',
+              type: "string",
+              format: "email",
+              description: "Correo electrónico del usuario",
             },
-            name: { type: 'string', description: 'Nombre completo del usuario' },
+            name: {
+              type: "string",
+              description: "Nombre completo del usuario",
+            },
             role: {
-              type: 'string',
-              enum: ['user', 'admin'],
-              default: 'user',
+              type: "string",
+              enum: ["user", "admin"],
+              default: "user",
             },
-            isActive: { type: 'boolean', default: true },
-            createdAt: { type: 'string', format: 'date-time' },
-            updatedAt: { type: 'string', format: 'date-time' },
+            isActive: { type: "boolean", default: true },
+            createdAt: { type: "string", format: "date-time" },
+            updatedAt: { type: "string", format: "date-time" },
           },
-          required: ['id', 'email', 'name'],
+          required: ["id", "email", "name"],
         },
         ApiResponse: {
-          type: 'object',
+          type: "object",
           properties: {
-            success: { type: 'boolean' },
-            message: { type: 'string' },
-            data: { type: 'object' },
-            timestamp: { type: 'string', format: 'date-time' },
+            success: { type: "boolean" },
+            message: { type: "string" },
+            data: { type: "object" },
+            timestamp: { type: "string", format: "date-time" },
           },
-          required: ['success', 'message', 'timestamp'],
+          required: ["success", "message", "timestamp"],
         },
       },
     },
     security: [{ cookieAuth: [] }],
     tags: [
-      { name: 'Auth', description: 'Endpoints de autenticación y registro' },
-      { name: 'Users', description: 'Gestión de usuarios' },
-      { name: 'Health', description: 'Verificación de estado del servicio' },
+      { name: "Auth", description: "Endpoints de autenticación y registro" },
+      { name: "Users", description: "Gestión de usuarios" },
+      { name: "Health", description: "Verificación de estado del servicio" },
     ],
   },
-  apis: ['./src/routes/*.ts', './src/routes/*.js'],
+  apis: ["./src/routes/*.ts", "./src/routes/*.js"],
 };
 
 const specs = swaggerJsdoc(swaggerOptions);
 
 const setupSwagger = (app: any) => {
-  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
-  app.get('/swagger.json', (req: any, res: any) => {
-    res.setHeader('Content-Type', 'application/json');
+  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
+  app.get("/swagger.json", (req: any, res: any) => {
+    res.setHeader("Content-Type", "application/json");
     res.send(specs);
   });
 };
@@ -127,7 +138,7 @@ const helmetConfig = helmet({
       defaultSrc: ["'self'"],
       styleSrc: ["'self'", "'unsafe-inline'"],
       scriptSrc: ["'self'"],
-      imgSrc: ["'self'", 'data:', 'https:'],
+      imgSrc: ["'self'", "data:", "https:"],
       connectSrc: ["'self'"],
       fontSrc: ["'self'"],
       objectSrc: ["'none'"],
@@ -141,10 +152,13 @@ const helmetConfig = helmet({
 const app = express();
 const PORT = process.env.PORT || 3003;
 
+// Trust proxy for rate limiting and IP logging behind proxies/CDNs
+app.set("trust proxy", 1);
+
 // Configuración de Redis para sesiones
 const redis = new Redis({
-  host: process.env.REDIS_HOST || 'localhost',
-  port: parseInt(process.env.REDIS_PORT || '6379'),
+  host: process.env.REDIS_HOST || "localhost",
+  port: parseInt(process.env.REDIS_PORT || "6379"),
   password: process.env.REDIS_PASSWORD,
   db: 0,
 });
@@ -152,7 +166,7 @@ const redis = new Redis({
 // Store de sesiones Redis
 const redisStore = new RedisStore({
   client: redis,
-  prefix: 'facturacion_sess:',
+  prefix: "facturacion_sess:",
 });
 
 // Middleware de seguridad
@@ -161,9 +175,9 @@ app.use(helmetConfig);
 app.use(
   cors({
     origin: function (origin, callback) {
-      const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(',') || [
-        'http://localhost:3000',
-        'https://localhost:3000',
+      const allowedOrigins = process.env.ALLOWED_ORIGINS?.split(",") || [
+        "http://localhost:3000",
+        "https://localhost:3000",
       ];
 
       // Permitir requests sin origin (mobile apps, etc.)
@@ -172,7 +186,7 @@ app.use(
       if (allowedOrigins.indexOf(origin) !== -1) {
         callback(null, true);
       } else {
-        callback(new Error('Not allowed by CORS'));
+        callback(new Error("Not allowed by CORS"));
       }
     },
     credentials: true, // Importante para cookies
@@ -181,7 +195,7 @@ app.use(
 );
 
 app.use(compression());
-app.use(morgan('combined'));
+app.use(morgan("combined"));
 app.use(cookieParser());
 
 // Configuración de sesiones EXPRESS-SESSION con configuración segura
@@ -190,21 +204,21 @@ app.use(
     store: redisStore,
     secret:
       process.env.SESSION_SECRET ||
-      'your-super-secret-session-key-change-in-production',
-    name: 'sessionId', // Nombre personalizado para ocultar express
+      "your-super-secret-session-key-change-in-production",
+    name: "sessionId", // Nombre personalizado para ocultar express
     resave: false,
     saveUninitialized: false,
     rolling: true, // Renovar expiración en cada request
     cookie: {
-      secure: process.env.NODE_ENV === 'production', // HTTPS en producción
+      secure: process.env.NODE_ENV === "production", // HTTPS en producción
       httpOnly: true, // No accesible desde JavaScript
       maxAge: 30 * 60 * 1000, // 30 minutos
-      sameSite: 'strict' as const, // Protección CSRF
+      sameSite: "strict" as const, // Protección CSRF
       domain: process.env.COOKIE_DOMAIN, // Configurar según dominio
     },
     genid: () => {
       // Generar ID de sesión más seguro
-      return crypto.randomBytes(32).toString('hex');
+      return crypto.randomBytes(32).toString("hex");
     },
   })
 );
@@ -215,8 +229,8 @@ const authLimiter = rateLimit({
   max: 5, // 5 intentos por IP para rutas de auth
   message: {
     error:
-      'Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos.',
-    code: 'TOO_MANY_AUTH_ATTEMPTS',
+      "Demasiados intentos de autenticación. Intenta de nuevo en 15 minutos.",
+    code: "TOO_MANY_AUTH_ATTEMPTS",
   },
   standardHeaders: true,
   legacyHeaders: false,
@@ -228,16 +242,16 @@ const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutos
   max: 100, // 100 requests por ventana
   message: {
-    error: 'Demasiadas solicitudes, inténtalo de nuevo más tarde.',
+    error: "Demasiadas solicitudes, inténtalo de nuevo más tarde.",
   },
 });
 
-app.use('/api/auth', authLimiter as any);
-app.use('/api/', generalLimiter as any);
+app.use("/api/auth", authLimiter as any);
+app.use("/api/", generalLimiter as any);
 
 // Middleware para parsing JSON
-app.use(express.json({ limit: '1mb' }));
-app.use(express.urlencoded({ extended: true, limit: '1mb' }));
+app.use(express.json({ limit: "1mb" }));
+app.use(express.urlencoded({ extended: true, limit: "1mb" }));
 
 // Middleware de logging personalizado
 app.use(requestLogger);
@@ -247,12 +261,12 @@ setupSwagger(app);
 
 // Middleware para regenerar session ID tras login exitoso
 app.use((req, res, next) => {
-  if (req.path.includes('/login') && req.method === 'POST') {
+  if (req.path.includes("/login") && req.method === "POST") {
     // Guardar datos antes de regenerar
     const sessionData = req.session;
     req.session.regenerate((err: any) => {
       if (err) {
-        console.error('Error regenerating session:', err);
+        console.error("Error regenerating session:", err);
         return next(err);
       }
       // Restaurar datos importantes (evita session fixation)
@@ -265,28 +279,28 @@ app.use((req, res, next) => {
 });
 
 // Health check
-app.get('/health', (req, res) => {
+app.get("/health", (req, res) => {
   res.json({
-    status: 'ok',
-    service: 'auth-service',
+    status: "ok",
+    service: "auth-service",
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0',
+    version: process.env.npm_package_version || "1.0.0",
     session: {
-      connected: redis.status === 'ready',
-      store: 'redis',
+      connected: redis.status === "ready",
+      store: "redis",
     },
   });
 });
 
 // Rutas
-app.use('/api/auth', authRoutes);
-app.use('/api/health', healthRoutes);
-app.use('/api/users', userRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/health", healthRoutes);
+app.use("/api/users", userRoutes);
 
 // 404 handler
-app.use('*', (req, res) => {
+app.use("*", (req, res) => {
   res.status(404).json({
-    error: 'Endpoint not found',
+    error: "Endpoint not found",
     path: req.originalUrl,
     method: req.method,
     timestamp: new Date().toISOString(),
@@ -297,14 +311,14 @@ app.use('*', (req, res) => {
 // app.use(errorHandler);
 
 // Graceful shutdown
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received. Shutting down gracefully...');
+process.on("SIGTERM", () => {
+  console.log("SIGTERM received. Shutting down gracefully...");
   redis.disconnect();
   process.exit(0);
 });
 
-process.on('SIGINT', () => {
-  console.log('SIGINT received. Shutting down gracefully...');
+process.on("SIGINT", () => {
+  console.log("SIGINT received. Shutting down gracefully...");
   redis.disconnect();
   process.exit(0);
 });
@@ -317,7 +331,7 @@ app.listen(PORT, () => {
   console.log(`🔒 Security features enabled:`);
   console.log(`   ✅ HttpOnly cookies`);
   console.log(
-    `   ✅ Secure cookies (${process.env.NODE_ENV === 'production' ? 'enabled' : 'disabled - dev mode'})`
+    `   ✅ Secure cookies (${process.env.NODE_ENV === "production" ? "enabled" : "disabled - dev mode"})`
   );
   console.log(`   ✅ SameSite=Strict`);
   console.log(`   ✅ Session fixation protection`);

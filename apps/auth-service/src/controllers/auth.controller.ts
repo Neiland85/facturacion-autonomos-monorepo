@@ -217,11 +217,7 @@ export class AuthController {
       // Invalidar refresh token en Redis si existe
       if (refreshToken) {
         try {
-          const decoded = jwt.verify(
-            refreshToken,
-            process.env.JWT_REFRESH_SECRET!
-          ) as { userId: string };
-          await this.jwtService.revokeRefreshToken(decoded.userId);
+          await this.jwtService.revokeRefreshToken(refreshToken);
         } catch (error) {
           console.error("Error invalidating refresh token:", error);
         }
@@ -298,6 +294,15 @@ export class AuthController {
         // Generar nuevo access token usando refresh token
         const accessToken =
           await this.jwtService.refreshAccessToken(refreshToken);
+
+        if (!accessToken) {
+          res.status(401).json({
+            success: false,
+            error: "No se pudo generar nuevo access token",
+            code: "TOKEN_GENERATION_FAILED",
+          });
+          return;
+        }
 
         // Actualizar cookie
         res.cookie("accessToken", accessToken, {

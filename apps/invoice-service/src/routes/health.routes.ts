@@ -1,4 +1,5 @@
 import express from "express";
+import { prisma } from "@facturacion/database";
 
 const router: express.Router = express.Router();
 
@@ -52,14 +53,18 @@ router.get("/", async (req: express.Request, res: express.Response) => {
   };
 
   try {
-    // Verificar base de datos (simulado por ahora)
-    // TODO: Implementar verificación real de Prisma
-    checks.database = true;
+    // Verificar base de datos con consulta real
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      checks.database = true;
+    } catch (error) {
+      console.warn("Database health check failed:", error);
+    }
 
     // Verificar sistema de archivos
     try {
       const fs = require("fs").promises;
-      const uploadPath = process.env.UPLOAD_PATH || "./uploads";
+      const uploadPath = process.env.UPLOAD_PATH ?? "./uploads";
 
       // Crear directorio si no existe
       await fs.mkdir(uploadPath, { recursive: true });
@@ -86,7 +91,7 @@ router.get("/", async (req: express.Request, res: express.Response) => {
         ? "Invoice Service is healthy"
         : "Invoice Service has issues",
       service: "invoice-service",
-      version: process.env.npm_package_version || "1.0.0",
+      version: process.env.npm_package_version ?? "1.0.0",
       timestamp: new Date().toISOString(),
       checks: {
         database: checks.database ? "up" : "down",

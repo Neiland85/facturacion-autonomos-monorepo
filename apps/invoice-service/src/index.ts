@@ -17,7 +17,10 @@ const { setupSwagger } = require(
 );
 
 const app: express.Application = express();
-const PORT = process.env.PORT ?? 3001;
+const PORT = process.env.PORT ?? 3002;
+
+// Trust proxy for rate limiting and IP logging behind proxies/CDNs
+app.set("trust proxy", 1);
 
 // Middleware de seguridad
 app.use(helmet());
@@ -50,9 +53,11 @@ setupSwagger(app);
 
 // Importar rutas
 import assistantRoutes from "./routes/assistant.routes";
+import healthRoutes from "./routes/health.routes";
 
 // Usar rutas
 app.use("/api", assistantRoutes);
+app.use("/api/health", healthRoutes);
 
 // Health check
 app.get("/health", (req: express.Request, res: express.Response) => {

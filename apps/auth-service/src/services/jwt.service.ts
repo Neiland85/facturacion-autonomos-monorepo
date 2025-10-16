@@ -22,12 +22,19 @@ export class JWTService {
   private readonly refreshTokenExpiry = "7d"; // 7 días
 
   constructor() {
-    this.accessTokenSecret =
-      process.env.JWT_ACCESS_SECRET ??
-      "fallback-access-secret-change-in-production";
-    this.refreshTokenSecret =
-      process.env.JWT_REFRESH_SECRET ??
-      "fallback-refresh-secret-change-in-production";
+    const isProduction = process.env.NODE_ENV === "production";
+
+    this.accessTokenSecret = process.env.JWT_ACCESS_SECRET;
+    this.refreshTokenSecret = process.env.JWT_REFRESH_SECRET;
+
+    if (isProduction) {
+      if (!this.accessTokenSecret) {
+        throw new Error("JWT_ACCESS_SECRET is required in production");
+      }
+      if (!this.refreshTokenSecret) {
+        throw new Error("JWT_REFRESH_SECRET is required in production");
+      }
+    }
   }
 
   /**
@@ -381,7 +388,7 @@ export class JWTService {
   isTokenExpiringSoon(token: string, thresholdMinutes = 5): boolean {
     try {
       const decoded: any = jwt.decode(token);
-      if (!decoded || !decoded.exp) {
+      if (!decoded?.exp) {
         return true;
       }
 

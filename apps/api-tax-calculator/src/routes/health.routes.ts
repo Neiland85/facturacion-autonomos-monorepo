@@ -1,4 +1,5 @@
 import express from "express";
+import { prisma } from "@facturacion/database";
 
 const router: express.Router = express.Router();
 
@@ -43,9 +44,13 @@ router.get("/", async (req: express.Request, res: express.Response) => {
   };
 
   try {
-    // Verificar base de datos (simulado por ahora)
-    // TODO: Implementar verificación real de Prisma
-    checks.database = true;
+    // Verificar base de datos con consulta real
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      checks.database = true;
+    } catch (error) {
+      console.warn("Database health check failed:", error);
+    }
 
     // Verificar configuración AEAT
     const aeatPublicKey = process.env.AEAT_PUBLIC_KEY;
@@ -65,7 +70,7 @@ router.get("/", async (req: express.Request, res: express.Response) => {
         ? "Tax Calculator Service is healthy"
         : "Tax Calculator Service has issues",
       service: "tax-calculator",
-      version: process.env.npm_package_version || "1.0.0",
+      version: process.env.npm_package_version ?? "1.0.0",
       timestamp: new Date().toISOString(),
       checks: {
         database: checks.database ? "up" : "down",

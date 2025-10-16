@@ -11,6 +11,9 @@ import healthRoutes from "./routes/health.routes";
 const app: Application = express();
 const PORT = process.env.PORT || 3001;
 
+// Trust proxy for rate limiting and IP logging behind proxies/CDNs
+app.set("trust proxy", 1);
+
 // Middleware
 app.use(helmet());
 app.use(cors());
@@ -48,13 +51,20 @@ app.use((req, res) => {
 });
 
 // Error handler
-app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error("Error:", err);
-  res.status(err.status || 500).json({
-    error: err.message || "Internal Server Error",
-    ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
-  });
-});
+app.use(
+  (
+    err: any,
+    req: express.Request,
+    res: express.Response,
+    next: express.NextFunction
+  ) => {
+    console.error("Error:", err);
+    res.status(err.status || 500).json({
+      error: err.message || "Internal Server Error",
+      ...(process.env.NODE_ENV === "development" && { stack: err.stack }),
+    });
+  }
+);
 
 // Start server
 app.listen(PORT, () => {

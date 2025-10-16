@@ -1,5 +1,6 @@
 import express from "express";
 import Redis from "ioredis";
+import { prisma } from "@facturacion/database";
 
 const router: express.Router = express.Router();
 
@@ -65,9 +66,13 @@ router.get("/", async (req: express.Request, res: express.Response) => {
       console.warn("Redis health check failed:", error);
     }
 
-    // Verificar base de datos (simulado por ahora)
-    // TODO: Implementar verificación real de Prisma
-    checks.database = true;
+    // Verificar base de datos con consulta real
+    try {
+      await prisma.$queryRaw`SELECT 1`;
+      checks.database = true;
+    } catch (error) {
+      console.warn("Database health check failed:", error);
+    }
 
     checks.overall = checks.redis && checks.database;
 
@@ -81,7 +86,7 @@ router.get("/", async (req: express.Request, res: express.Response) => {
         ? "Auth Service is healthy"
         : "Auth Service has issues",
       service: "auth-service",
-      version: process.env.npm_package_version || "1.0.0",
+      version: process.env.npm_package_version ?? "1.0.0",
       timestamp: new Date().toISOString(),
       checks: {
         redis: checks.redis ? "up" : "down",

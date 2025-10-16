@@ -8,7 +8,10 @@ const { setupSwagger } = require(
 );
 
 const app: express.Application = express();
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT ?? 3004;
+
+// Trust proxy for rate limiting and IP logging behind proxies/CDNs
+app.set("trust proxy", 1);
 
 // TODO: Crear middlewares faltantes
 // import { errorHandler } from './middleware/errorHandler';
@@ -88,5 +91,3 @@ process.on("SIGINT", async () => {
     process.exit(0);
   });
 });
-
-const c = 3; // Selecciona la versión correcta
