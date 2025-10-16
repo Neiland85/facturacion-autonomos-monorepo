@@ -55,6 +55,11 @@ next-env.d.ts
 # ===========================================
 # 🔐 SECRETS & ENVIRONMENT VARIABLES
 # ===========================================
+# Ignore all .env files except .env.example (which serves as template)
+.env*
+!.env.example
+
+# Legacy patterns (keeping for compatibility)
 .env
 .env.local
 .env.development.local

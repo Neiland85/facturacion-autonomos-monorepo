@@ -1,40 +1,128 @@
-version: '3.8'
+version: "3.8"
 
 services:
-  backend:
+  # API Gateway
+  api-gateway:
     build:
-      context: ./backend
+      context: ./apps/api-gateway
     ports:
-      - '3000:3000'
+      - "3001:3001"
     environment:
       - NODE_ENV=development
+      - PORT=3001
+      - AUTH_SERVICE_URL=http://auth-service:3003
+      - INVOICE_SERVICE_URL=http://invoice-service:3002
+      - TAX_CALCULATOR_URL=http://api-tax-calculator:3004
+    depends_on:
+      - auth-service
+      - invoice-service
+      - api-tax-calculator
     volumes:
-      - ./backend:/usr/src/app
+      - ./apps/api-gateway:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run dev
+    command: pnpm run dev
 
-  frontend:
+  # Authentication Service
+  auth-service:
     build:
-      context: ./frontend
+      context: ./apps/auth-service
     ports:
-      - '3001:3000'
+      - "3003:3003"
     environment:
       - NODE_ENV=development
+      - PORT=3003
+      - DATABASE_URL=postgresql://user:password@db:5432/facturacion
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - JWT_ACCESS_SECRET=your-super-secret-jwt-access-key-change-in-production
+      - JWT_REFRESH_SECRET=your-super-secret-jwt-refresh-key-change-in-production
+      - SESSION_SECRET=your-super-secret-session-key-change-in-production
+      - COOKIE_DOMAIN=localhost
+    depends_on:
+      - db
+      - redis
     volumes:
-      - ./frontend:/usr/src/app
+      - ./apps/auth-service:/usr/src/app
       - /usr/src/app/node_modules
-    command: npm run dev
+    command: pnpm run dev
 
+  # Invoice Service
+  invoice-service:
+    build:
+      context: ./apps/invoice-service
+    ports:
+      - "3002:3002"
+    environment:
+      - NODE_ENV=development
+      - PORT=3002
+      - DATABASE_URL=postgresql://user:password@db:5432/facturacion
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./apps/invoice-service:/usr/src/app
+      - /usr/src/app/node_modules
+    command: pnpm run dev
+
+  # Tax Calculator Service
+  api-tax-calculator:
+    build:
+      context: ./apps/api-tax-calculator
+    ports:
+      - "3004:3004"
+    environment:
+      - NODE_ENV=development
+      - PORT=3004
+      - DATABASE_URL=postgresql://user:password@db:5432/facturacion
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+    depends_on:
+      - db
+      - redis
+    volumes:
+      - ./apps/api-tax-calculator:/usr/src/app
+      - /usr/src/app/node_modules
+    command: pnpm run dev
+
+  # Web Frontend
+  web:
+    build:
+      context: ./apps/web
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - NEXT_PUBLIC_API_URL=http://localhost:3001
+    depends_on:
+      - api-gateway
+    volumes:
+      - ./apps/web:/usr/src/app
+      - /usr/src/app/node_modules
+      - /usr/src/app/.next
+    command: pnpm run dev
+
+  # PostgreSQL Database
   db:
     image: postgres:15
     environment:
-      POSTGRES_USER: ${POSTGRES_USER}
-      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
-      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: user
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: facturacion
     ports:
-      - '5432:5432'
+      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
 
+  # Redis for sessions and caching
+  redis:
+    image: redis:7-alpine
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+
 volumes:
   db_data:
+  redis_data:
