@@ -6,9 +6,9 @@ const router = Router();
 router.get('/', (req, res) => {
   res.json({
     success: true,
-    message: 'Auth Service is healthy',
+    message: 'Subscription Service is healthy',
     timestamp: new Date().toISOString(),
-    service: 'auth-service',
+    service: 'subscription-service',
     version: '1.0.0'
   });
 });

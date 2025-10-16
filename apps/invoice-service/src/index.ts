@@ -1,122 +1,56 @@
-import cors from "cors";
-import "dotenv/config";
-import express from "express";
-import rateLimit from "express-rate-limit";
-import helmet from "helmet";
-import morgan from "morgan";
-import path from "path";
+import express from 'express';
+import cors from 'cors';
+import helmet from 'helmet';
+import compression from 'compression';
+import morgan from 'morgan';
+import rateLimit from 'express-rate-limit';
 
-// Importar extensiones de números llamables
-if (process.env.NODE_ENV !== "test") {
-  import("./types/number-callable.prod");
-}
+// Import routes
+import invoiceRoutes from './routes/invoice.routes';
+import healthRoutes from './routes/health.routes';
 
-// Configurar documentación API
-const { setupSwagger } = require(
-  path.join(__dirname, "../../config/invoice-service-swagger")
-);
+const app = express();
+const PORT = process.env.PORT || 3003;
 
-const app: express.Application = express();
-const PORT = process.env.PORT ?? 3002;
-
-// Trust proxy for rate limiting and IP logging behind proxies/CDNs
-app.set("trust proxy", 1);
-
-// Middleware de seguridad
+// Middleware
 app.use(helmet());
-app.use(
-  cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(",") ?? [
-      "http://localhost:3000",
-    ],
-    credentials: true,
-  })
-);
+app.use(cors());
+app.use(compression());
+app.use(morgan('combined'));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
 // Rate limiting
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // 100 requests por ventana
-  message: "Demasiadas solicitudes, inténtalo de nuevo más tarde.",
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.',
 });
-app.use(limiter as any);
+app.use(limiter);
 
-// Middleware para parsing
-app.use(express.json({ limit: "10mb" }));
-app.use(express.urlencoded({ extended: true }));
+// Routes
+app.use('/api/invoices', invoiceRoutes);
+app.use('/api/health', healthRoutes);
 
-// Logging
-app.use(morgan("combined"));
-
-// Configurar documentación API
-setupSwagger(app);
-
-// Importar rutas
-import assistantRoutes from "./routes/assistant.routes";
-import healthRoutes from "./routes/health.routes";
-
-// Usar rutas
-app.use("/api", assistantRoutes);
-app.use("/api/health", healthRoutes);
-
-// Health check
-app.get("/health", (req: express.Request, res: express.Response) => {
-  res.json({
-    status: "ok",
-    service: "invoice-service",
-    timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version ?? "1.0.0",
+// Error handling middleware
+app.use((err: any, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({
+    success: false,
+    error: 'Internal server error',
   });
 });
-
-// Rutas principales
-app.get(
-  "/api/invoices/stats",
-  (req: express.Request, res: express.Response) => {
-    res.json({
-      message: "Invoice service stats endpoint",
-      totalInvoices: 0,
-      pendingInvoices: 0,
-      timestamp: new Date().toISOString(),
-    });
-  }
-);
 
 // 404 handler
-app.use("*", (req: express.Request, res: express.Response) => {
+app.use((req: express.Request, res: express.Response) => {
   res.status(404).json({
-    error: "Endpoint not found",
-    path: req.originalUrl,
-    method: req.method,
-    timestamp: new Date().toISOString(),
+    success: false,
+    error: 'Route not found',
   });
 });
 
-// Error handler
-app.use(
-  (
-    err: Error,
-    req: express.Request,
-    res: express.Response,
-    _next: express.NextFunction
-  ) => {
-    console.error("Error:", err);
-    res.status(500).json({
-      error: "Internal server error",
-      timestamp: new Date().toISOString(),
-    });
-  }
-);
-
 app.listen(PORT, () => {
-  console.info(`📄 Invoice Service running on port ${PORT}`);
-  console.info(
-    `📖 API Documentation available at: http://localhost:${PORT}/api-docs`
-  );
-  console.info(`🔒 Security features enabled:`);
-  console.info(`   ✅ Helmet security headers`);
-  console.info(`   ✅ CORS protection`);
-  console.info(`   ✅ Rate limiting`);
+  console.log(`🚀 Invoice Service running on port ${PORT}`);
 });
 
 export default app;

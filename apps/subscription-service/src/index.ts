@@ -6,17 +6,23 @@ import morgan from 'morgan';
 import rateLimit from 'express-rate-limit';
 
 // Import routes
-import gatewayRoutes from './routes/gateway.routes';
+import subscriptionRoutes from './routes/subscription.routes';
+import webhookRoutes from './routes/webhook.routes';
 import healthRoutes from './routes/health.routes';
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3002;
 
 // Middleware
 app.use(helmet());
 app.use(cors());
 app.use(compression());
 app.use(morgan('combined'));
+
+// Stripe webhooks need raw body
+app.use('/api/webhooks', express.raw({ type: 'application/json' }));
+
+// Other routes need JSON parsing
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
@@ -29,7 +35,8 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Routes
-app.use('/api', gatewayRoutes);
+app.use('/api/subscriptions', subscriptionRoutes);
+app.use('/api/webhooks', webhookRoutes);
 app.use('/api/health', healthRoutes);
 
 // Error handling middleware
@@ -50,7 +57,7 @@ app.use((req: express.Request, res: express.Response) => {
 });
 
 app.listen(PORT, () => {
-  console.log(`🚀 API Gateway running on port ${PORT}`);
+  console.log(`🚀 Subscription Service running on port ${PORT}`);
 });
 
 export default app;

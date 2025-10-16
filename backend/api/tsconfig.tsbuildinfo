@@ -1,1 +1,0 @@
-{"root":["./src/index.ts","./src/controllers/invoicecontroller.ts","./src/controllers/usercontroller.ts","./src/prisma/client.ts","./src/routes/index.ts","./src/routes/userroutes.ts","./src/utils/logger.ts"],"errors":true,"version":"5.8.3"}
