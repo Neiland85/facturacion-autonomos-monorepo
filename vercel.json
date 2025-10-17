@@ -1,9 +1,0 @@
-{
-  "version": 2,
-  "buildCommand": "pnpm run build --continue",
-  "installCommand": "pnpm install --frozen-lockfile",
-  "framework": null,
-  "env": {
-    "NODE_ENV": "production"
-  }
-}
