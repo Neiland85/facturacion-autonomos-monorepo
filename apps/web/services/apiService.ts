@@ -1,138 +1,437 @@
-import { DashboardData, Invoice, InvoiceStatus, Client, FiscalData } from '../types';
-import { httpClient, withIdempotency } from './httpClient';
-import { v4 as uuidv4 } from 'uuid';
+import {
+  ApiResponse,
+  Client,
+  Company,
+  DashboardData,
+  Invoice,
+  InvoiceLine,
+  InvoiceStatus,
+  InvoiceStatusLabels,
+  PaginatedResult,
+} from "../types";
+import { httpClient, withIdempotency } from "./httpClient";
+import { v4 as uuidv4 } from "uuid";
 
-// Authentication functions
+export type InvoiceListParams = {
+  page?: number;
+  limit?: number;
+  status?: InvoiceStatus;
+  search?: string;
+  series?: string;
+  dateFrom?: string;
+  dateTo?: string;
+};
+
+export type ClientListParams = {
+  page?: number;
+  limit?: number;
+  search?: string;
+};
+
+export type CreateInvoicePayload = {
+  clientId: string;
+  companyId: string;
+  issueDate: string;
+  dueDate?: string | null;
+  notes?: string | null;
+  lines: Array<{
+    description: string;
+    quantity: number;
+    price: number;
+    vatRate: number;
+  }>;
+};
+
+export type UpdateInvoicePayload = Partial<CreateInvoicePayload> & {
+  status?: InvoiceStatus;
+};
+
+export type CreateClientPayload = {
+  name: string;
+  nifCif: string;
+  address?: string;
+  city?: string;
+  postalCode?: string;
+  province?: string;
+  phone?: string;
+  email?: string;
+};
+
+export type UpdateClientPayload = Partial<CreateClientPayload>;
+
+export type UpsertCompanyPayload = {
+  name: string;
+  cif: string;
+  address: string;
+  city: string;
+  postalCode: string;
+  province: string;
+  phone?: string;
+  email?: string;
+  website?: string;
+  taxRegime?: string;
+};
+
+const toNumber = (value: unknown): number => {
+  if (value === null || value === undefined) {
+    return 0;
+  }
+
+  if (typeof value === "number") {
+    return value;
+  }
+
+  if (typeof value === "string") {
+    const parsed = Number(value);
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+
+  if (typeof value === "object" && value !== null && "toString" in value) {
+    const parsed = Number((value as { toString: () => string }).toString());
+    return Number.isNaN(parsed) ? 0 : parsed;
+  }
+
+  return 0;
+};
+
+const mapClient = (client: any): Client => ({
+  id: client.id,
+  name: client.name,
+  nifCif: client.nifCif,
+  address: client.address ?? null,
+  city: client.city ?? null,
+  postalCode: client.postalCode ?? null,
+  province: client.province ?? null,
+  phone: client.phone ?? null,
+  email: client.email ?? null,
+  createdAt: client.createdAt,
+  updatedAt: client.updatedAt,
+});
+
+const mapCompany = (company: any): Company => ({
+  id: company.id,
+  name: company.name,
+  cif: company.cif,
+  address: company.address,
+  city: company.city,
+  postalCode: company.postalCode,
+  province: company.province,
+  phone: company.phone ?? null,
+  email: company.email ?? null,
+  website: company.website ?? null,
+  taxRegime: company.taxRegime ?? null,
+  vatNumber: company.vatNumber ?? null,
+  createdAt: company.createdAt,
+  updatedAt: company.updatedAt,
+});
+
+const mapInvoiceLine = (line: any): InvoiceLine => ({
+  id: line.id,
+  description: line.description,
+  quantity: toNumber(line.quantity),
+  price: toNumber(line.price),
+  vatRate: toNumber(line.vatRate),
+  amount: toNumber(line.amount),
+});
+
+const mapInvoice = (invoice: any): Invoice => ({
+  id: invoice.id,
+  number: invoice.number,
+  series: invoice.series,
+  issueDate: invoice.issueDate,
+  dueDate: invoice.dueDate ?? null,
+  subtotal: toNumber(invoice.subtotal),
+  vatAmount: toNumber(invoice.vatAmount),
+  total: toNumber(invoice.total),
+  status: (invoice.status as InvoiceStatus) ?? InvoiceStatus.Draft,
+  notes: invoice.notes ?? null,
+  signedXml: invoice.signedXml ?? null,
+  pdfUrl: invoice.pdfUrl ?? null,
+  client: mapClient(invoice.client),
+  company: mapCompany(invoice.company),
+  lines: Array.isArray(invoice.lines) ? invoice.lines.map(mapInvoiceLine) : [],
+  createdAt: invoice.createdAt,
+  updatedAt: invoice.updatedAt,
+});
+
+const mapPaginated = <T>(payload: any, mapper: (item: any) => T): PaginatedResult<T> => ({
+  items: Array.isArray(payload.items) ? payload.items.map(mapper) : [],
+  page: payload.page,
+  limit: payload.limit,
+  total: payload.total,
+  totalPages: payload.totalPages,
+});
+
+// Authentication
 export const login = async (email: string, password: string) => {
-  const response = await httpClient.post('/auth/login', { email, password });
+  const response = await httpClient.post("/auth/login", { email, password });
   return response.data;
 };
 
-export const register = async (data: { email: string; password: string; firstName: string; lastName: string; companyName?: string }) => {
-  const response = await httpClient.post('/auth/register', data);
+export const register = async (data: {
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  companyName?: string;
+}) => {
+  const response = await httpClient.post("/auth/register", data);
   return response.data;
 };
 
-// Dashboard data
+// Dashboard / stats
 export const getDashboardData = async (): Promise<DashboardData> => {
-  const response = await httpClient.get('/invoices/stats/summary');
-  return response.data;
+  const response = await httpClient.get<ApiResponse<any>>("/invoices/stats/summary");
+  const payload = response.data.data;
+
+  return {
+    totals: {
+      totalInvoices: payload.totals.totalInvoices ?? 0,
+      subtotal: toNumber(payload.totals.subtotal),
+      vatAmount: toNumber(payload.totals.vatAmount),
+      totalRevenue: toNumber(payload.totals.totalRevenue),
+    },
+    byStatus: Array.isArray(payload.byStatus)
+      ? payload.byStatus.map((item: any) => ({
+          status: (item.status as InvoiceStatus) ?? InvoiceStatus.Draft,
+          count: item.count ?? item._count ?? 0,
+          totalAmount: toNumber(item.totalAmount ?? item._sum?.total),
+        }))
+      : [],
+    recentInvoices: Array.isArray(payload.recentInvoices)
+      ? payload.recentInvoices.map(mapInvoice)
+      : [],
+  };
 };
 
-// Invoices with pagination
-export const getInvoices = async (params?: { page?: number; limit?: number; status?: InvoiceStatus; search?: string }): Promise<{
-  invoices: Invoice[];
-  total: number;
-  page: number;
-  totalPages: number;
-}> => {
-  const response = await httpClient.get('/invoices', { params });
-  return response.data;
+// Invoices
+export const getInvoices = async (
+  params: InvoiceListParams = {}
+): Promise<PaginatedResult<Invoice>> => {
+  const response = await httpClient.get<ApiResponse<any>>("/invoices", {
+    params,
+  });
+
+  return mapPaginated(response.data.data, mapInvoice);
 };
 
-// Create invoice with idempotency
-export const createInvoice = async (invoiceData: {
-  clientName: string;
-  amount: number;
-  description?: string;
-  dueDate: string;
-  category?: string;
-  invoiceType?: 'proforma' | 'official';
-}): Promise<Invoice> => {
+export const getInvoiceById = async (id: string): Promise<Invoice> => {
+  const response = await httpClient.get<ApiResponse<any>>(`/invoices/${id}`);
+  return mapInvoice(response.data.data);
+};
+
+export const createInvoice = async (
+  payload: CreateInvoicePayload
+): Promise<Invoice> => {
   const idempotencyKey = uuidv4();
-  const response = await httpClient.post('/invoices', invoiceData, withIdempotency({}, idempotencyKey));
-  return response.data;
+  const response = await httpClient.post<ApiResponse<any>>(
+    "/invoices",
+    payload,
+    withIdempotency({}, idempotencyKey)
+  );
+
+  return mapInvoice(response.data.data);
+};
+
+export const updateInvoice = async (
+  id: string,
+  payload: UpdateInvoicePayload
+): Promise<Invoice> => {
+  const idempotencyKey = uuidv4();
+  const response = await httpClient.put<ApiResponse<any>>(
+    `/invoices/${id}`,
+    payload,
+    withIdempotency({}, idempotencyKey)
+  );
+
+  return mapInvoice(response.data.data);
+};
+
+export const deleteInvoice = async (id: string): Promise<void> => {
+  await httpClient.delete<ApiResponse<void>>(`/invoices/${id}`);
+};
+
+export const downloadSignedXml = async (id: string): Promise<Blob> => {
+  const response = await httpClient.get(`/invoices/${id}/xml/signed`, {
+    responseType: "blob",
+  });
+
+  return response.data as Blob;
 };
 
 // Clients
-export const getClients = async (): Promise<Client[]> => {
-  const response = await httpClient.get('/clients');
-  return response.data;
+export const getClients = async (
+  params: ClientListParams = {}
+): Promise<PaginatedResult<Client>> => {
+  const response = await httpClient.get<ApiResponse<any>>("/clients", {
+    params,
+  });
+
+  return mapPaginated(response.data.data, mapClient);
 };
 
-// Fiscal data
-export const getFiscalData = async (year: number, quarter: number): Promise<FiscalData> => {
-  const response = await httpClient.get(`/fiscal/${year}/quarter/${quarter}`);
-  return response.data;
+export const createClient = async (
+  payload: CreateClientPayload
+): Promise<Client> => {
+  const idempotencyKey = uuidv4();
+  const response = await httpClient.post<ApiResponse<any>>(
+    "/clients",
+    payload,
+    withIdempotency({}, idempotencyKey)
+  );
+
+  return mapClient(response.data.data);
 };
 
-// Subscription management
+export const updateClient = async (
+  id: string,
+  payload: UpdateClientPayload
+): Promise<Client> => {
+  const idempotencyKey = uuidv4();
+  const response = await httpClient.put<ApiResponse<any>>(
+    `/clients/${id}`,
+    payload,
+    withIdempotency({}, idempotencyKey)
+  );
+
+  return mapClient(response.data.data);
+};
+
+export const deleteClient = async (id: string): Promise<void> => {
+  await httpClient.delete<ApiResponse<void>>(`/clients/${id}`);
+};
+
+// Company
+export const getMyCompany = async (): Promise<Company> => {
+  const response = await httpClient.get<ApiResponse<any>>("/companies/me");
+  return mapCompany(response.data.data);
+};
+
+export const createCompany = async (
+  payload: UpsertCompanyPayload
+): Promise<Company> => {
+  const response = await httpClient.post<ApiResponse<any>>("/companies", payload);
+  return mapCompany(response.data.data);
+};
+
+export const updateCompany = async (
+  payload: UpsertCompanyPayload
+): Promise<Company> => {
+  const response = await httpClient.put<ApiResponse<any>>("/companies", payload);
+  return mapCompany(response.data.data);
+};
+
+// Subscription management (unchanged)
 export const createSubscription = async (subscriptionData: {
   planId: string;
   paymentMethodId?: string;
 }): Promise<any> => {
   const idempotencyKey = uuidv4();
-  const response = await httpClient.post('/subscriptions', subscriptionData, withIdempotency({}, idempotencyKey));
+  const response = await httpClient.post(
+    "/subscriptions",
+    subscriptionData,
+    withIdempotency({}, idempotencyKey)
+  );
   return response.data;
 };
 
-// Legacy mock functions - only used when VITE_ENABLE_MOCK_DATA=true
-const getMockDashboardData = async (): Promise<DashboardData> => {
-  console.log("Fetching dashboard data...");
-  await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
+// Mock helpers for demo environments
+const runtimeEnv = (import.meta as Record<string, any> | undefined)?.env ?? {};
+const ENABLE_MOCK_DATA = runtimeEnv.VITE_ENABLE_MOCK_DATA === "true";
 
-  const recentInvoices: Invoice[] = [
-    { id: '1', invoiceNumber: 'INV-005', clientName: 'Innovate Solutions', issueDate: '20/06/2024', dueDate: '20/07/2024', amount: 1200, status: InvoiceStatus.Pending, category: 'Ingreso por Ventas' },
-    { id: '2', invoiceNumber: 'INV-004', clientName: 'García & Asociados', issueDate: '15/06/2024', dueDate: '15/07/2024', amount: 850, status: InvoiceStatus.Paid, category: 'Servicios Profesionales' },
-    { id: '3', invoiceNumber: 'INV-003', clientName: 'Creative Web Design', issueDate: '01/05/2024', dueDate: '01/06/2024', amount: 2500, status: InvoiceStatus.Overdue, category: 'Diseño y Creatividad' },
-  ];
-
-  return {
-    monthlyInvoices: {
-      count: 12,
-      change: 15,
-      new: 3,
-    },
-    totalRevenue: {
-      amount: 4580.50,
-      change: 8.2,
-    },
-    pendingAmount: {
-      amount: 3700,
-      invoiceCount: 2,
-    },
-    recentInvoices,
-  };
+const mockCompany: Company = {
+  id: "company-1",
+  name: "Mi Empresa Creativa S.L.",
+  cif: "B12345678",
+  address: "Calle Ejemplo 123",
+  city: "Madrid",
+  postalCode: "28001",
+  province: "Madrid",
+  phone: "+34911222333",
+  email: "hola@miempresa.es",
+  website: "https://miempresa.es",
+  taxRegime: "GENERAL",
+  vatNumber: "ESB12345678",
 };
 
-// Mock function to simulate fetching clients
-const getMockClients = async (): Promise<Client[]> => {
-    console.log("Fetching clients...");
-    await new Promise(resolve => setTimeout(resolve, 300));
-    return [
-        { id: '1', name: 'Innovate Solutions S.L.' },
-        { id: '2', name: 'García & Asociados Gestoría' },
-        { id: '3', name: 'Creative Web Design' },
-        { id: '4', name: 'Supermercados El Ahorro' },
-    ];
-};
+const mockClient = (id: string, name: string): Client => ({
+  id,
+  name,
+  nifCif: `X${id.toUpperCase()}`,
+  address: "Calle Ficticia 45",
+  city: "Madrid",
+  postalCode: "28002",
+  province: "Madrid",
+  phone: "+34910000000",
+  email: `${name.toLowerCase().replace(/\s+/g, ".")}@mail.com`,
+});
 
-// Mock function to simulate fetching fiscal data
-const getMockFiscalData = async (year: number, quarter: number): Promise<FiscalData> => {
-    console.log(`Fetching fiscal data for Q${quarter} ${year}...`);
-    await new Promise(resolve => setTimeout(resolve, 700));
+const mockInvoice = (id: string, overrides: Partial<Invoice> = {}): Invoice => ({
+  id,
+  number: `INV-${id}`,
+  series: "A",
+  issueDate: new Date().toISOString(),
+  dueDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString(),
+  subtotal: 1200,
+  vatAmount: 252,
+  total: 1452,
+  status: InvoiceStatus.Sent,
+  notes: "",
+  signedXml: null,
+  pdfUrl: null,
+  client: mockClient("client-1", "Innovate Solutions"),
+  company: mockCompany,
+  lines: [
+    {
+      id: `line-${id}`,
+      description: "Servicio de consultoría",
+      quantity: 1,
+      price: 1200,
+      vatRate: 21,
+      amount: 1200,
+    },
+  ],
+  ...overrides,
+});
 
-    const baseRevenue = {
-        1: [{ month: 'Ene', revenue: 3800 }, { month: 'Feb', revenue: 4500 }, { month: 'Mar', revenue: 4100 }],
-        2: [{ month: 'Abr', revenue: 4200 }, { month: 'May', revenue: 5100 }, { month: 'Jun', revenue: 4850 }],
-        3: [{ month: 'Jul', revenue: 5500 }, { month: 'Ago', revenue: 5300 }, { month: 'Sep', revenue: 6100 }],
-        4: [{ month: 'Oct', revenue: 6500 }, { month: 'Nov', revenue: 7200 }, { month: 'Dic', revenue: 8000 }],
-    }[quarter] || [];
+const getMockDashboardData = async (): Promise<DashboardData> => ({
+  totals: {
+    totalInvoices: 5,
+    subtotal: 5600,
+    vatAmount: 1176,
+    totalRevenue: 6776,
+  },
+  byStatus: [
+    { status: InvoiceStatus.Sent, count: 2, totalAmount: 2900 },
+    { status: InvoiceStatus.Paid, count: 2, totalAmount: 2876 },
+    { status: InvoiceStatus.Draft, count: 1, totalAmount: 1000 },
+  ],
+  recentInvoices: [
+    mockInvoice("005", { total: 1800, client: mockClient("client-2", "García & Asociados") }),
+    mockInvoice("004", { total: 850, status: InvoiceStatus.Paid }),
+    mockInvoice("003", { total: 2500, status: InvoiceStatus.Overdue }),
+  ],
+});
 
-    // Simulate some variation based on quarter
-    const randomFactor = (quarter / 4) + 0.5;
+const getMockClients = async (): Promise<PaginatedResult<Client>> => ({
+  items: [
+    mockClient("client-1", "Innovate Solutions S.L."),
+    mockClient("client-2", "García & Asociados Gestoría"),
+    mockClient("client-3", "Creative Web Design"),
+    mockClient("client-4", "Supermercados El Ahorro"),
+  ],
+  page: 1,
+  limit: 10,
+  total: 4,
+  totalPages: 1,
+});
 
-    return {
-        quarterlyExpense: 3250.75 * randomFactor,
-        pendingVAT: 2345.10 * randomFactor,
-        sentInvoices: Math.round(35 * randomFactor),
-        revenueChartData: baseRevenue.map(d => ({ ...d, revenue: d.revenue * randomFactor })),
-    };
-};
+export const getDashboardDataWithFallback = ENABLE_MOCK_DATA
+  ? getMockDashboardData
+  : getDashboardData;
 
-// Fallback to mocks if enabled
-const ENABLE_MOCK_DATA = import.meta.env.VITE_ENABLE_MOCK_DATA === 'true';
+export const getClientsWithFallback = ENABLE_MOCK_DATA
+  ? (async () => (await getMockClients()).items)
+  : async (params?: ClientListParams) => (await getClients(params)).items;
 
-export const getDashboardDataWithFallback = ENABLE_MOCK_DATA ? getMockDashboardData : getDashboardData;
-export const getClientsWithFallback = ENABLE_MOCK_DATA ? getMockClients : getClients;
-export const getFiscalDataWithFallback = ENABLE_MOCK_DATA ? getMockFiscalData : getFiscalData;
+export const InvoiceStatusDisplay = InvoiceStatusLabels;

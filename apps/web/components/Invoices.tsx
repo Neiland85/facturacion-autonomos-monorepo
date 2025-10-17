@@ -1,20 +1,22 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { useQuery } from '@tanstack/react-query';
-import { getDashboardData } from '../services/apiService';
+import { getInvoices } from '../services/apiService';
 import { getInvoiceSuggestions } from '../services/geminiService';
-import { Invoice, InvoiceStatus, View, DashboardData, InvoiceSuggestion, SubscriptionTier, VoiceInvoiceData } from '../types';
+import { Invoice, InvoiceStatus, InvoiceStatusLabels, View, InvoiceSuggestion, SubscriptionTier, VoiceInvoiceData } from '../types';
 import { PlusIcon, DocumentTextIcon, TagIcon, SparklesIcon, XIcon, MicrophoneIcon, DiamondIcon } from './icons';
 import { useSound } from '../hooks/useSound';
 import VoiceCommandModal from './VoiceCommandModal';
 
 const InvoiceStatusBadge: React.FC<{ status: InvoiceStatus }> = ({ status }) => {
-    const baseClasses = "px-2.5 py-1 text-xs font-semibold rounded-full inline-block";
-    const statusClasses = {
-      [InvoiceStatus.Paid]: "bg-green-500/20 text-green-400",
-      [InvoiceStatus.Pending]: "bg-yellow-500/20 text-yellow-400",
-      [InvoiceStatus.Overdue]: "bg-red-500/20 text-red-400",
-    };
-    return <span className={`${baseClasses} ${statusClasses[status]}`}>{status}</span>;
+        const baseClasses = "px-2.5 py-1 text-xs font-semibold rounded-full inline-block";
+        const statusClasses: Record<InvoiceStatus, string> = {
+            [InvoiceStatus.Draft]: "bg-slate-500/20 text-slate-400",
+            [InvoiceStatus.Sent]: "bg-blue-500/20 text-blue-400",
+            [InvoiceStatus.Paid]: "bg-green-500/20 text-green-400",
+            [InvoiceStatus.Overdue]: "bg-red-500/20 text-red-400",
+            [InvoiceStatus.Cancelled]: "bg-slate-500/20 text-slate-400",
+        };
+        return <span className={`${baseClasses} ${statusClasses[status]}`}>{InvoiceStatusLabels[status]}</span>;
 };
 
 const CategoryBadge: React.FC<{ category: string }> = ({ category }) => {
@@ -38,49 +40,54 @@ const CategoryBadge: React.FC<{ category: string }> = ({ category }) => {
     );
 };
 
-const InvoiceRow: React.FC<{ invoice: Invoice }> = ({ invoice }) => (
-    <tr className="block mb-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 sm:table-row sm:p-0 sm:mb-0 sm:border-b sm:border-slate-100 dark:sm:border-slate-700 sm:bg-transparent dark:sm:bg-transparent sm:hover:bg-slate-50 dark:sm:hover:bg-slate-800/50">
-        <td className="block p-1 sm:table-cell sm:p-4 font-medium text-slate-900 dark:text-white">
-            <div className="flex justify-between items-center sm:block">
-                <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Número</span>
-                <span>{invoice.invoiceNumber}</span>
-            </div>
-        </td>
-        <td className="block p-1 sm:table-cell sm:p-4 text-slate-600 dark:text-slate-300">
-             <div className="flex justify-between items-center sm:block">
-                <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Cliente</span>
-                <div>
-                     <p className="font-medium text-slate-800 dark:text-slate-200">{invoice.clientName}</p>
-                     {invoice.description && <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[200px]">{invoice.description}</p>}
+const InvoiceRow: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
+    const concept = invoice.lines[0]?.description || invoice.notes || 'Sin descripción';
+    const formattedIssueDate = new Date(invoice.issueDate).toLocaleDateString('es-ES');
+
+    return (
+        <tr className="block mb-4 p-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 sm:table-row sm:p-0 sm:mb-0 sm:border-b sm:border-slate-100 dark:sm:border-slate-700 sm:bg-transparent dark:sm:bg-transparent sm:hover:bg-slate-50 dark:sm:hover:bg-slate-800/50">
+            <td className="block p-1 sm:table-cell sm:p-4 font-medium text-slate-900 dark:text-white">
+                <div className="flex justify-between items-center sm:block">
+                    <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Número</span>
+                    <span>{invoice.number}</span>
                 </div>
-            </div>
-        </td>
-        <td className="block p-1 sm:table-cell sm:p-4 text-slate-500 dark:text-slate-400">
-             <div className="flex justify-between items-center sm:block">
-                <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Emisión</span>
-                <span>{invoice.issueDate}</span>
-            </div>
-        </td>
-        <td className="block p-1 sm:table-cell sm:p-4">
-            <div className="flex justify-between items-center sm:block">
-                <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Categoría</span>
-                 {invoice.category && <CategoryBadge category={invoice.category} />}
-            </div>
-        </td>
-        <td className="block p-1 font-semibold sm:text-right">
-            <div className="flex justify-between items-center sm:block">
-                <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Importe</span>
-                <span className="text-slate-900 dark:text-white">€{invoice.amount.toLocaleString('es-ES')}</span>
-            </div>
-        </td>
-        <td className="block p-1 mt-2 sm:mt-0 sm:table-cell sm:p-4 sm:text-right">
-            <div className="flex justify-between items-center sm:block">
-                <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Estado</span>
-                <InvoiceStatusBadge status={invoice.status} />
-            </div>
-        </td>
-    </tr>
-);
+            </td>
+            <td className="block p-1 sm:table-cell sm:p-4 text-slate-600 dark:text-slate-300">
+                <div className="flex justify-between items-center sm:block">
+                    <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Cliente</span>
+                    <div>
+                        <p className="font-medium text-slate-800 dark:text-slate-200">{invoice.client.name}</p>
+                        {concept && <p className="text-xs text-slate-500 dark:text-slate-400 truncate max-w-[200px]">{concept}</p>}
+                    </div>
+                </div>
+            </td>
+            <td className="block p-1 sm:table-cell sm:p-4 text-slate-500 dark:text-slate-400">
+                <div className="flex justify-between items-center sm:block">
+                    <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Emisión</span>
+                    <span>{formattedIssueDate}</span>
+                </div>
+            </td>
+            <td className="block p-1 sm:table-cell sm:p-4">
+                <div className="flex justify-between items-center sm:block">
+                    <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Concepto</span>
+                    <CategoryBadge category={concept} />
+                </div>
+            </td>
+            <td className="block p-1 font-semibold sm:text-right">
+                <div className="flex justify-between items-center sm:block">
+                    <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Importe</span>
+                    <span className="text-slate-900 dark:text-white">€{invoice.total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</span>
+                </div>
+            </td>
+            <td className="block p-1 mt-2 sm:mt-0 sm:table-cell sm:p-4 sm:text-right">
+                <div className="flex justify-between items-center sm:block">
+                    <span className="font-bold text-slate-500 dark:text-slate-400 sm:hidden">Estado</span>
+                    <InvoiceStatusBadge status={invoice.status} />
+                </div>
+            </td>
+        </tr>
+    );
+};
 
 interface InvoicesProps {
   setView: (view: View) => void;

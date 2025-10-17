@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { InvoiceController } from "../controllers/invoice.controller";
 import { idempotencyMiddleware } from "../middleware/idempotency.middleware";
+import { authenticateToken } from "../middleware/auth.middleware";
 
 const router = Router();
 
@@ -52,15 +53,7 @@ const router = Router();
  *       401:
  *         description: No autorizado
  */
-router.get("/", (req, res) => {
-  res.json({
-    success: false,
-    message: "Invoice routes not yet implemented - Get invoices endpoint",
-    endpoint: "/api/v1/invoices",
-    method: "GET",
-    query: req.query,
-  });
-});
+router.get("/", authenticateToken, InvoiceController.getInvoices);
 
 /**
  * @swagger
@@ -115,6 +108,22 @@ router.post("/", idempotencyMiddleware(), InvoiceController.createInvoice);
 
 /**
  * @swagger
+ * /api/v1/invoices/stats/summary:
+ *   get:
+ *     summary: Obtener estadísticas de facturas
+ *     tags: [Invoices]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Estadísticas obtenidas exitosamente
+ *       401:
+ *         description: No autorizado
+ */
+router.get("/stats/summary", authenticateToken, InvoiceController.getStats);
+
+/**
+ * @swagger
  * /api/v1/invoices/{id}:
  *   get:
  *     summary: Obtener factura por ID
@@ -136,15 +145,7 @@ router.post("/", idempotencyMiddleware(), InvoiceController.createInvoice);
  *       401:
  *         description: No autorizado
  */
-router.get("/:id", (req, res) => {
-  res.json({
-    success: false,
-    message: "Invoice routes not yet implemented - Get invoice by ID endpoint",
-    endpoint: `/api/v1/invoices/${req.params.id}`,
-    method: "GET",
-    invoiceId: req.params.id,
-  });
-});
+router.get("/:id", authenticateToken, InvoiceController.getInvoiceById);
 
 /**
  * @swagger
@@ -239,7 +240,7 @@ router.delete("/:id", InvoiceController.deleteInvoice);
  *       401:
  *         description: No autorizado
  */
-router.get("/:id/pdf", (req, res) => {
+router.get("/:id/pdf", authenticateToken, (req, res) => {
   res.json({
     success: false,
     message: "Invoice routes not yet implemented - Generate PDF endpoint",
@@ -248,6 +249,35 @@ router.get("/:id/pdf", (req, res) => {
     invoiceId: req.params.id,
   });
 });
+
+/**
+ * @swagger
+ * /api/v1/invoices/{id}/xml/signed:
+ *   get:
+ *     summary: Descargar XML firmado de una factura
+ *     tags: [Invoices]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la factura
+ *     responses:
+ *       200:
+ *         description: XML firmado de la factura
+ *         content:
+ *           application/xml:
+ *             schema:
+ *               type: string
+ *       401:
+ *         description: No autorizado
+ *       404:
+ *         description: Factura no encontrada o XML no disponible
+ */
+router.get("/:id/xml/signed", InvoiceController.getSignedXml);
 
 /**
  * @swagger
@@ -287,45 +317,5 @@ router.get("/:id/pdf", (req, res) => {
  *         description: No autorizado
  */
 router.post("/:id/send", idempotencyMiddleware(), InvoiceController.sendInvoice);
-
-/**
- * @swagger
- * /api/v1/invoices/stats:
- *   get:
- *     summary: Obtener estadísticas de facturas
- *     tags: [Invoices]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Estadísticas obtenidas exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 totalInvoices:
- *                   type: integer
- *                 totalRevenue:
- *                   type: number
- *                 pendingAmount:
- *                   type: number
- *                 overdueAmount:
- *                   type: number
- *                 monthlyStats:
- *                   type: array
- *                   items:
- *                     type: object
- *       401:
- *         description: No autorizado
- */
-router.get("/stats/summary", (req, res) => {
-  res.json({
-    success: false,
-    message: "Invoice routes not yet implemented - Get stats endpoint",
-    endpoint: "/api/v1/invoices/stats",
-    method: "GET",
-  });
-});
 
 export default router;

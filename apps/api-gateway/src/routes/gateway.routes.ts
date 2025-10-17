@@ -1,80 +1,111 @@
-import { Router } from "express";
+import { Request, Response, Router } from "express";
 import { createProxyMiddleware } from "http-proxy-middleware";
+import type { ClientRequest } from "http";
+import { Socket } from "net";
 
 const router = Router();
 
-// Proxy to Auth Service
+type ProxyConfig = {
+  prefix: string;
+  targetEnvVar: "AUTH_SERVICE_URL" | "SUBSCRIPTION_SERVICE_URL" | "INVOICE_SERVICE_URL";
+  fallbackUrl: string;
+  serviceLabel: string;
+  errorMessage: string;
+};
+
+const createServiceProxy = ({
+  prefix,
+  targetEnvVar,
+  fallbackUrl,
+  serviceLabel,
+  errorMessage,
+}: ProxyConfig) => {
+  const target = process.env[targetEnvVar] || fallbackUrl;
+
+  return createProxyMiddleware({
+    target,
+    changeOrigin: true,
+    preserveHeaderKeyCase: true,
+    pathRewrite: {
+      [`^/${prefix}`]: "",
+    },
+    on: {
+      proxyReq: (_proxyReq: ClientRequest, req: Request) => {
+        console.log(`[Gateway] Proxying ${req.method} ${req.path} to ${serviceLabel}`);
+      },
+      error: (err: Error, req: Request, res: Response | Socket) => {
+        console.error(`[Gateway] ${serviceLabel} proxy error:`, err);
+
+        if (res instanceof Socket) {
+          res.destroy();
+          return;
+        }
+
+        if (res.headersSent) {
+          return;
+        }
+
+        res.status(502).json({
+          success: false,
+          message: errorMessage,
+        });
+      },
+    },
+  });
+};
+
 router.use(
   "/auth/*",
-  createProxyMiddleware({
-    target: process.env.AUTH_SERVICE_URL || "http://localhost:3001",
-    changeOrigin: true,
-    preserveHeaderKeyCase: true, // Important for Idempotency-Key header
-    pathRewrite: {
-      "^/auth": "", // Remove /auth prefix when forwarding
-    },
-    onProxyReq: (proxyReq, req) => {
-      console.log(`[Gateway] Proxying ${req.method} ${req.path} to Auth Service`);
-    },
-    onError: (err, req, res) => {
-      console.error("[Gateway] Auth service proxy error:", err);
-      if (res && typeof res.status === 'function') {
-        res.status(502).json({
-          success: false,
-          message: "Auth service unavailable",
-        });
-      }
-    },
+  createServiceProxy({
+    prefix: "auth",
+    targetEnvVar: "AUTH_SERVICE_URL",
+    fallbackUrl: "http://localhost:3001",
+    serviceLabel: "Auth Service",
+    errorMessage: "Auth service unavailable",
   })
 );
 
-// Proxy to Subscription Service
 router.use(
   "/subscriptions/*",
-  createProxyMiddleware({
-    target: process.env.SUBSCRIPTION_SERVICE_URL || "http://localhost:3003",
-    changeOrigin: true,
-    preserveHeaderKeyCase: true,
-    pathRewrite: {
-      "^/subscriptions": "",
-    },
-    onProxyReq: (proxyReq, req) => {
-      console.log(`[Gateway] Proxying ${req.method} ${req.path} to Subscription Service`);
-    },
-    onError: (err, req, res) => {
-      console.error("[Gateway] Subscription service proxy error:", err);
-      if (res && typeof res.status === 'function') {
-        res.status(502).json({
-          success: false,
-          message: "Subscription service unavailable",
-        });
-      }
-    },
+  createServiceProxy({
+    prefix: "subscriptions",
+    targetEnvVar: "SUBSCRIPTION_SERVICE_URL",
+    fallbackUrl: "http://localhost:3003",
+    serviceLabel: "Subscription Service",
+    errorMessage: "Subscription service unavailable",
   })
 );
 
-// Proxy to Invoice Service
 router.use(
   "/invoices/*",
-  createProxyMiddleware({
-    target: process.env.INVOICE_SERVICE_URL || "http://localhost:3002",
-    changeOrigin: true,
-    preserveHeaderKeyCase: true,
-    pathRewrite: {
-      "^/invoices": "",
-    },
-    onProxyReq: (proxyReq, req) => {
-      console.log(`[Gateway] Proxying ${req.method} ${req.path} to Invoice Service`);
-    },
-    onError: (err, req, res) => {
-      console.error("[Gateway] Invoice service proxy error:", err);
-      if (res && typeof res.status === 'function') {
-        res.status(502).json({
-          success: false,
-          message: "Invoice service unavailable",
-        });
-      }
-    },
+  createServiceProxy({
+    prefix: "invoices",
+    targetEnvVar: "INVOICE_SERVICE_URL",
+    fallbackUrl: "http://localhost:3002",
+    serviceLabel: "Invoice Service",
+    errorMessage: "Invoice service unavailable",
+  })
+);
+
+router.use(
+  "/clients/*",
+  createServiceProxy({
+    prefix: "clients",
+    targetEnvVar: "INVOICE_SERVICE_URL",
+    fallbackUrl: "http://localhost:3002",
+    serviceLabel: "Invoice Service (clients)",
+    errorMessage: "Invoice service unavailable",
+  })
+);
+
+router.use(
+  "/companies/*",
+  createServiceProxy({
+    prefix: "companies",
+    targetEnvVar: "INVOICE_SERVICE_URL",
+    fallbackUrl: "http://localhost:3002",
+    serviceLabel: "Invoice Service (companies)",
+    errorMessage: "Invoice service unavailable",
   })
 );
 

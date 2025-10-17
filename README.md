@@ -150,6 +150,72 @@ pnpm run dev  # Inicia todos los servicios con Turbo
 - PostgreSQL 14+
 - 4GB RAM, 20GB SSD
 
+## 🏗️ Arquitectura de Servicios
+
+### Servicios del Monorepo
+
+| Servicio | Puerto | Descripción | Endpoints Principales |
+|----------|--------|-------------|----------------------|
+| **API Gateway** | 3001 | Punto de entrada unificado | `/api/*` |
+| **Invoice Service** | 3002 | Gestión de facturas | `/invoices`, `/invoices/:id/xml` |
+| **Auth Service** | 3003 | Autenticación y autorización | `/auth/login`, `/auth/register` |
+| **XML Transformer** | 3004 | Transformación XML FacturaE | `/transform`, `/health` |
+| **Web App** | 5173 | Aplicación frontend (Vite) | Interfaz de usuario |
+| **Subscription Service** | 3006 | Gestión de suscripciones | `/subscriptions` |
+
+### Flujo de Generación y Firma XML
+
+```mermaid
+sequenceDiagram
+    participant Frontend as Web App
+    participant Gateway as API Gateway
+    participant Invoice as Invoice Service
+    participant XML as XML Transformer
+    participant Signer as XMLDSig Signer
+    
+    Frontend->>Gateway: POST /api/invoices
+    Gateway->>Invoice: Crear factura
+    Invoice->>XML: Generar XML FacturaE
+    XML-->>Invoice: XML generado
+    Invoice->>Signer: Firmar XML
+    Signer-->>Invoice: XML firmado
+    Invoice-->>Gateway: Factura creada
+    Gateway-->>Frontend: Respuesta
+```
+
+## ⚠️ Servicios de Desarrollo
+
+### TimestampService
+
+El `timestamp-service.ts` es **SOLO para desarrollo**. En producción:
+
+- El servicio lanza error al intentar instanciarse
+- Los métodos fallan si `NODE_ENV=production`
+- Para producción, integrar con TSA real (Autoridad de Sellado de Tiempo)
+
+```typescript
+// ❌ En producción falla
+const service = new TimestampService(); // Error!
+
+// ✅ Solo funciona en desarrollo
+process.env.NODE_ENV = 'development';
+const service = createTimestampService(); // OK
+```
+
+### Configuración de Certificados Digitales
+
+Para firmar XML FacturaE, configura las siguientes variables:
+
+```bash
+# Certificado P12/PFX (recomendado)
+CERTIFICATE_PATH=/path/to/certificate.p12
+CERTIFICATE_PASSWORD=your-certificate-password
+
+# Alternativamente, certificados PEM
+CERTIFICATE_PEM_PATH=/path/to/certificate.pem
+PRIVATE_KEY_PEM_PATH=/path/to/private-key.pem
+```
+
 ## 💼 Licencia
 
 Software de código cerrado. Contacto para licenciamiento comercial.

@@ -1,13 +1,186 @@
-import { Request, Response } from "express";
+import { Response } from "express";
 import { IdempotentRequest } from "../middleware/idempotency.middleware";
+import { AuthenticatedRequest } from "../middleware/auth.middleware";
 import { withTransaction, isUniqueConstraintError } from "@facturacion/database";
 import { prisma } from "@facturacion/database";
+import { XmlGeneratorService } from "../services/xml-generator.service";
 
 export class InvoiceController {
   /**
+   * Get paginated list of invoices for the authenticated user
+   */
+  static async getInvoices(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: "Usuario no autorizado",
+        });
+        return;
+      }
+
+      const parseNumberParam = (value: unknown, fallback: number) => {
+        const parsed = Number(value);
+        return Number.isFinite(parsed) && parsed > 0 ? parsed : fallback;
+      };
+
+      const page = parseNumberParam(req.query.page, 1);
+      const limit = Math.min(parseNumberParam(req.query.limit, 10), 100);
+      const statusParam = typeof req.query.status === "string" ? req.query.status : undefined;
+      const searchParam = typeof req.query.search === "string" ? req.query.search.trim() : undefined;
+      const seriesParam = typeof req.query.series === "string" ? req.query.series.trim() : undefined;
+      const dateFromParam = typeof req.query.dateFrom === "string" ? req.query.dateFrom : undefined;
+      const dateToParam = typeof req.query.dateTo === "string" ? req.query.dateTo : undefined;
+
+      const filters: any[] = [];
+
+      if (statusParam) {
+        filters.push({ status: statusParam.toUpperCase() });
+      }
+
+      if (seriesParam) {
+        filters.push({ series: seriesParam });
+      }
+
+      if (dateFromParam) {
+        const fromDate = new Date(dateFromParam);
+        if (!Number.isNaN(fromDate.getTime())) {
+          filters.push({ issueDate: { gte: fromDate } });
+        }
+      }
+
+      if (dateToParam) {
+        const toDate = new Date(dateToParam);
+        if (!Number.isNaN(toDate.getTime())) {
+          filters.push({ issueDate: { lte: toDate } });
+        }
+      }
+
+      if (searchParam) {
+        filters.push({
+          OR: [
+            { number: { contains: searchParam, mode: "insensitive" } },
+            { notes: { contains: searchParam, mode: "insensitive" } },
+            {
+              client: {
+                name: {
+                  contains: searchParam,
+                  mode: "insensitive",
+                },
+              },
+            },
+            {
+              company: {
+                name: {
+                  contains: searchParam,
+                  mode: "insensitive",
+                },
+              },
+            },
+          ],
+        });
+      }
+
+      const where = filters.length
+        ? {
+            userId,
+            AND: filters,
+          }
+        : { userId };
+
+      const [total, invoices] = await Promise.all([
+        prisma.invoice.count({ where }),
+        prisma.invoice.findMany({
+          where,
+          include: {
+            client: true,
+            company: true,
+            lines: true,
+          },
+          orderBy: { issueDate: "desc" },
+          skip: (page - 1) * limit,
+          take: limit,
+        }),
+      ]);
+
+      res.json({
+        success: true,
+        message: "Facturas obtenidas exitosamente",
+        data: {
+          items: invoices,
+          page,
+          limit,
+          total,
+          totalPages: Math.ceil(total / limit) || 1,
+        },
+      });
+    } catch (error) {
+      console.error("Get invoices error:", error);
+
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  }
+
+  /**
+   * Get invoice by ID
+   */
+  static async getInvoiceById(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: "Usuario no autorizado",
+        });
+        return;
+      }
+
+      const invoice = await prisma.invoice.findFirst({
+        where: {
+          id,
+          userId,
+        },
+        include: {
+          client: true,
+          company: true,
+          lines: true,
+        },
+      });
+
+      if (!invoice) {
+        res.status(404).json({
+          success: false,
+          message: "Factura no encontrada",
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        message: "Factura obtenida exitosamente",
+        data: invoice,
+      });
+    } catch (error) {
+      console.error("Get invoice by id error:", error);
+
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  }
+
+  /**
    * Create a new invoice
    */
-  static async createInvoice(req: IdempotentRequest, res: Response): Promise<void> {
+  static async createInvoice(req: IdempotentRequest & AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const {
         clientId,
@@ -18,7 +191,7 @@ export class InvoiceController {
         lines,
       } = req.body;
 
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.id;
       if (!userId) {
         res.status(401).json({
           success: false,
@@ -78,6 +251,7 @@ export class InvoiceController {
                     quantity: line.quantity,
                     price: line.price,
                     vatRate: line.vatRate,
+                    amount: line.quantity * line.price,
                   })),
                 },
               },
@@ -112,6 +286,7 @@ export class InvoiceController {
                   quantity: line.quantity,
                   price: line.price,
                   vatRate: line.vatRate,
+                  amount: line.quantity * line.price,
                 })),
               },
             },
@@ -139,10 +314,10 @@ export class InvoiceController {
     } catch (error) {
       console.error("Create invoice error:", error);
 
-      if (error.message === "INVOICE_NUMBER_EXISTS") {
+      if ((error as any).message === "INVOICE_NUMBER_EXISTS") {
         res.status(409).json({
           success: false,
-          message: "Número de factura ya existe",
+          message: "Ya existe una factura con este número",
         });
         return;
       }
@@ -157,11 +332,11 @@ export class InvoiceController {
   /**
    * Update an invoice
    */
-  static async updateInvoice(req: IdempotentRequest, res: Response): Promise<void> {
+  static async updateInvoice(req: IdempotentRequest & AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
       const updates = req.body;
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.id;
 
       if (!userId) {
         res.status(401).json({
@@ -193,7 +368,7 @@ export class InvoiceController {
     } catch (error) {
       console.error("Update invoice error:", error);
 
-      if (error.code === "P2025") {
+      if ((error as any).code === "P2025") {
         res.status(404).json({
           success: false,
           message: "Factura no encontrada",
@@ -211,10 +386,10 @@ export class InvoiceController {
   /**
    * Delete an invoice (soft delete)
    */
-  static async deleteInvoice(req: Request, res: Response): Promise<void> {
+  static async deleteInvoice(req: AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.id;
 
       if (!userId) {
         res.status(401).json({
@@ -242,7 +417,7 @@ export class InvoiceController {
     } catch (error) {
       console.error("Delete invoice error:", error);
 
-      if (error.code === "P2025") {
+      if ((error as any).code === "P2025") {
         res.status(404).json({
           success: false,
           message: "Factura no encontrada",
@@ -260,10 +435,11 @@ export class InvoiceController {
   /**
    * Send invoice
    */
-  static async sendInvoice(req: IdempotentRequest, res: Response): Promise<void> {
+  static async sendInvoice(req: IdempotentRequest & AuthenticatedRequest, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.userId;
+      const { email } = req.body;
+      const userId = req.user?.id;
 
       if (!userId) {
         res.status(401).json({
@@ -298,13 +474,158 @@ export class InvoiceController {
     } catch (error) {
       console.error("Send invoice error:", error);
 
-      if (error.code === "P2025") {
+      if ((error as any).code === "P2025") {
         res.status(404).json({
           success: false,
           message: "Factura no encontrada o ya enviada",
         });
         return;
       }
+
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  }
+
+  /**
+   * Get aggregated stats for invoices
+   */
+  static async getStats(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: "Usuario no autorizado",
+        });
+        return;
+      }
+
+      const numberFromDecimal = (value: any) => (value ? Number(value) : 0);
+
+      const [totals, statusSummary, recentInvoices] = await Promise.all([
+        prisma.invoice.aggregate({
+          where: { userId },
+          _count: { _all: true },
+          _sum: {
+            subtotal: true,
+            vatAmount: true,
+            total: true,
+          },
+        }),
+        prisma.invoice.groupBy({
+          by: ["status"],
+          where: { userId },
+          _count: { _all: true },
+          _sum: { total: true },
+        }),
+        prisma.invoice.findMany({
+          where: { userId },
+          include: {
+            client: true,
+            company: true,
+            lines: true,
+          },
+          orderBy: { issueDate: "desc" },
+          take: 5,
+        }),
+      ]);
+
+      res.json({
+        success: true,
+        message: "Estadísticas obtenidas exitosamente",
+        data: {
+          totals: {
+            totalInvoices: totals._count._all ?? 0,
+            subtotal: numberFromDecimal(totals._sum?.subtotal),
+            vatAmount: numberFromDecimal(totals._sum?.vatAmount),
+            totalRevenue: numberFromDecimal(totals._sum?.total),
+          },
+          byStatus: statusSummary.map((item) => ({
+            status: item.status,
+            count: item._count._all,
+            totalAmount: numberFromDecimal(item._sum.total),
+          })),
+          recentInvoices,
+        },
+      });
+    } catch (error) {
+      console.error("Get invoice stats error:", error);
+
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  }
+
+  /**
+   * Get signed XML for an invoice
+   */
+  static async getSignedXml(req: AuthenticatedRequest, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: "Usuario no autorizado",
+        });
+        return;
+      }
+
+      const invoice = await prisma.invoice.findFirst({
+        where: {
+          id,
+          userId,
+        },
+        include: {
+          client: true,
+          company: true,
+          lines: true,
+        },
+      });
+
+      if (!invoice) {
+        res.status(404).json({
+          success: false,
+          message: "Factura no encontrada",
+        });
+        return;
+      }
+
+      let signedXml = invoice.signedXml;
+
+      if (!signedXml) {
+        try {
+          signedXml = await XmlGeneratorService.generateAndSignXml(invoice);
+
+          await prisma.invoice.update({
+            where: { id: invoice.id },
+            data: {
+              signedXml,
+            },
+          });
+        } catch (generationError) {
+          console.error("Error generando XML firmado:", generationError);
+
+          res.status(500).json({
+            success: false,
+            message: "Error generando el XML firmado",
+          });
+          return;
+        }
+      }
+
+      res.setHeader("Content-Type", "application/xml");
+      res.setHeader("Content-Disposition", `attachment; filename="factura-${invoice.number}.xml"`);
+      res.send(signedXml);
+    } catch (error) {
+      console.error("Get signed XML error:", error);
 
       res.status(500).json({
         success: false,

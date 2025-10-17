@@ -1,7 +1,7 @@
 import React from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { getDashboardData } from '../services/apiService';
-import { DashboardData, Invoice, InvoiceStatus, View, SubscriptionTier } from '../types';
+import { DashboardData, Invoice, InvoiceStatus, InvoiceStatusLabels, View, SubscriptionTier } from '../types';
 import { DocumentTextIcon, SparklesIcon, DiamondIcon } from './icons';
 import { useSound } from '../hooks/useSound';
 
@@ -22,31 +22,37 @@ const StatCard = ({ title, value, change, subtext }: { title: string, value: str
 
 const InvoiceStatusBadge: React.FC<{ status: InvoiceStatus }> = ({ status }) => {
     const baseClasses = "px-2.5 py-1 text-xs font-semibold rounded-full";
-    const statusClasses = {
-      [InvoiceStatus.Paid]: "bg-green-500/20 text-green-400",
-      [InvoiceStatus.Pending]: "bg-yellow-500/20 text-yellow-400",
-      [InvoiceStatus.Overdue]: "bg-red-500/20 text-red-400",
+    const statusClasses: Record<InvoiceStatus, string> = {
+        [InvoiceStatus.Draft]: "bg-slate-500/20 text-slate-400",
+        [InvoiceStatus.Sent]: "bg-blue-500/20 text-blue-400",
+        [InvoiceStatus.Paid]: "bg-green-500/20 text-green-400",
+        [InvoiceStatus.Overdue]: "bg-red-500/20 text-red-400",
+        [InvoiceStatus.Cancelled]: "bg-slate-500/20 text-slate-400",
     };
-    return <span className={`${baseClasses} ${statusClasses[status]}`}>{status}</span>;
-  };
+    return <span className={`${baseClasses} ${statusClasses[status]}`}>{InvoiceStatusLabels[status]}</span>;
+};
 
-const RecentInvoiceItem: React.FC<{ invoice: Invoice }> = ({ invoice }) => (
-    <li className="flex items-center justify-between py-3">
-        <div className="flex items-center gap-3">
-            <div className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg">
-                <DocumentTextIcon className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+const RecentInvoiceItem: React.FC<{ invoice: Invoice }> = ({ invoice }) => {
+    const formattedDate = new Date(invoice.issueDate).toLocaleDateString('es-ES');
+
+    return (
+        <li className="flex items-center justify-between py-3">
+            <div className="flex items-center gap-3">
+                <div className="bg-slate-100 dark:bg-slate-700 p-2 rounded-lg">
+                    <DocumentTextIcon className="w-5 h-5 text-slate-500 dark:text-slate-400" />
+                </div>
+                <div>
+                    <p className="font-semibold text-slate-800 dark:text-white">{invoice.client.name}</p>
+                    <p className="text-sm text-slate-500 dark:text-slate-400">{formattedDate}</p>
+                </div>
             </div>
-            <div>
-                <p className="font-semibold text-slate-800 dark:text-white">{invoice.clientName}</p>
-                <p className="text-sm text-slate-500 dark:text-slate-400">{invoice.issueDate}</p>
+            <div className="text-right">
+                <p className="font-bold text-slate-800 dark:text-white">€{invoice.total.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</p>
+                <InvoiceStatusBadge status={invoice.status} />
             </div>
-        </div>
-        <div className="text-right">
-            <p className="font-bold text-slate-800 dark:text-white">€{invoice.amount.toLocaleString('es-ES')}</p>
-            <InvoiceStatusBadge status={invoice.status} />
-        </div>
-    </li>
-);
+        </li>
+    );
+};
 
 interface DashboardProps {
     setView: (view: View) => void;
@@ -78,6 +84,20 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, subscriptionTier }) => {
         setView('pricing');
     }
 
+    const totalInvoices = data.totals.totalInvoices;
+    const totalRevenue = data.totals.totalRevenue;
+    const subtotal = data.totals.subtotal;
+    const vatAmount = data.totals.vatAmount;
+
+    const paidSummary = data.byStatus.find(item => item.status === InvoiceStatus.Paid);
+    const pendingSummaries = data.byStatus.filter(item => item.status === InvoiceStatus.Sent || item.status === InvoiceStatus.Overdue);
+    const draftSummary = data.byStatus.find(item => item.status === InvoiceStatus.Draft);
+
+    const pendingAmount = pendingSummaries.reduce((acc, item) => acc + item.totalAmount, 0);
+    const pendingCount = pendingSummaries.reduce((acc, item) => acc + item.count, 0);
+    const paidAmount = paidSummary?.totalAmount ?? 0;
+    const draftCount = draftSummary?.count ?? 0;
+
     return (
         <div className="p-4 md:p-6 space-y-6">
             <div>
@@ -107,21 +127,19 @@ const Dashboard: React.FC<DashboardProps> = ({ setView, subscriptionTier }) => {
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 <StatCard 
-                    title="Facturas este mes"
-                    value={data.monthlyInvoices.count.toString()}
-                    change={data.monthlyInvoices.change}
-                    subtext={`${data.monthlyInvoices.new} nuevas`}
+                    title="Facturas totales"
+                    value={totalInvoices.toString()}
+                    subtext={`${paidSummary?.count ?? 0} pagadas · ${draftCount} borradores`}
                 />
                 <StatCard 
-                    title="Ingresos Totales"
-                    value={`€${data.totalRevenue.amount.toLocaleString('es-ES')}`}
-                    change={data.totalRevenue.change}
-                    subtext="Últimos 30 días"
+                    title="Ingresos acumulados"
+                    value={`€${totalRevenue.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                    subtext={`Subtotal €${subtotal.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })} · IVA €${vatAmount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 />
                  <StatCard 
-                    title="Pendiente de Cobro"
-                    value={`€${data.pendingAmount.amount.toLocaleString('es-ES')}`}
-                    subtext={`En ${data.pendingAmount.invoiceCount} facturas`}
+                    title="Pendiente de cobro"
+                    value={`€${pendingAmount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
+                    subtext={`En ${pendingCount} facturas · Pagado €${paidAmount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`}
                 />
             </div>
 
