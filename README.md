@@ -33,6 +33,35 @@ Plataforma completa de gestión de facturación diseñada específicamente para 
 - Exportación PDF/Excel
 - Webhooks y notificaciones
 
+## 🔄 Idempotencia
+
+Los siguientes endpoints soportan el header `Idempotency-Key` para prevenir operaciones duplicadas:
+
+- `POST /api/auth/register` - Registro de usuarios
+- `POST /api/auth/reset-password` - Reset de contraseña
+- `POST /api/invoices` - Creación de facturas
+- `PUT /api/invoices/:id` - Actualización de facturas
+- `POST /api/invoices/:id/send` - Envío de facturas
+- `POST /api/subscriptions` - Creación de suscripciones
+
+### Uso del Idempotency-Key
+
+```bash
+curl -X POST https://api.example.com/api/invoices \
+  -H "Idempotency-Key: unique-key-123" \
+  -H "Content-Type: application/json" \
+  -d '{...}'
+```
+
+- La clave debe ser única por operación
+- Se recomienda usar UUID v4
+- Las claves expiran después de 24 horas
+- Si se reintenta con la misma clave, se retorna la respuesta original
+
+### Webhooks
+
+Los webhooks de Stripe y AEAT son automáticamente deduplicados usando el ID único del evento. No es necesario enviar `Idempotency-Key`.
+
 ## 🏗️ Arquitectura
 
 Stack: Next.js 15, React 19, Node.js, PostgreSQL, Prisma, Redis

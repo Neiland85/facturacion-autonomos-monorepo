@@ -71,3 +71,20 @@ export type MonthlyRevenue = {
   amount: number;
   invoiceCount: number;
 };
+
+// ===========================================
+// 🔄 IDEMPOTENCY TYPES
+// ===========================================
+
+export type IdempotencyKeyRecord = Prisma.IdempotencyKeyGetPayload<{}>;
+
+export type IdempotentOperationResult<T> = {
+  data: T;
+  statusCode: number;
+};
+
+export interface IdempotencyOptions {
+  ttlSeconds?: number;
+  skipCache?: boolean;
+  enabled?: boolean;
+}

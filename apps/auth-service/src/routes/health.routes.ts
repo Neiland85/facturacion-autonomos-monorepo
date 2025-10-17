@@ -1,15 +1,15 @@
-import { Router } from 'express';
+import express from "express";
 
-const router = Router();
+const router = express.Router();
 
 // Health check endpoint
-router.get('/', (req, res) => {
+router.get("/", (req, res) => {
   res.json({
     success: true,
-    message: 'Auth Service is healthy',
+    message: "Auth Service is healthy",
     timestamp: new Date().toISOString(),
-    service: 'auth-service',
-    version: '1.0.0'
+    service: "auth-service",
+    version: "1.0.0",
   });
 });
 

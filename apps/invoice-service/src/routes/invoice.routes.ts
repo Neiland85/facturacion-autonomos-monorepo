@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { InvoiceController } from "../controllers/invoice.controller";
+import { idempotencyMiddleware } from "../middleware/idempotency.middleware";
 
 const router = Router();
 
@@ -109,15 +111,7 @@ router.get("/", (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.post("/", (req, res) => {
-  res.json({
-    success: false,
-    message: "Invoice routes not yet implemented - Create invoice endpoint",
-    endpoint: "/api/v1/invoices",
-    method: "POST",
-    body: req.body,
-  });
-});
+router.post("/", idempotencyMiddleware(), InvoiceController.createInvoice);
 
 /**
  * @swagger
@@ -190,16 +184,7 @@ router.get("/:id", (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.put("/:id", (req, res) => {
-  res.json({
-    success: false,
-    message: "Invoice routes not yet implemented - Update invoice endpoint",
-    endpoint: `/api/v1/invoices/${req.params.id}`,
-    method: "PUT",
-    invoiceId: req.params.id,
-    body: req.body,
-  });
-});
+router.put("/:id", idempotencyMiddleware(), InvoiceController.updateInvoice);
 
 /**
  * @swagger
@@ -224,15 +209,7 @@ router.put("/:id", (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.delete("/:id", (req, res) => {
-  res.json({
-    success: false,
-    message: "Invoice routes not yet implemented - Delete invoice endpoint",
-    endpoint: `/api/v1/invoices/${req.params.id}`,
-    method: "DELETE",
-    invoiceId: req.params.id,
-  });
-});
+router.delete("/:id", InvoiceController.deleteInvoice);
 
 /**
  * @swagger
@@ -309,16 +286,7 @@ router.get("/:id/pdf", (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.post("/:id/send", (req, res) => {
-  res.json({
-    success: false,
-    message: "Invoice routes not yet implemented - Send invoice endpoint",
-    endpoint: `/api/v1/invoices/${req.params.id}/send`,
-    method: "POST",
-    invoiceId: req.params.id,
-    body: req.body,
-  });
-});
+router.post("/:id/send", idempotencyMiddleware(), InvoiceController.sendInvoice);
 
 /**
  * @swagger

@@ -1,20 +1,17 @@
 {
-  "extends": "./tsconfig.base.json",
-  "compilerOptions": {
-    "noEmit": true
-  },
-  "include": [
-    "next-env.d.ts",
-    "**/*.ts",
-    "**/*.tsx",
-    "**/*.js",
-    "**/*.jsx",
-    "apps/**/*",
-    "packages/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    ".next"
+  "files": [],
+  "references": [
+    { "path": "./packages/core" },
+    { "path": "./packages/types" },
+    { "path": "./packages/validation" },
+    { "path": "./packages/database" },
+    { "path": "./packages/facturacion-utils" },
+    { "path": "./packages/services" },
+    { "path": "./packages/ui" },
+    { "path": "./apps/api-gateway" },
+    { "path": "./apps/auth-service" },
+    { "path": "./apps/invoice-service" },
+    { "path": "./apps/subscription-service" },
+    { "path": "./apps/web" }
   ]
 }

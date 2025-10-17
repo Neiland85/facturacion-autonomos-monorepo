@@ -130,6 +130,12 @@
       "cache": false,
       "persistent": true
     },
+    "db:clean-idempotency": {
+      "cache": false,
+      "inputs": [
+        "packages/database/src/**/*.ts"
+      ]
+    },
     "format": {
       "outputs": [
         ".prettierCache"

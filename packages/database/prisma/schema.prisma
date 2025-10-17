@@ -3,7 +3,7 @@
 
 generator client {
   provider = "prisma-client-js"
-  output   = "../src/generated"
+  output   = "../dist/generated"
 }
 
 datasource db {
@@ -166,7 +166,7 @@ model WebhookNotificacion {
   id                String   @id @default(cuid())
   
   // Datos del webhook
-  webhookId         String?  // ID único del webhook (generado por nosotros)
+  webhookId         String?  @unique // ID único del webhook (generado por nosotros)
   tipoNotificacion  String   // Tipo de notificación (PRESENTACION_ACEPTADA, PRESENTACION_RECHAZADA, etc.)
   origen            String   @default("AEAT") // Origen del webhook
   
@@ -255,4 +255,21 @@ enum EstadoPresentacion {
   CORREGIDO
   
   @@map("estados_presentacion")
+}
+
+// ===========================================
+// 🔄 IDEMPOTENCY KEYS
+// ===========================================
+
+model IdempotencyKey {
+  id            String   @id @default(cuid())
+  key           String   @unique
+  requestHash   String
+  response      Json?
+  statusCode    Int?
+  expiresAt     DateTime
+  createdAt     DateTime @default(now())
+  
+  @@index([key, createdAt])
+  @@map("idempotency_keys")
 }

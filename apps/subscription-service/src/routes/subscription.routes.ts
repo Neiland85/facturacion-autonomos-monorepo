@@ -1,4 +1,6 @@
 import { Router } from "express";
+import { SubscriptionController } from "../controllers/subscription.controller";
+import { idempotencyMiddleware } from "../middleware/idempotency.middleware";
 
 const router = Router();
 
@@ -39,16 +41,7 @@ const router = Router();
  *       402:
  *         description: Pago requerido
  */
-router.post("/", (req, res) => {
-  res.json({
-    success: false,
-    message:
-      "Subscription routes not yet implemented - Create subscription endpoint",
-    endpoint: "/api/v1/subscriptions",
-    method: "POST",
-    body: req.body,
-  });
-});
+router.post("/", idempotencyMiddleware(), SubscriptionController.createSubscription);
 
 /**
  * @swagger
@@ -121,17 +114,7 @@ router.get("/:id", (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.put("/:id/cancel", (req, res) => {
-  res.json({
-    success: false,
-    message:
-      "Subscription routes not yet implemented - Cancel subscription endpoint",
-    endpoint: `/api/v1/subscriptions/${req.params.id}/cancel`,
-    method: "PUT",
-    subscriptionId: req.params.id,
-    body: req.body,
-  });
-});
+router.put("/:id/cancel", SubscriptionController.cancelSubscription);
 
 /**
  * @swagger
@@ -265,5 +248,30 @@ router.get("/:id/payment-methods", (req, res) => {
     subscriptionId: req.params.id,
   });
 });
+
+/**
+ * @swagger
+ * /api/v1/subscriptions/{id}/reactivate:
+ *   put:
+ *     summary: Reactivar suscripción cancelada
+ *     tags: [Subscriptions]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la suscripción
+ *     responses:
+ *       200:
+ *         description: Suscripción reactivada exitosamente
+ *       404:
+ *         description: Suscripción no encontrada
+ *       401:
+ *         description: No autorizado
+ */
+router.put("/:id/reactivate", SubscriptionController.reactivateSubscription);
 
 export default router;

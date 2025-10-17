@@ -1,15 +1,16 @@
 {
-  "extends": "../../tsconfig.base.json",
+  "extends": "../../tsconfig.base.lib.json",
   "compilerOptions": {
-    "noEmit": false,
     "outDir": "./dist",
     "rootDir": "./src",
-    "declaration": true,
-    "declarationMap": true,
-    "composite": true,
     "allowJs": true,
-    "checkJs": false
+    "checkJs": false,
+    "allowSyntheticDefaultImports": true
   },
+  "references": [
+    { "path": "../core" },
+    { "path": "../types" }
+  ],
   "include": ["src/**/*"],
   "exclude": [
     "node_modules",

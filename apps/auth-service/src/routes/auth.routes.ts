@@ -1,4 +1,11 @@
 import { Router } from "express";
+import { AuthController } from "../controllers/auth.controller";
+import {
+  authenticateToken,
+  requireEmailVerification,
+} from "../middleware/auth.middleware";
+import { idempotencyMiddleware } from "../middleware/idempotency.middleware";
+import { validateBody, authValidation } from "../validation/auth.validation";
 
 const router = Router();
 
@@ -38,14 +45,12 @@ const router = Router();
  *       409:
  *         description: Usuario ya existe
  */
-router.post("/register", (req, res) => {
-  res.json({
-    success: false,
-    message: "Auth routes not yet implemented - Register endpoint",
-    endpoint: "/api/v1/auth/register",
-    method: "POST",
-  });
-});
+router.post(
+  "/register",
+  idempotencyMiddleware(),
+  validateBody(authValidation.register),
+  AuthController.register
+);
 
 /**
  * @swagger
@@ -71,49 +76,39 @@ router.post("/register", (req, res) => {
  *     responses:
  *       200:
  *         description: Login exitoso
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 token:
- *                   type: string
- *                 user:
- *                   type: object
  *       401:
  *         description: Credenciales inválidas
  */
-router.post("/login", (req, res) => {
-  res.json({
-    success: false,
-    message: "Auth routes not yet implemented - Login endpoint",
-    endpoint: "/api/v1/auth/login",
-    method: "POST",
-  });
-});
+router.post("/login", validateBody(authValidation.login), AuthController.login);
 
 /**
  * @swagger
  * /api/v1/auth/refresh:
  *   post:
- *     summary: Refrescar token JWT
+ *     summary: Refrescar token de acceso
  *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - refreshToken
+ *             properties:
+ *               refreshToken:
+ *                 type: string
  *     responses:
  *       200:
  *         description: Token refrescado exitosamente
  *       401:
- *         description: Token inválido
+ *         description: Refresh token inválido
  */
-router.post("/refresh", (req, res) => {
-  res.json({
-    success: false,
-    message: "Auth routes not yet implemented - Refresh token endpoint",
-    endpoint: "/api/v1/auth/refresh",
-    method: "POST",
-  });
-});
+router.post(
+  "/refresh",
+  validateBody(authValidation.refresh),
+  AuthController.refresh
+);
 
 /**
  * @swagger
@@ -121,51 +116,41 @@ router.post("/refresh", (req, res) => {
  *   post:
  *     summary: Cerrar sesión
  *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
+ *     requestBody:
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
  *     responses:
  *       200:
- *         description: Sesión cerrada exitosamente
- *       401:
- *         description: Token inválido
+ *         description: Logout exitoso
  */
-router.post("/logout", (req, res) => {
-  res.json({
-    success: false,
-    message: "Auth routes not yet implemented - Logout endpoint",
-    endpoint: "/api/v1/auth/logout",
-    method: "POST",
-  });
-});
+router.post("/logout", AuthController.logout);
 
 /**
  * @swagger
  * /api/v1/auth/me:
  *   get:
- *     summary: Obtener información del usuario actual
+ *     summary: Obtener perfil del usuario actual
  *     tags: [Authentication]
  *     security:
  *       - bearerAuth: []
  *     responses:
  *       200:
- *         description: Información del usuario
+ *         description: Perfil del usuario
  *       401:
- *         description: Token inválido
+ *         description: No autorizado
  */
-router.get("/me", (req, res) => {
-  res.json({
-    success: false,
-    message: "Auth routes not yet implemented - Get current user endpoint",
-    endpoint: "/api/v1/auth/me",
-    method: "GET",
-  });
-});
+router.get("/me", authenticateToken, AuthController.me);
 
 /**
  * @swagger
  * /api/v1/auth/forgot-password:
  *   post:
- *     summary: Solicitar recuperación de contraseña
+ *     summary: Solicitar reset de contraseña
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -181,24 +166,19 @@ router.get("/me", (req, res) => {
  *                 format: email
  *     responses:
  *       200:
- *         description: Email de recuperación enviado
- *       404:
- *         description: Usuario no encontrado
+ *         description: Email enviado si el usuario existe
  */
-router.post("/forgot-password", (req, res) => {
-  res.json({
-    success: false,
-    message: "Auth routes not yet implemented - Forgot password endpoint",
-    endpoint: "/api/v1/auth/forgot-password",
-    method: "POST",
-  });
-});
+router.post(
+  "/forgot-password",
+  validateBody(authValidation.forgotPassword),
+  AuthController.forgotPassword
+);
 
 /**
  * @swagger
  * /api/v1/auth/reset-password:
  *   post:
- *     summary: Restablecer contraseña
+ *     summary: Resetear contraseña
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -217,17 +197,44 @@ router.post("/forgot-password", (req, res) => {
  *                 minLength: 8
  *     responses:
  *       200:
- *         description: Contraseña restablecida exitosamente
+ *         description: Contraseña reseteada exitosamente
  *       400:
- *         description: Token inválido o expirado
+ *         description: Token inválido
  */
-router.post("/reset-password", (req, res) => {
-  res.json({
-    success: false,
-    message: "Auth routes not yet implemented - Reset password endpoint",
-    endpoint: "/api/v1/auth/reset-password",
-    method: "POST",
-  });
-});
+router.post(
+  "/reset-password",
+  idempotencyMiddleware(),
+  validateBody(authValidation.resetPassword),
+  AuthController.resetPassword
+);
+
+/**
+ * @swagger
+ * /api/v1/auth/verify-email:
+ *   post:
+ *     summary: Verificar email
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - token
+ *             properties:
+ *               token:
+ *                 type: string
+ *     responses:
+ *       200:
+ *         description: Email verificado exitosamente
+ *       400:
+ *         description: Token inválido
+ */
+router.post(
+  "/verify-email",
+  validateBody(authValidation.verifyEmail),
+  AuthController.verifyEmail
+);
 
 export default router;

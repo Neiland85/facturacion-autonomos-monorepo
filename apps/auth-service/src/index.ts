@@ -7,7 +7,9 @@ import rateLimit from "express-rate-limit";
 
 // Import routes
 import authRoutes from "./routes/auth.routes";
-import healthRoutes from "./routes/health.routes";
+// import healthRoutes from "./routes/health.routes";
+
+console.log("🚀 Starting Auth Service...");
 
 const app = express();
 const PORT = process.env.PORT || 3001;
@@ -30,7 +32,16 @@ app.use(limiter as any);
 
 // Routes
 app.use("/api/auth", authRoutes);
-app.use("/api/health", healthRoutes);
+// app.use("/api/health", healthRoutes);
+
+// Temporary route for testing
+app.get("/api/health", (req, res) => {
+  res.json({
+    success: true,
+    message: "Auth Service is healthy",
+    timestamp: new Date().toISOString(),
+  });
+});
 
 // Error handling middleware
 app.use(

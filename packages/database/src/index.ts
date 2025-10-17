@@ -1,4 +1,6 @@
 export { prisma } from "./client";
+export { redisClient } from "./redis";
+export * from "./redis";
 export * from "./helpers";
 export * from "./types";
 
