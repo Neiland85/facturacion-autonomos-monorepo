@@ -1,7 +1,73 @@
 import { DashboardData, Invoice, InvoiceStatus, Client, FiscalData } from '../types';
+import { httpClient, withIdempotency } from './httpClient';
+import { v4 as uuidv4 } from 'uuid';
 
-// Mock function to simulate fetching dashboard data
+// Authentication functions
+export const login = async (email: string, password: string) => {
+  const response = await httpClient.post('/auth/login', { email, password });
+  return response.data;
+};
+
+export const register = async (data: { email: string; password: string; firstName: string; lastName: string; companyName?: string }) => {
+  const response = await httpClient.post('/auth/register', data);
+  return response.data;
+};
+
+// Dashboard data
 export const getDashboardData = async (): Promise<DashboardData> => {
+  const response = await httpClient.get('/invoices/stats/summary');
+  return response.data;
+};
+
+// Invoices with pagination
+export const getInvoices = async (params?: { page?: number; limit?: number; status?: InvoiceStatus; search?: string }): Promise<{
+  invoices: Invoice[];
+  total: number;
+  page: number;
+  totalPages: number;
+}> => {
+  const response = await httpClient.get('/invoices', { params });
+  return response.data;
+};
+
+// Create invoice with idempotency
+export const createInvoice = async (invoiceData: {
+  clientName: string;
+  amount: number;
+  description?: string;
+  dueDate: string;
+  category?: string;
+  invoiceType?: 'proforma' | 'official';
+}): Promise<Invoice> => {
+  const idempotencyKey = uuidv4();
+  const response = await httpClient.post('/invoices', invoiceData, withIdempotency({}, idempotencyKey));
+  return response.data;
+};
+
+// Clients
+export const getClients = async (): Promise<Client[]> => {
+  const response = await httpClient.get('/clients');
+  return response.data;
+};
+
+// Fiscal data
+export const getFiscalData = async (year: number, quarter: number): Promise<FiscalData> => {
+  const response = await httpClient.get(`/fiscal/${year}/quarter/${quarter}`);
+  return response.data;
+};
+
+// Subscription management
+export const createSubscription = async (subscriptionData: {
+  planId: string;
+  paymentMethodId?: string;
+}): Promise<any> => {
+  const idempotencyKey = uuidv4();
+  const response = await httpClient.post('/subscriptions', subscriptionData, withIdempotency({}, idempotencyKey));
+  return response.data;
+};
+
+// Legacy mock functions - only used when VITE_ENABLE_MOCK_DATA=true
+const getMockDashboardData = async (): Promise<DashboardData> => {
   console.log("Fetching dashboard data...");
   await new Promise(resolve => setTimeout(resolve, 500)); // Simulate network delay
 
@@ -30,7 +96,7 @@ export const getDashboardData = async (): Promise<DashboardData> => {
 };
 
 // Mock function to simulate fetching clients
-export const getClients = async (): Promise<Client[]> => {
+const getMockClients = async (): Promise<Client[]> => {
     console.log("Fetching clients...");
     await new Promise(resolve => setTimeout(resolve, 300));
     return [
@@ -41,9 +107,8 @@ export const getClients = async (): Promise<Client[]> => {
     ];
 };
 
-
 // Mock function to simulate fetching fiscal data
-export const getFiscalData = async (year: number, quarter: number): Promise<FiscalData> => {
+const getMockFiscalData = async (year: number, quarter: number): Promise<FiscalData> => {
     console.log(`Fetching fiscal data for Q${quarter} ${year}...`);
     await new Promise(resolve => setTimeout(resolve, 700));
 
@@ -53,7 +118,7 @@ export const getFiscalData = async (year: number, quarter: number): Promise<Fisc
         3: [{ month: 'Jul', revenue: 5500 }, { month: 'Ago', revenue: 5300 }, { month: 'Sep', revenue: 6100 }],
         4: [{ month: 'Oct', revenue: 6500 }, { month: 'Nov', revenue: 7200 }, { month: 'Dic', revenue: 8000 }],
     }[quarter] || [];
-    
+
     // Simulate some variation based on quarter
     const randomFactor = (quarter / 4) + 0.5;
 
@@ -64,3 +129,10 @@ export const getFiscalData = async (year: number, quarter: number): Promise<Fisc
         revenueChartData: baseRevenue.map(d => ({ ...d, revenue: d.revenue * randomFactor })),
     };
 };
+
+// Fallback to mocks if enabled
+const ENABLE_MOCK_DATA = import.meta.env.VITE_ENABLE_MOCK_DATA === 'true';
+
+export const getDashboardDataWithFallback = ENABLE_MOCK_DATA ? getMockDashboardData : getDashboardData;
+export const getClientsWithFallback = ENABLE_MOCK_DATA ? getMockClients : getClients;
+export const getFiscalDataWithFallback = ENABLE_MOCK_DATA ? getMockFiscalData : getFiscalData;
