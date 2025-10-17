@@ -1,0 +1,275 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../dist/generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Authentication fields
+  password                 String?
+  emailVerified            Boolean   @default(false)
+  emailVerificationToken   String?
+  emailVerificationExpires DateTime?
+  passwordResetToken       String?
+  passwordResetExpires     DateTime?
+  refreshToken             String?
+  lastLogin                DateTime?
+  isActive                 Boolean   @default(true)
+
+  // Relaciones
+  company  Company?
+  invoices Invoice[]
+  clients  Client[]
+
+  @@map("users")
+}
+
+model Company {
+  id         String  @id @default(cuid())
+  name       String
+  cif        String  @unique
+  address    String
+  city       String
+  postalCode String
+  province   String
+  phone      String?
+  email      String?
+  website    String?
+
+  // Datos fiscales
+  taxRegime TaxRegime @default(GENERAL)
+  vatNumber String?
+
+  // Relaciones
+  userId   String    @unique
+  user     User      @relation(fields: [userId], references: [id])
+  invoices Invoice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("companies")
+}
+
+model Client {
+  id         String  @id @default(cuid())
+  name       String
+  nifCif     String
+  address    String?
+  city       String?
+  postalCode String?
+  province   String?
+  phone      String?
+  email      String?
+
+  // Relaciones
+  userId   String
+  user     User      @relation(fields: [userId], references: [id])
+  invoices Invoice[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("clients")
+}
+
+model Invoice {
+  id        String    @id @default(cuid())
+  number    String    @unique
+  series    String    @default("A")
+  issueDate DateTime
+  dueDate   DateTime?
+
+  // Importes
+  subtotal  Decimal @db.Decimal(10, 2)
+  vatAmount Decimal @db.Decimal(10, 2)
+  total     Decimal @db.Decimal(10, 2)
+
+  // Estado
+  status InvoiceStatus @default(DRAFT)
+  paidAt DateTime?
+
+  // SII Integration
+  siiSent      Boolean   @default(false)
+  siiReference String?
+  siiSentAt    DateTime?
+
+  // Relaciones
+  companyId String
+  company   Company       @relation(fields: [companyId], references: [id])
+  clientId  String
+  client    Client        @relation(fields: [clientId], references: [id])
+  userId    String
+  user      User          @relation(fields: [userId], references: [id])
+  lines     InvoiceLine[]
+
+  // Metadatos
+  notes     String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("invoices")
+}
+
+model InvoiceLine {
+  id          String  @id @default(cuid())
+  description String
+  quantity    Decimal @db.Decimal(10, 2)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  vatRate     Decimal @default(21.00) @db.Decimal(5, 2)
+  amount      Decimal @db.Decimal(10, 2)
+
+  // Relaciones
+  invoiceId String
+  invoice   Invoice @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  @@map("invoice_lines")
+}
+
+// Enums
+enum TaxRegime {
+  GENERAL
+  SIMPLIFIED
+  AGRICULTURE
+
+  @@map("tax_regimes")
+}
+
+enum InvoiceStatus {
+  DRAFT
+  SENT
+  PAID
+  OVERDUE
+  CANCELLED
+
+  @@map("invoice_statuses")
+}
+
+// ===========================================
+// 🔄 WEBHOOKS AEAT
+// ===========================================
+
+model WebhookNotificacion {
+  id String @id @default(cuid())
+
+  // Datos del webhook
+  webhookId        String? @unique // ID único del webhook (generado por nosotros)
+  tipoNotificacion String // Tipo de notificación (PRESENTACION_ACEPTADA, PRESENTACION_RECHAZADA, etc.)
+  origen           String  @default("AEAT") // Origen del webhook
+
+  // Datos de la presentación
+  modeloId           String? // ID del modelo fiscal
+  numeroJustificante String? // Número de justificante de AEAT
+  estado             WebhookEstado @default(PENDIENTE)
+
+  // Payload y respuesta
+  payload   Json? // Payload completo recibido
+  respuesta Json? // Respuesta enviada
+  errores   Json? // Errores si los hay
+
+  // Verificación de seguridad
+  firmaVerificada    Boolean @default(false)
+  metodoVerificacion String? // Método usado para verificar (HMAC-SHA256, RSA)
+
+  // Metadatos de procesamiento
+  fechaRecepcion     DateTime  @default(now())
+  fechaProcesamiento DateTime?
+  intentos           Int       @default(0)
+  ultimoIntento      DateTime?
+  ultimoError        String?
+
+  // Relaciones
+  usuarioId    String? // Usuario relacionado
+  presentacion PresentacionModelo?
+
+  // Auditoría
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("webhook_notificaciones")
+}
+
+model PresentacionModelo {
+  id String @id @default(cuid())
+
+  // Datos de la presentación
+  modelo    String // Tipo de modelo (303, 130, etc.)
+  ejercicio Int // Año del ejercicio
+  trimestre Int? // Trimestre (1-4) o mes (1-12)
+  periodo   String // Periodo completo (2024T1, 2024M01, etc.)
+
+  // Estado de la presentación
+  estado             EstadoPresentacion @default(PENDIENTE)
+  numeroJustificante String? // Número de justificante de AEAT
+  fechaPresentacion  DateTime?
+  fechaAceptacion    DateTime?
+
+  // Datos fiscales
+  importeTotal      Decimal? @db.Decimal(15, 2)
+  datosPresentacion Json? // Datos completos de la presentación
+
+  // Relaciones
+  usuarioId String
+  webhookId String?              @unique
+  webhook   WebhookNotificacion? @relation(fields: [webhookId], references: [id])
+
+  // Auditoría
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([usuarioId, modelo, ejercicio, periodo])
+  @@map("presentaciones_modelo")
+}
+
+// ===========================================
+// 📊 ENUMS ADICIONALES
+// ===========================================
+
+enum WebhookEstado {
+  PENDIENTE
+  PROCESADO
+  ERROR
+  REINTENTANDO
+
+  @@map("webhook_estados")
+}
+
+enum EstadoPresentacion {
+  PENDIENTE
+  PRESENTADO
+  ACEPTADO
+  RECHAZADO
+  CORREGIDO
+
+  @@map("estados_presentacion")
+}
+
+// ===========================================
+// 🔄 IDEMPOTENCY KEYS
+// ===========================================
+
+model IdempotencyKey {
+  id          String   @id @default(cuid())
+  key         String   @unique
+  requestHash String
+  response    Json?
+  statusCode  Int?
+  expiresAt   DateTime
+  createdAt   DateTime @default(now())
+
+  @@index([key, createdAt])
+  @@map("idempotency_keys")
+}

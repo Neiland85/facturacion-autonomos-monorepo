@@ -1,4 +1,2 @@
-import dotenv from 'dotenv';
-
-// Load test environment variables
-dotenv.config({ path: '.env.test' });
+// Jest setup file for auth-service
+process.env.NODE_ENV = 'test';

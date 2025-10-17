@@ -1,8 +1,8 @@
-const { esmConfig } = require('../jest.config.base');
+import { esmConfig } from "../../jest.config.base";
 
-const jestConfig = {
+export default {
   ...esmConfig,
-  // Configuración específica para auth-service si es necesaria
+  // Configuración específica para auth-service
+  testEnvironment: "node",
+  setupFilesAfterEnv: ["<rootDir>/jest.setup.ts"],
 };
-
-module.exports = jestConfig;
