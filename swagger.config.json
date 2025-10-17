@@ -3,12 +3,12 @@
     "definition": {
       "openapi": "3.0.3",
       "info": {
-        "title": "Facturación Autónomos - Monorepo API",
+        "title": "TributariApp - Monorepo API",
         "version": "1.0.0",
-        "description": "Sistema completo de facturación para autónomos con múltiples APIs especializadas",
+        "description": "Sistema completo de facturación para autónomos con arquitectura de microservicios",
         "contact": {
           "name": "Equipo de Desarrollo",
-          "email": "dev@facturacion-autonomos.com"
+          "email": "dev@tributariapp.com"
         },
         "license": {
           "name": "MIT",
@@ -17,20 +17,24 @@
       },
       "servers": [
         {
-          "url": "http://localhost:3001/api/v1",
-          "description": "API Facturas - Desarrollo"
+          "url": "http://localhost:3000",
+          "description": "API Gateway - Desarrollo"
         },
         {
-          "url": "http://localhost:3002/api/v1",
-          "description": "API Tax Calculator - Desarrollo"
+          "url": "http://localhost:3001",
+          "description": "Auth Service - Desarrollo"
         },
         {
-          "url": "https://api.facturacion-autonomos.com/v1",
-          "description": "API Facturas - Producción"
+          "url": "http://localhost:3002",
+          "description": "Invoice Service - Desarrollo"
         },
         {
-          "url": "https://api.facturacion-autonomos.com/tax/v1",
-          "description": "API Tax Calculator - Producción"
+          "url": "http://localhost:3003",
+          "description": "Subscription Service - Desarrollo"
+        },
+        {
+          "url": "https://api.tributariapp.com",
+          "description": "API Gateway - Producción"
         }
       ],
       "components": {
@@ -50,113 +54,35 @@
       "security": [
         {
           "bearerAuth": []
-        },
-        {
-          "apiKey": []
         }
       ]
     },
     "apis": [
-      "./openapi/*.yaml",
       "./apps/*/src/**/*.ts",
-      "./packages/*/src/**/*.ts",
-      "./openapi/unified-api.openapi.yaml",
-      "./openapi/auth-service.openapi.yaml",
-      "./openapi/invoice-service.openapi.yaml",
-      "./openapi/tax-calculator.openapi.yaml",
-      "./openapi/facturas.openapi.yaml"
+      "./packages/*/src/**/*.ts"
     ]
   },
-  "apis": {
-    "facturas": {
-      "title": "API de Facturas",
-      "description": "Gestión completa de facturas, clientes y reportes",
+  "services": {
+    "auth": {
+      "title": "Auth Service API",
+      "description": "Autenticación y gestión de usuarios",
       "version": "1.0.0",
-      "spec": "./openapi/facturas.openapi.yaml",
       "baseUrl": "http://localhost:3001",
       "docsPath": "/api-docs"
     },
-    "taxCalculator": {
-      "title": "API Tax Calculator",
-      "description": "Cálculos fiscales y simulaciones tributarias",
+    "invoices": {
+      "title": "Invoice Service API",
+      "description": "Gestión completa de facturas y documentos",
       "version": "1.0.0",
-      "spec": "./openapi/tax-calculator.openapi.yaml",
       "baseUrl": "http://localhost:3002",
       "docsPath": "/api-docs"
-    }
-  },
-  "swagger": {
-    "definition": {
-      "swagger": "2.0",
-      "info": {
-        "title": "Facturación Autónomos API",
-        "version": "1.0.0",
-        "description": "Sistema de facturación para autónomos - Documentación Swagger 2.0"
-      }
     },
-    "apis": [
-      "./openapi/*.yaml",
-      "./apps/*/src/**/*.ts"
-    ]
-  },
-  "redoc": {
-    "title": "Facturación Autónomos - Documentación API Completa",
-    "version": "1.0.0",
-    "specs": [
-      {
-        "name": "API Facturas",
-        "url": "./openapi/facturas.openapi.yaml"
-      },
-      {
-        "name": "API Tax Calculator",
-        "url": "./openapi/tax-calculator.openapi.yaml"
-      }
-    ],
-    "options": {
-      "theme": {
-        "colors": {
-          "primary": {
-            "main": "#2563eb"
-          }
-        }
-      },
-      "hideDownloadButton": false,
-      "expandResponses": "200,201",
-      "requiredPropsFirst": true,
-      "sortPropsAlphabetically": true,
-      "showExtensions": true,
-      "hideHostname": false,
-      "hideLoading": false,
-      "nativeScrollbars": false,
-      "pathInMiddlePanel": false,
-      "untrustedSpec": false,
-      "hideSchemaPattern": false
+    "subscriptions": {
+      "title": "Subscription Service API",
+      "description": "Gestión de suscripciones y pagos con Stripe",
+      "version": "1.0.0",
+      "baseUrl": "http://localhost:3003",
+      "docsPath": "/api-docs"
     }
-  },
-  "postman": {
-    "collections": [
-      {
-        "name": "Facturación Autónomos - API Facturas",
-        "spec": "./openapi/facturas.openapi.yaml",
-        "output": "./postman/facturas-collection.json"
-      },
-      {
-        "name": "Facturación Autónomos - API Tax Calculator",
-        "spec": "./openapi/tax-calculator.openapi.yaml",
-        "output": "./postman/tax-calculator-collection.json"
-      }
-    ]
-  },
-  "insomnia": {
-    "collections": [
-      {
-        "name": "Facturación Autónomos - Complete API",
-        "specs": [
-          "./openapi/facturas.openapi.yaml",
-          "./openapi/tax-calculator.openapi.yaml"
-        ],
-        "output": "./insomnia/complete-workspace.json"
-      }
-    ]
   }
 }
