@@ -1,0 +1,8 @@
+{
+  "name": "TributariApp",
+  "description": "An intelligent invoicing and tax management application for freelancers and SMEs in Spain. It uses AI to provide financial advice, find grants, and automate invoice data entry via OCR.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}
