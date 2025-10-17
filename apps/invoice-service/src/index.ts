@@ -15,7 +15,7 @@ const PORT = process.env.PORT || 3002;
 // Middleware
 app.use(helmet());
 app.use(cors());
-app.use(compression());
+app.use(compression() as any);
 app.use(morgan("combined"));
 app.use(express.json({ limit: "10mb" }));
 app.use(express.urlencoded({ extended: true }));
