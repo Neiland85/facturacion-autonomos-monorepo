@@ -27,6 +27,7 @@ Esta plataforma está diseñada para simplificar la gestión administrativa y fi
 ## 🚀 Pipeline CI/CD
 
 ### Automatización Completa
+
 - ✅ **Build automático** del monorepo con Turbo
 - ✅ **Tests unitarios** y de integración
 - ✅ **Linting** y validación de código
@@ -35,6 +36,7 @@ Esta plataforma está diseñada para simplificar la gestión administrativa y fi
 - ✅ **Monitoreo** integrado en Vercel
 
 ### Infraestructura Vercel
+
 - 🎯 **Multi-ambiente**: Preview, Staging y Producción
 - 🔄 **Auto-scaling**: Escalado automático según demanda
 - 📊 **Observabilidad**: Logs, métricas y analytics integrados
@@ -90,16 +92,17 @@ yarn dev
 
 ### 🎪 Servicios Disponibles
 
-| Servicio | Puerto | URL | Descripción |
-|----------|--------|-----|-------------|
-| **Web App** | 3000 | http://localhost:3000 | Frontend principal |
-| **API Facturas** | 3001 | http://localhost:3001 | API de gestión de facturas |
-| **API Tax Calculator** | 3002 | http://localhost:3002 | API de cálculos fiscales |
-| **Prisma Studio** | 5555 | http://localhost:5555 | Gestor visual de BD |
+| Servicio               | Puerto | URL                   | Descripción                |
+| ---------------------- | ------ | --------------------- | -------------------------- |
+| **Web App**            | 3000   | http://localhost:3000 | Frontend principal         |
+| **API Facturas**       | 3001   | http://localhost:3001 | API de gestión de facturas |
+| **API Tax Calculator** | 3002   | http://localhost:3002 | API de cálculos fiscales   |
+| **Prisma Studio**      | 5555   | http://localhost:5555 | Gestor visual de BD        |
 
 ## 🛠️ Stack Tecnológico
 
 ### Frontend
+
 - **⚛️ React 18** - UI library
 - **🔄 Next.js 15** - Framework fullstack
 - **🎨 Tailwind CSS** - Styling
@@ -108,6 +111,7 @@ yarn dev
 - **🧪 Jest + Testing Library** - Testing
 
 ### Backend
+
 - **🚀 Node.js 20** - Runtime
 - **⚡ Express.js** - Web framework
 - **🗄️ Prisma** - ORM
@@ -116,6 +120,7 @@ yarn dev
 - **📝 Zod** - Schema validation
 
 ### DevOps & Tooling
+
 - **📦 Yarn 4 PnP** - Package manager
 - **⚡ Turbo** - Monorepo build system
 - **🔧 TypeScript** - Type safety
@@ -127,6 +132,7 @@ yarn dev
 ## 📋 Comandos Disponibles
 
 ### Desarrollo
+
 ```bash
 yarn dev              # Iniciar todos los servicios
 yarn dev:web          # Solo frontend
@@ -135,6 +141,7 @@ yarn type-check       # Verificación de tipos
 ```
 
 ### Testing
+
 ```bash
 yarn test             # Tests unitarios
 yarn test:watch       # Tests en modo watch
@@ -144,6 +151,7 @@ yarn copilot:test-all # Todos los tests (Copilot)
 ```
 
 ### Base de Datos
+
 ```bash
 yarn db:generate     # Generar cliente Prisma
 yarn db:push         # Aplicar cambios al schema
@@ -153,6 +161,7 @@ yarn db:reset        # Reset completo de BD
 ```
 
 ### Calidad de Código
+
 ```bash
 yarn lint             # Linting
 yarn lint:fix         # Linting con auto-fix
@@ -161,6 +170,7 @@ yarn format:check     # Verificar formato
 ```
 
 ### Documentación
+
 ```bash
 yarn adr:new "Título" # Crear nuevo ADR
 ```
@@ -265,12 +275,12 @@ facturacion-autonomos-monorepo/
 
 ### Coverage Goals
 
-| Tipo | Mínimo | Objetivo |
-|------|--------|----------|
-| Statements | 70% | 85% |
-| Branches | 70% | 80% |
-| Functions | 70% | 85% |
-| Lines | 70% | 85% |
+| Tipo       | Mínimo | Objetivo |
+| ---------- | ------ | -------- |
+| Statements | 70%    | 85%      |
+| Branches   | 70%    | 80%      |
+| Functions  | 70%    | 85%      |
+| Lines      | 70%    | 85%      |
 
 ## 🚢 Deployment
 
@@ -284,30 +294,100 @@ facturacion-autonomos-monorepo/
 
 La aplicación se despliega automáticamente en Vercel usando GitHub Actions.
 
-#### Variables de Entorno Requeridas en Vercel
+#### Configuración de GitHub Actions Secrets
+
+Antes de poder desplegar automáticamente, necesitas configurar las secrets de Vercel en GitHub:
+
+##### Configuración Automática de Secrets
 
 ```bash
-# Vercel Configuration
-VERCEL_TOKEN=<tu-vercel-token>
-VERCEL_PROJECT_ID=<tu-project-id>
-VERCEL_ORG_ID=<tu-org-id>
+# 1. Instalar GitHub CLI si no lo tienes
+brew install gh  # macOS
+# winget install --id GitHub.cli  # Windows
+# sudo apt install gh  # Ubuntu/Debian
 
-# Database
+# 2. Autenticarte en GitHub
+gh auth login
+
+# 3. Ejecutar el script de configuración
+./setup-github-secrets.sh
+```
+
+##### Configuración Manual de Secrets
+
+Ve a [GitHub Repository Settings](https://github.com/Neiland85/facturacion-autonomos-monorepo/settings/secrets/actions) y agrega estas secrets:
+
+- `VERCEL_TOKEN`: `8MaMflyLy6c8A7prEMRKv5BY`
+- `VERCEL_PROJECT_ID`: `prj_asVGzmIka4hgkSsLIDcEHEZ5syLw`
+- `VERCEL_ORG_ID`: `ciSmJvy2ITmzaape3bWxMkcw`
+
+#### Variables de Entorno Requeridas en Vercel
+
+##### Configuración Automática (Recomendado)
+
+Usa el script de configuración automática para configurar todas las variables de entorno:
+
+```bash
+# 1. Instalar Vercel CLI si no lo tienes
+npm install -g vercel
+
+# 2. Autenticarte en Vercel
+vercel login
+
+# 3. Ejecutar el script de configuración
+./setup-vercel-env.sh
+```
+
+El script configurará automáticamente las variables básicas con valores de ejemplo que deberás actualizar manualmente.
+
+##### Configuración Manual
+
+Si prefieres configurar manualmente, ve a [Vercel Dashboard](https://vercel.com/dashboard) > Tu Proyecto > Settings > Environment Variables y configura:
+
+```bash
+# 🔧 Configuración de Vercel (requerido para CI/CD)
+VERCEL_TOKEN=<tu-vercel-token>           # Token de acceso de Vercel
+VERCEL_PROJECT_ID=<tu-project-id>        # ID del proyecto en Vercel
+VERCEL_ORG_ID=<tu-org-id>                # ID de la organización en Vercel
+
+# 🗄️ Base de Datos (requerido)
 DATABASE_URL=<postgresql-connection-string>
+# Ejemplo: postgresql://usuario:password@host:5432/database?sslmode=require
 
-# Authentication
-JWT_SECRET=<jwt-secret>
+# 🔐 Autenticación (requerido)
+JWT_SECRET=<jwt-secret-super-seguro-min-32-caracteres>
 JWT_EXPIRES_IN=24h
 
-# Redis (para rate limiting y cache)
+# ⚡ Redis (requerido para rate limiting y cache)
 REDIS_URL=<redis-connection-string>
+# Ejemplo: redis://username:password@host:port/database
 
-# Email (opcional)
+# 📧 Email (opcional - para notificaciones)
 SMTP_HOST=<smtp-host>
 SMTP_PORT=587
 SMTP_USER=<smtp-user>
 SMTP_PASS=<smtp-password>
+
+# 🔗 Webhooks (opcional - para integraciones externas)
+WEBHOOK_SECRET=<webhook-secret>
 ```
+
+##### Cómo Obtener los Valores
+
+1. **VERCEL_TOKEN**: Ve a [Vercel Account Settings](https://vercel.com/account/tokens) > Create Token
+2. **VERCEL_PROJECT_ID & VERCEL_ORG_ID**: En tu proyecto Vercel > Settings > General
+3. **DATABASE_URL**: Configura una base de datos PostgreSQL (Neon, Supabase, Railway, etc.)
+4. **JWT_SECRET**: Genera un string aleatorio seguro de al menos 32 caracteres
+5. **REDIS_URL**: Configura Redis (Upstash, Redis Labs, etc.)
+6. **SMTP\_\***: Configura un servicio de email (SendGrid, Mailgun, etc.)
+
+##### Variables por Entorno
+
+Configura las variables en los siguientes entornos:
+
+- **Production**: Todas las variables con valores reales
+- **Preview**: Variables de desarrollo/testing
+- **Development**: Variables locales (opcional)
 
 #### Despliegue Automático
 
@@ -343,6 +423,7 @@ docker-compose up -d postgres redis
 ## 🔄 Desarrollo y Despliegue
 
 ### Entorno Local con Docker
+
 ```bash
 # Iniciar servicios de desarrollo
 docker-compose -f docker-compose.dev.yml up -d
@@ -357,6 +438,7 @@ docker-compose -f docker-compose.dev.yml logs -f
 ### Pipeline CI/CD
 
 #### Configuración de Variables (GitHub Actions + Vercel)
+
 ```bash
 # Vercel (GitHub Secrets)
 VERCEL_TOKEN=<vercel-token>
@@ -375,6 +457,7 @@ REDIS_URL=<redis-connection-string>
 ```
 
 #### Despliegue Automático
+
 - ✅ **Build automático** del monorepo con Turbo
 - ✅ **Tests unitarios** y de integración
 - ✅ **Linting** y validación de código
@@ -384,12 +467,14 @@ REDIS_URL=<redis-connection-string>
 ### Monitoreo y Observabilidad
 
 #### URLs de Acceso
+
 - **Aplicación**: `https://[tu-proyecto].vercel.app`
 - **API Docs**: `https://[tu-proyecto].vercel.app/api/docs`
 - **Staging**: `https://[tu-proyecto]-develop.vercel.app`
 - **Preview**: `https://[tu-proyecto]-git-[branch].vercel.app`
 
 #### Health Checks
+
 ```bash
 # API Facturas
 curl https://api-facturacion.tu-dominio.com/health
@@ -493,22 +578,26 @@ facturacion-autonomos-monorepo/
 ## 🚀 Instalación
 
 1. **Clonar el repositorio**
+
    ```bash
    git clone <repository-url>
    cd facturacion-autonomos-monorepo
    ```
 
 2. **Habilitar corepack**
+
    ```bash
    corepack enable
    ```
 
 3. **Instalar dependencias**
+
    ```bash
    yarn install
    ```
 
 4. **Configurar variables de entorno**
+
    ```bash
    cp .env.example .env
    # Editar .env con tus configuraciones
@@ -568,6 +657,7 @@ yarn dev
 ```
 
 Esto iniciará:
+
 - 🌐 **Frontend (web)**: http://localhost:3000
 - 🔌 **API Facturas**: http://localhost:3001
 - 📊 **API Tax Calculator**: http://localhost:3002
@@ -625,6 +715,7 @@ code facturacion-autonomos.code-workspace
 ```
 
 #### Características del Workspace:
+
 - 📁 **Folders organizados** por apps y packages
 - ⚙️ **Settings específicos** para el proyecto
 - 🧩 **Extensiones aisladas** que no afectan otros proyectos
@@ -674,6 +765,7 @@ El proyecto está optimizado para GitHub Copilot Agent con tareas predefinidas:
 ## 🛠️ Tecnologías
 
 ### Frontend
+
 - **Next.js 14** - React framework con App Router
 - **React 18** - Librería UI con Server Components
 - **Tailwind CSS** - Utility-first CSS framework
@@ -681,6 +773,7 @@ El proyecto está optimizado para GitHub Copilot Agent con tareas predefinidas:
 - **Framer Motion** - Animaciones declarativas
 
 ### Backend
+
 - **Express.js** - Framework web para Node.js
 - **Prisma** - ORM moderno para bases de datos
 - **JWT** - Autenticación basada en tokens
@@ -688,6 +781,7 @@ El proyecto está optimizado para GitHub Copilot Agent con tareas predefinidas:
 - **Winston** - Logging estructurado
 
 ### DevTools
+
 - **TurboRepo** - Monorepo con caching inteligente
 - **TypeScript** - Superset tipado de JavaScript
 - **ESLint** - Linter para JavaScript/TypeScript
@@ -697,6 +791,7 @@ El proyecto está optimizado para GitHub Copilot Agent con tareas predefinidas:
 - **Playwright** - Cross-browser testing
 
 ### Package Management
+
 - **Yarn 4** - Package manager con node-modules linker
 - **corepack** - Gestor de package managers
 
