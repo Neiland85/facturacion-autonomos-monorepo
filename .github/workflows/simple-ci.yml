@@ -5,12 +5,14 @@ on:
     branches: 
       - main
       - develop
+      - development
       - "feature/**"
       - "hotfix/**"
   pull_request:
     branches:
       - main
       - develop
+      - development
 
 env:
   NODE_VERSION: '20'
