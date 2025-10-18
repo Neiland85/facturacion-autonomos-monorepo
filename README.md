@@ -330,6 +330,7 @@ El proyecto usa un sistema de archivos `.env` separados por entorno:
 - **`.env.development`** - Variables para desarrollo
 
 Para cargar un entorno específico:
+
 ```bash
 # Cargar entorno de producción
 ENVIRONMENT=production source ./load-env.sh
@@ -343,16 +344,52 @@ npm run env:load
 Configura estas variables específicas del entorno en GitHub Actions secrets:
 
 **Base (comunes):**
+
 - `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_ORG_ID`
 
 **Producción:**
+
 - `DATABASE_URL_PROD`, `JWT_SECRET_PROD`, `REDIS_URL_PROD`
 
 **Staging:**
+
 - `DATABASE_URL_STAGING`, `JWT_SECRET_STAGING`, `REDIS_URL_STAGING`
 
 **Desarrollo:**
+
 - `DATABASE_URL_DEV`, `JWT_SECRET_DEV`, `REDIS_URL_DEV`
+
+**Desarrollo:**
+- `DATABASE_URL_DEV`, `JWT_SECRET_DEV`, `REDIS_URL_DEV`
+
+##### Servicios Recomendados
+
+**🐘 PostgreSQL:**
+- [Neon](https://neon.tech) - Serverless PostgreSQL
+- [Supabase](https://supabase.com) - PostgreSQL + Auth
+- [Railway](https://railway.app) - PostgreSQL integrado
+
+**🔴 Redis:**
+- [Upstash](https://upstash.com) - Redis serverless
+- [Redis Labs](https://redis.com) - Redis Cloud
+
+##### Configuración Automática
+
+```bash
+# Configurar todos los secrets básicos
+npm run github:secrets
+
+# Actualizar JWT secrets con valores seguros
+npm run github:secrets:update
+```
+
+##### Configuración Manual
+
+Ve a [GitHub Repository Settings](https://github.com/Neiland85/facturacion-autonomos-monorepo/settings/secrets/actions) y actualiza:
+
+1. **DATABASE_URL_PROD**: `postgresql://user:pass@host:5432/db?sslmode=require`
+2. **REDIS_URL_PROD**: `redis://user:pass@host:port/db`
+3. Mantén los JWT secrets generados automáticamente
 
 #### Variables de Entorno Requeridas en Vercel
 

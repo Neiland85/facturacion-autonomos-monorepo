@@ -51,6 +51,7 @@
     "audit": "npm audit",
     "vercel:setup": "./setup-vercel-env.sh",
     "github:secrets": "./setup-github-secrets.sh",
+    "github:secrets:update": "./update-secrets.sh",
     "env:load": "source ./load-env.sh",
     "deploy:vercel": "./deploy-to-vercel.sh"
   },
