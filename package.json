@@ -53,6 +53,7 @@
     "github:secrets": "./setup-github-secrets.sh",
     "github:secrets:update": "./update-secrets.sh",
     "services:urls": "./setup-service-urls.sh",
+    "system:activate": "./activate-full-system.sh",
     "env:load": "source ./load-env.sh",
     "deploy:vercel": "./deploy-to-vercel.sh"
   },

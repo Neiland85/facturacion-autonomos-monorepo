@@ -78,6 +78,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
           JWT_SECRET: ${{ secrets.JWT_SECRET_PROD }}
           REDIS_URL: ${{ secrets.REDIS_URL_PROD }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST_PROD }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT_PROD }}
+          SMTP_USER: ${{ secrets.SMTP_USER_PROD }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS_PROD }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET_PROD }}
+          NODE_ENV: ${{ secrets.NODE_ENV_PROD }}
 
       - name: 🚀 Deploy to Vercel (Staging)
         if: github.ref == 'refs/heads/develop'
@@ -91,6 +97,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
           JWT_SECRET: ${{ secrets.JWT_SECRET_STAGING }}
           REDIS_URL: ${{ secrets.REDIS_URL_STAGING }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST_STAGING }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT_STAGING }}
+          SMTP_USER: ${{ secrets.SMTP_USER_STAGING }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS_STAGING }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET_STAGING }}
+          NODE_ENV: ${{ secrets.NODE_ENV_STAGING }}
 
       - name: 🚀 Deploy to Vercel (Development)
         if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop'
@@ -104,6 +116,12 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_DEV }}
           JWT_SECRET: ${{ secrets.JWT_SECRET_DEV }}
           REDIS_URL: ${{ secrets.REDIS_URL_DEV }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+          NODE_ENV: ${{ secrets.NODE_ENV_DEV }}
 
   preview-deploy:
     name: 👀 Deploy Preview
@@ -145,3 +163,9 @@ jobs:
           DATABASE_URL: ${{ secrets.DATABASE_URL_DEV }}
           JWT_SECRET: ${{ secrets.JWT_SECRET_DEV }}
           REDIS_URL: ${{ secrets.REDIS_URL_DEV }}
+          SMTP_HOST: ${{ secrets.SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.SMTP_PORT }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASS: ${{ secrets.SMTP_PASS }}
+          WEBHOOK_SECRET: ${{ secrets.WEBHOOK_SECRET }}
+          NODE_ENV: ${{ secrets.NODE_ENV_DEV }}
