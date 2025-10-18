@@ -26,8 +26,8 @@ export class HttpClient {
       method: 'GET',
       headers: {
         'Content-Type': 'application/json',
-        ...this.config.headers
-      }
+        ...this.config.headers,
+      },
     });
 
     if (!response.ok) {
@@ -43,9 +43,9 @@ export class HttpClient {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        ...this.config.headers
+        ...this.config.headers,
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -61,9 +61,9 @@ export class HttpClient {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
-        ...this.config.headers
+        ...this.config.headers,
       },
-      body: JSON.stringify(data)
+      body: JSON.stringify(data),
     });
 
     if (!response.ok) {
@@ -79,8 +79,8 @@ export class HttpClient {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
-        ...this.config.headers
-      }
+        ...this.config.headers,
+      },
     });
 
     if (!response.ok) {
@@ -99,21 +99,33 @@ export class AuthService {
     this.httpClient = new HttpClient(config);
   }
 
-  async login(email: string, password: string, remember = false): Promise<{ success: boolean; user: User; token?: string }> {
-    const response = await this.httpClient.post('/auth/login', { email, password, remember });
+  async login(
+    email: string,
+    password: string,
+    remember = false
+  ): Promise<{ success: boolean; user: User; token?: string }> {
+    const response = await this.httpClient.post('/auth/login', {
+      email,
+      password,
+      remember,
+    });
     return {
       success: true,
       user: response.user,
-      token: response.token
+      token: response.token,
     };
   }
 
-  async register(userData: { email: string; password: string; name: string }): Promise<{ success: boolean; user: User; token?: string }> {
+  async register(userData: {
+    email: string;
+    password: string;
+    name: string;
+  }): Promise<{ success: boolean; user: User; token?: string }> {
     const response = await this.httpClient.post('/auth/register', userData);
     return {
       success: true,
       user: response.user,
-      token: response.token
+      token: response.token,
     };
   }
 
@@ -150,7 +162,10 @@ export class InvoiceService {
     return this.httpClient.post('/api/facturas', invoiceData);
   }
 
-  async updateInvoice(id: string, invoiceData: Partial<Invoice>): Promise<Invoice> {
+  async updateInvoice(
+    id: string,
+    invoiceData: Partial<Invoice>
+  ): Promise<Invoice> {
     return this.httpClient.put(`/api/facturas/${id}`, invoiceData);
   }
 
@@ -218,11 +233,13 @@ export class TaxCalculatorService {
     return this.httpClient.post('/api/calculate-tax', data);
   }
 
-  async getTaxTypes(): Promise<Array<{
-    id: string;
-    name: string;
-    description: string;
-  }>> {
+  async getTaxTypes(): Promise<
+    Array<{
+      id: string;
+      name: string;
+      description: string;
+    }>
+  > {
     return this.httpClient.get('/api/tax-types');
   }
 }
@@ -257,18 +274,18 @@ export const DEFAULT_API_CONFIG: ApiConfig = {
   baseUrl: process.env.API_BASE_URL || 'http://localhost:3001',
   timeout: 30000,
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 };
 
 export const TAX_CALCULATOR_CONFIG: ApiConfig = {
   baseUrl: process.env.TAX_CALCULATOR_URL || 'http://localhost:3002',
   timeout: 30000,
   headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  }
+    Accept: 'application/json',
+    'Content-Type': 'application/json',
+  },
 };
 
 export default {
@@ -280,6 +297,6 @@ export default {
   ServiceFactory,
 };
 // Placeholder for services
-export const servicesVersion = "1.0.0";
+export const servicesVersion = '1.0.0';
 
 const a = 1; // Selecciona la versión correcta
