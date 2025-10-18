@@ -1,0 +1,113 @@
+name: 🚀 Vercel Deployment
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+env:
+  NODE_VERSION: '20.x'
+
+jobs:
+  test-and-deploy:
+    name: 🧪 Test & Deploy to Vercel
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      - name: ⚙️ Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@8.15.0 --activate
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🔍 Type Check
+        run: pnpm --filter @facturacion/web type-check
+
+      - name: 🧹 Lint Check
+        run: pnpm --filter @facturacion/web lint
+
+      - name: 🧪 Run Tests
+        run: pnpm --filter @facturacion/web test --passWithNoTests
+
+      - name: 📊 Generate Coverage
+        run: pnpm --filter @facturacion/web test --coverage --passWithNoTests
+        continue-on-error: true
+
+      - name: 🏗️ Build for Production
+        run: pnpm --filter @facturacion/web build
+        env:
+          NODE_ENV: production
+
+      - name: 🚀 Deploy to Vercel (Production)
+        if: github.ref == 'refs/heads/main'
+        run: |
+          npm install -g vercel
+          vercel --prod --yes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+
+      - name: 🚀 Deploy to Vercel (Preview)
+        if: github.ref != 'refs/heads/main'
+        run: |
+          npm install -g vercel
+          vercel --yes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+
+  preview-deploy:
+    name: 👀 Deploy Preview
+    runs-on: ubuntu-latest
+    if: github.event_name == 'pull_request'
+
+    steps:
+      - name: 📥 Checkout code
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      - name: ⚙️ Enable Corepack
+        run: |
+          corepack enable
+          corepack prepare pnpm@8.15.0 --activate
+
+      - name: 📦 Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: 🏗️ Build Preview
+        run: pnpm --filter @facturacion/web build
+        env:
+          NODE_ENV: production
+
+      - name: 🚀 Deploy Preview to Vercel
+        run: |
+          npm install -g vercel
+          vercel --yes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}

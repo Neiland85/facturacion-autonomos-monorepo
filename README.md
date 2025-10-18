@@ -19,8 +19,8 @@ Esta plataforma está diseñada para simplificar la gestión administrativa y fi
 - **💼 Gestión de Facturas**: Creación, edición y seguimiento de facturas
 - **🧮 Cálculo Fiscal**: Automatización de cálculos de IVA, IRPF y retenciones
 - **📊 Reporting**: Informes detallados y exportación de datos
-- **🔄 CI/CD Pipeline**: Despliegue automático en Kubernetes
-- **📈 Monitoreo**: Métricas con Prometheus y Grafana
+- **🔄 CI/CD Pipeline**: Despliegue automático en Vercel
+- **📈 Monitoreo**: Logs integrados en Vercel
 - **🔒 Seguridad**: Autenticación JWT y validación de datos
 - **🌐 API RESTful**: Documentación completa con OpenAPI/Swagger
 
@@ -30,18 +30,17 @@ Esta plataforma está diseñada para simplificar la gestión administrativa y fi
 - ✅ **Build automático** del monorepo con Turbo
 - ✅ **Tests unitarios** y de integración
 - ✅ **Linting** y validación de código
-- ✅ **Construcción de Docker images** optimizadas
-- ✅ **Despliegue automático** en staging
-- ✅ **Despliegue manual** en producción
-- ✅ **Monitoreo** y alertas integradas
+- ✅ **Despliegue automático** a Vercel (Staging/Producción)
+- ✅ **Preview deployments** para Pull Requests
+- ✅ **Monitoreo** integrado en Vercel
 
-### Infraestructura Kubernetes
-- 🎯 **Multi-ambiente**: Staging y Producción
-- 🔄 **Auto-scaling**: HPA configurado
-- 📊 **Observabilidad**: Logs, métricas y trazas
-- 🛡️ **Seguridad**: Policies de red y RBAC
-- 💾 **Persistencia**: Volúmenes para bases de datos
-- 🌐 **Ingress**: SSL/TLS automático con Let's Encrypt
+### Infraestructura Vercel
+- 🎯 **Multi-ambiente**: Preview, Staging y Producción
+- 🔄 **Auto-scaling**: Escalado automático según demanda
+- 📊 **Observabilidad**: Logs, métricas y analytics integrados
+- 🛡️ **Seguridad**: SSL automático y protección DDoS
+- 💾 **Global CDN**: Distribución global optimizada
+- 🌐 **Edge Functions**: Funciones serverless en el edge
 
 ## 🏗️ Arquitectura del Monorepo
 
@@ -278,8 +277,55 @@ facturacion-autonomos-monorepo/
 ### Environments
 
 - **Development** - Local + feature branches
-- **Staging** - Branch `develop`
-- **Production** - Branch `main`
+- **Staging** - Branch `develop` (Vercel)
+- **Production** - Branch `main` (Vercel)
+
+### Vercel Deployment
+
+La aplicación se despliega automáticamente en Vercel usando GitHub Actions.
+
+#### Variables de Entorno Requeridas en Vercel
+
+```bash
+# Vercel Configuration
+VERCEL_TOKEN=<tu-vercel-token>
+VERCEL_PROJECT_ID=<tu-project-id>
+VERCEL_ORG_ID=<tu-org-id>
+
+# Database
+DATABASE_URL=<postgresql-connection-string>
+
+# Authentication
+JWT_SECRET=<jwt-secret>
+JWT_EXPIRES_IN=24h
+
+# Redis (para rate limiting y cache)
+REDIS_URL=<redis-connection-string>
+
+# Email (opcional)
+SMTP_HOST=<smtp-host>
+SMTP_PORT=587
+SMTP_USER=<smtp-user>
+SMTP_PASS=<smtp-password>
+```
+
+#### Despliegue Automático
+
+- **Push a `main`**: Despliegue automático a producción
+- **Push a `develop`**: Despliegue automático a staging
+- **Pull Requests**: Despliegue de preview
+
+#### Despliegue Manual
+
+```bash
+# Despliegue a Vercel (detecta automáticamente el entorno)
+./deploy-to-vercel.sh
+
+# O usando Vercel CLI directamente
+npm install -g vercel
+vercel --prod --yes  # Producción
+vercel --yes         # Staging/Preview
+```
 
 ### Docker
 
@@ -310,40 +356,38 @@ docker-compose -f docker-compose.dev.yml logs -f
 
 ### Pipeline CI/CD
 
-#### Configuración de Variables (GitLab CI/CD)
+#### Configuración de Variables (GitHub Actions + Vercel)
 ```bash
-# Registry
-CI_REGISTRY_IMAGE=registry.gitlab.com/tu-grupo/facturacion-autonomos
-CI_REGISTRY_USER=gitlab-ci-token
-CI_REGISTRY_PASSWORD=<token>
+# Vercel (GitHub Secrets)
+VERCEL_TOKEN=<vercel-token>
+VERCEL_PROJECT_ID=<vercel-project-id>
+VERCEL_ORG_ID=<vercel-org-id>
 
-# Kubernetes
-KUBE_URL=https://tu-cluster.k8s.com
-KUBE_TOKEN=<service-account-token>
-KUBE_DOMAIN=tu-dominio.com
+# Database
+DATABASE_URL=<postgresql-connection-string>
 
-# Secrets (Base64)
-POSTGRES_PASSWORD_B64=<base64-encoded>
-JWT_SECRET_B64=<base64-encoded>
-DATABASE_URL_B64=<base64-encoded>
+# Authentication
+JWT_SECRET=<jwt-secret>
+JWT_EXPIRES_IN=24h
+
+# Redis (para rate limiting y cache)
+REDIS_URL=<redis-connection-string>
 ```
 
-#### Despliegue Manual
-```bash
-# Staging
-./deploy.sh staging
-
-# Production
-./deploy.sh production
-```
+#### Despliegue Automático
+- ✅ **Build automático** del monorepo con Turbo
+- ✅ **Tests unitarios** y de integración
+- ✅ **Linting** y validación de código
+- ✅ **Despliegue automático** a Vercel (Staging/Producción)
+- ✅ **Preview deployments** para Pull Requests
 
 ### Monitoreo y Observabilidad
 
 #### URLs de Acceso
-- **Aplicación**: `https://facturacion.tu-dominio.com`
-- **API Docs**: `https://api-facturacion.tu-dominio.com/api/docs`
-- **Grafana**: `https://grafana.tu-dominio.com`
-- **Prometheus**: `https://prometheus.tu-dominio.com`
+- **Aplicación**: `https://[tu-proyecto].vercel.app`
+- **API Docs**: `https://[tu-proyecto].vercel.app/api/docs`
+- **Staging**: `https://[tu-proyecto]-develop.vercel.app`
+- **Preview**: `https://[tu-proyecto]-git-[branch].vercel.app`
 
 #### Health Checks
 ```bash
