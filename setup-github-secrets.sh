@@ -22,7 +22,7 @@ fi
 
 echo "✅ GitHub CLI está configurado"
 
-# Credenciales de Vercel (deben coincidir con .env.vercel)
+# Credenciales de Vercel (deben coincidir con .env por entorno)
 VERCEL_TOKEN="8MaMflyLy6c8A7prEMRKv5BY"
 VERCEL_PROJECT_ID="prj_asVGzmIka4hgkSsLIDcEHEZ5syLw"
 VERCEL_ORG_ID="ciSmJvy2ITmzaape3bWxMkcw"
@@ -39,11 +39,32 @@ set_github_secret() {
     echo "$secret_value" | gh secret set "$secret_name"
 }
 
-# Configurar secrets de Vercel
-echo "🚀 Configurando secrets de Vercel..."
+# Configurar secrets base de Vercel
+echo "🚀 Configurando secrets base de Vercel..."
 set_github_secret "VERCEL_TOKEN" "$VERCEL_TOKEN"
 set_github_secret "VERCEL_PROJECT_ID" "$VERCEL_PROJECT_ID"
 set_github_secret "VERCEL_ORG_ID" "$VERCEL_ORG_ID"
+
+# Configurar placeholders para variables de entorno específicas
+echo ""
+echo "📝 Configurando placeholders para variables de entorno..."
+echo "⚠️  IMPORTANTE: Estas son variables de EJEMPLO."
+echo "   Debes actualizarlas con valores reales en el dashboard de GitHub."
+
+# Variables de producción (requieren configuración manual)
+set_github_secret "DATABASE_URL_PROD" "postgresql://prod_user:prod_pass@prod_host:5432/prod_db?sslmode=require"
+set_github_secret "JWT_SECRET_PROD" "tu_jwt_secret_produccion_muy_seguro_min_32_caracteres"
+set_github_secret "REDIS_URL_PROD" "redis://prod_user:prod_pass@prod_host:port/prod_db"
+
+# Variables de staging (requieren configuración manual)
+set_github_secret "DATABASE_URL_STAGING" "postgresql://staging_user:staging_pass@staging_host:5432/staging_db?sslmode=require"
+set_github_secret "JWT_SECRET_STAGING" "tu_jwt_secret_staging_seguro_min_32_caracteres"
+set_github_secret "REDIS_URL_STAGING" "redis://staging_user:staging_pass@staging_host:port/staging_db"
+
+# Variables de desarrollo (requieren configuración manual)
+set_github_secret "DATABASE_URL_DEV" "postgresql://dev_user:dev_pass@dev_host:5432/dev_db"
+set_github_secret "JWT_SECRET_DEV" "tu_jwt_secret_desarrollo_seguro_min_32_caracteres"
+set_github_secret "REDIS_URL_DEV" "redis://dev_user:dev_pass@dev_host:port/dev_db"
 
 echo ""
 echo "✅ Secrets configurados exitosamente!"

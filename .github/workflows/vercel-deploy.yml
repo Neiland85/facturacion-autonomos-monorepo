@@ -33,6 +33,18 @@ jobs:
           corepack enable
           corepack prepare pnpm@8.15.0 --activate
 
+      - name: 🌍 Load Environment Variables
+        run: |
+          if [ "$GITHUB_REF" = "refs/heads/main" ]; then
+            export ENVIRONMENT=production
+          elif [ "$GITHUB_REF" = "refs/heads/develop" ]; then
+            export ENVIRONMENT=staging
+          else
+            export ENVIRONMENT=development
+          fi
+          echo "ENVIRONMENT=$ENVIRONMENT" >> $GITHUB_ENV
+          source ./load-env.sh
+
       - name: 📦 Install dependencies
         run: pnpm install --frozen-lockfile
 
@@ -63,9 +75,12 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL_PROD }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET_PROD }}
+          REDIS_URL: ${{ secrets.REDIS_URL_PROD }}
 
-      - name: 🚀 Deploy to Vercel (Preview)
-        if: github.ref != 'refs/heads/main'
+      - name: 🚀 Deploy to Vercel (Staging)
+        if: github.ref == 'refs/heads/develop'
         run: |
           npm install -g vercel
           vercel --yes
@@ -73,6 +88,22 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL_STAGING }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET_STAGING }}
+          REDIS_URL: ${{ secrets.REDIS_URL_STAGING }}
+
+      - name: 🚀 Deploy to Vercel (Development)
+        if: github.ref != 'refs/heads/main' && github.ref != 'refs/heads/develop'
+        run: |
+          npm install -g vercel
+          vercel --yes
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+          VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+          VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL_DEV }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET_DEV }}
+          REDIS_URL: ${{ secrets.REDIS_URL_DEV }}
 
   preview-deploy:
     name: 👀 Deploy Preview
@@ -111,3 +142,6 @@ jobs:
           VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
           VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
           VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL_DEV }}
+          JWT_SECRET: ${{ secrets.JWT_SECRET_DEV }}
+          REDIS_URL: ${{ secrets.REDIS_URL_DEV }}

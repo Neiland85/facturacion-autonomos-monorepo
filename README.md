@@ -321,6 +321,39 @@ Ve a [GitHub Repository Settings](https://github.com/Neiland85/facturacion-auton
 - `VERCEL_PROJECT_ID`: `prj_asVGzmIka4hgkSsLIDcEHEZ5syLw`
 - `VERCEL_ORG_ID`: `ciSmJvy2ITmzaape3bWxMkcw`
 
+##### Sistema de Entornos
+
+El proyecto usa un sistema de archivos `.env` separados por entorno:
+
+- **`.env.production`** - Variables para producción
+- **`.env.staging`** - Variables para staging
+- **`.env.development`** - Variables para desarrollo
+
+Para cargar un entorno específico:
+```bash
+# Cargar entorno de producción
+ENVIRONMENT=production source ./load-env.sh
+
+# O usar el script de npm
+npm run env:load
+```
+
+##### Variables por Entorno en GitHub Secrets
+
+Configura estas variables específicas del entorno en GitHub Actions secrets:
+
+**Base (comunes):**
+- `VERCEL_TOKEN`, `VERCEL_PROJECT_ID`, `VERCEL_ORG_ID`
+
+**Producción:**
+- `DATABASE_URL_PROD`, `JWT_SECRET_PROD`, `REDIS_URL_PROD`
+
+**Staging:**
+- `DATABASE_URL_STAGING`, `JWT_SECRET_STAGING`, `REDIS_URL_STAGING`
+
+**Desarrollo:**
+- `DATABASE_URL_DEV`, `JWT_SECRET_DEV`, `REDIS_URL_DEV`
+
 #### Variables de Entorno Requeridas en Vercel
 
 ##### Configuración Automática (Recomendado)

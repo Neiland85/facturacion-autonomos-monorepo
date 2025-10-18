@@ -61,7 +61,7 @@ echo ""
 set_env_var() {
     local var_name=$1
     local var_value=$2
-    local environment=${3:-"production,preview,development"}
+    local environment=${3:-"production"}
 
     echo "Configurando $var_name..."
     vercel env add $var_name $environment << EOF
