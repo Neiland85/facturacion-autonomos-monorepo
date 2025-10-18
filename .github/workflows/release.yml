@@ -1,0 +1,142 @@
+name: 🚀 Release & Version
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+    inputs:
+      version_type:
+        description: 'Version bump type'
+        required: true
+        default: 'patch'
+        type: choice
+        options:
+          - patch
+          - minor
+          - major
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  NODE_VERSION: '20.0.0'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  release:
+    name: 📦 Create Release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch' || (github.event_name == 'push' && !contains(github.event.head_commit.message, 'chore: release'))
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+      - name: Determine version bump
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "bump_type=${{ inputs.version_type }}" >> $GITHUB_OUTPUT
+          else
+            # Auto-determine based on conventional commits
+            if git log --oneline -n 20 | grep -q "feat:"; then
+              echo "bump_type=minor" >> $GITHUB_OUTPUT
+            elif git log --oneline -n 20 | grep -q "BREAKING CHANGE"; then
+              echo "bump_type=major" >> $GITHUB_OUTPUT
+            else
+              echo "bump_type=patch" >> $GITHUB_OUTPUT
+            fi
+          fi
+
+      - name: Bump version
+        id: bump
+        run: |
+          current_version=$(node -p "require('./package.json').version")
+          echo "Current version: $current_version"
+
+          case "${{ steps.version.outputs.bump_type }}" in
+            major)
+              new_version=$(node -p "const v = '$current_version'.split('.'); v[0] = parseInt(v[0]) + 1; v[1] = 0; v[2] = 0; v.join('.')")
+              ;;
+            minor)
+              new_version=$(node -p "const v = '$current_version'.split('.'); v[1] = parseInt(v[1]) + 1; v[2] = 0; v.join('.')")
+              ;;
+            patch)
+              new_version=$(node -p "const v = '$current_version'.split('.'); v[2] = parseInt(v[2]) + 1; v.join('.')")
+              ;;
+          esac
+
+          echo "New version: $new_version"
+          echo "version=$new_version" >> $GITHUB_OUTPUT
+
+          # Update package.json
+          npm version $new_version --no-git-tag-version
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          # Generate changelog from conventional commits
+          changelog=$(git log --pretty=format:"* %s (%h)" --since="$(git describe --tags --abbrev=0 2>/dev/null || echo '1970-01-01')")
+          echo "changelog<<EOF" >> $GITHUB_OUTPUT
+          echo "## What's Changed" >> $GITHUB_OUTPUT
+          echo "$changelog" >> $GITHUB_OUTPUT
+          echo "EOF" >> $GITHUB_OUTPUT
+
+      - name: Commit changes
+        run: |
+          git add package.json
+          git commit -m "chore: release v${{ steps.bump.outputs.version }}"
+
+      - name: Create Git tag
+        run: |
+          git tag "v${{ steps.bump.outputs.version }}"
+
+      - name: Push changes
+        run: |
+          git push origin main
+          git push origin "v${{ steps.bump.outputs.version }}"
+
+      - name: Create GitHub Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.bump.outputs.version }}
+          release_name: Release v${{ steps.bump.outputs.version }}
+          body: ${{ steps.changelog.outputs.changelog }}
+          draft: false
+          prerelease: false
+
+  notify:
+    name: 📢 Notify Release
+    runs-on: ubuntu-latest
+    needs: release
+    if: success()
+
+    steps:
+      - name: Slack Notification
+        uses: 8398a7/action-slack@v3
+        if: env.SLACK_WEBHOOK_URL != null
+        with:
+          status: success
+          text: "🎉 New release v${{ needs.release.outputs.version }} has been published!"
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

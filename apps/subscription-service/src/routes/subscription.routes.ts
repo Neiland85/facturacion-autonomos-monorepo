@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { SubscriptionController } from "../controllers/subscription.controller";
 import { idempotencyMiddleware } from "../middleware/idempotency.middleware";
+import { authenticateToken } from "../middleware/auth.middleware";
 
 const router = Router();
 
@@ -45,6 +46,56 @@ router.post("/", idempotencyMiddleware(), SubscriptionController.createSubscript
 
 /**
  * @swagger
+ * /api/v1/subscriptions/plans:
+ *   get:
+ *     summary: Obtener planes de suscripción disponibles
+ *     tags: [Subscriptions]
+ *     responses:
+ *       200:
+ *         description: Lista de planes obtenida exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   name:
+ *                     type: string
+ *                   price:
+ *                     type: number
+ *                   currency:
+ *                     type: string
+ *                   interval:
+ *                     type: string
+ *                     enum: [month, year]
+ *                   features:
+ *                     type: array
+ *                     items:
+ *                       type: string
+ */
+router.get("/plans", SubscriptionController.getSubscriptionPlans);
+
+/**
+ * @swagger
+ * /api/v1/subscriptions/user:
+ *   get:
+ *     summary: Obtener suscripciones del usuario actual
+ *     tags: [Subscriptions]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: Suscripciones obtenidas exitosamente
+ *       401:
+ *         description: No autorizado
+ */
+router.get("/user", authenticateToken, SubscriptionController.getUserSubscriptions);
+
+/**
+ * @swagger
  * /api/v1/subscriptions/{id}:
  *   get:
  *     summary: Obtener suscripción por ID
@@ -66,16 +117,7 @@ router.post("/", idempotencyMiddleware(), SubscriptionController.createSubscript
  *       401:
  *         description: No autorizado
  */
-router.get("/:id", (req, res) => {
-  res.json({
-    success: false,
-    message:
-      "Subscription routes not yet implemented - Get subscription by ID endpoint",
-    endpoint: `/api/v1/subscriptions/${req.params.id}`,
-    method: "GET",
-    subscriptionId: req.params.id,
-  });
-});
+router.get("/:id", authenticateToken, SubscriptionController.getSubscriptionById);
 
 /**
  * @swagger
@@ -114,106 +156,7 @@ router.get("/:id", (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.put("/:id/cancel", SubscriptionController.cancelSubscription);
-
-/**
- * @swagger
- * /api/v1/subscriptions/{id}/reactivate:
- *   put:
- *     summary: Reactivar suscripción cancelada
- *     tags: [Subscriptions]
- *     security:
- *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         schema:
- *           type: string
- *         description: ID de la suscripción
- *     responses:
- *       200:
- *         description: Suscripción reactivada exitosamente
- *       404:
- *         description: Suscripción no encontrada
- *       401:
- *         description: No autorizado
- */
-router.put("/:id/reactivate", (req, res) => {
-  res.json({
-    success: false,
-    message:
-      "Subscription routes not yet implemented - Reactivate subscription endpoint",
-    endpoint: `/api/v1/subscriptions/${req.params.id}/reactivate`,
-    method: "PUT",
-    subscriptionId: req.params.id,
-  });
-});
-
-/**
- * @swagger
- * /api/v1/subscriptions/plans:
- *   get:
- *     summary: Obtener planes de suscripción disponibles
- *     tags: [Subscriptions]
- *     responses:
- *       200:
- *         description: Lista de planes obtenida exitosamente
- *         content:
- *           application/json:
- *             schema:
- *               type: array
- *               items:
- *                 type: object
- *                 properties:
- *                   id:
- *                     type: string
- *                   name:
- *                     type: string
- *                   price:
- *                     type: number
- *                   currency:
- *                     type: string
- *                   interval:
- *                     type: string
- *                     enum: [month, year]
- *                   features:
- *                     type: array
- *                     items:
- *                       type: string
- */
-router.get("/plans", (req, res) => {
-  res.json({
-    success: false,
-    message: "Subscription routes not yet implemented - Get plans endpoint",
-    endpoint: "/api/v1/subscriptions/plans",
-    method: "GET",
-  });
-});
-
-/**
- * @swagger
- * /api/v1/subscriptions/user:
- *   get:
- *     summary: Obtener suscripciones del usuario actual
- *     tags: [Subscriptions]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       200:
- *         description: Suscripciones obtenidas exitosamente
- *       401:
- *         description: No autorizado
- */
-router.get("/user", (req, res) => {
-  res.json({
-    success: false,
-    message:
-      "Subscription routes not yet implemented - Get user subscriptions endpoint",
-    endpoint: "/api/v1/subscriptions/user",
-    method: "GET",
-  });
-});
+router.put("/:id/cancel", authenticateToken, SubscriptionController.cancelSubscription);
 
 /**
  * @swagger
@@ -238,16 +181,7 @@ router.get("/user", (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.get("/:id/payment-methods", (req, res) => {
-  res.json({
-    success: false,
-    message:
-      "Subscription routes not yet implemented - Get payment methods endpoint",
-    endpoint: `/api/v1/subscriptions/${req.params.id}/payment-methods`,
-    method: "GET",
-    subscriptionId: req.params.id,
-  });
-});
+router.get("/:id/payment-methods", authenticateToken, SubscriptionController.getPaymentMethods);
 
 /**
  * @swagger
@@ -272,6 +206,6 @@ router.get("/:id/payment-methods", (req, res) => {
  *       401:
  *         description: No autorizado
  */
-router.put("/:id/reactivate", SubscriptionController.reactivateSubscription);
+router.put("/:id/reactivate", authenticateToken, SubscriptionController.reactivateSubscription);
 
 export default router;

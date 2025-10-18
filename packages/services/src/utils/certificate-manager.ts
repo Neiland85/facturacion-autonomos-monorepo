@@ -56,10 +56,10 @@ export class CertificateManager {
           certificate.publicKey as forge.pki.rsa.PublicKey
         ),
         issuer: certificate.issuer.attributes
-          .map(attr => `${attr.shortName}=${attr.value}`)
+          .map((attr: any) => `${attr.shortName}=${attr.value}`)
           .join(', '),
         subject: certificate.subject.attributes
-          .map(attr => `${attr.shortName}=${attr.value}`)
+          .map((attr: any) => `${attr.shortName}=${attr.value}`)
           .join(', '),
         validFrom: certificate.validity.notBefore,
         validTo: certificate.validity.notAfter,

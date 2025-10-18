@@ -3,7 +3,7 @@ import { tokenStorage } from './tokenStorage';
 
 // Create axios instance with base configuration
 const httpClient: AxiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api',
+  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api',
   timeout: 10000, // 10 seconds timeout
   headers: {
     'Content-Type': 'application/json',
@@ -43,7 +43,7 @@ httpClient.interceptors.response.use(
         try {
           // Attempt to refresh the token
           const refreshResponse = await axios.post(
-            `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3000/api'}/auth/refresh`,
+            `${import.meta.env.VITE_API_BASE_URL || 'http://localhost:3001/api'}/auth/refresh`,
             { refreshToken }
           );
 

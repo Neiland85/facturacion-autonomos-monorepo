@@ -11,6 +11,7 @@ type ProxyConfig = {
   fallbackUrl: string;
   serviceLabel: string;
   errorMessage: string;
+  pathRewrite?: Record<string, string>;
 };
 
 const createServiceProxy = ({
@@ -19,6 +20,7 @@ const createServiceProxy = ({
   fallbackUrl,
   serviceLabel,
   errorMessage,
+  pathRewrite,
 }: ProxyConfig) => {
   const target = process.env[targetEnvVar] || fallbackUrl;
 
@@ -26,9 +28,10 @@ const createServiceProxy = ({
     target,
     changeOrigin: true,
     preserveHeaderKeyCase: true,
-    pathRewrite: {
-      [`^/${prefix}`]: "",
-    },
+    pathRewrite:
+      pathRewrite ?? {
+        [`^/${prefix}`]: "",
+      },
     on: {
       proxyReq: (_proxyReq: ClientRequest, req: Request) => {
         console.log(`[Gateway] Proxying ${req.method} ${req.path} to ${serviceLabel}`);
@@ -59,7 +62,7 @@ router.use(
   createServiceProxy({
     prefix: "auth",
     targetEnvVar: "AUTH_SERVICE_URL",
-    fallbackUrl: "http://localhost:3001",
+    fallbackUrl: "http://localhost:3003",
     serviceLabel: "Auth Service",
     errorMessage: "Auth service unavailable",
   })
@@ -70,7 +73,7 @@ router.use(
   createServiceProxy({
     prefix: "subscriptions",
     targetEnvVar: "SUBSCRIPTION_SERVICE_URL",
-    fallbackUrl: "http://localhost:3003",
+    fallbackUrl: "http://localhost:3006",
     serviceLabel: "Subscription Service",
     errorMessage: "Subscription service unavailable",
   })
@@ -84,6 +87,9 @@ router.use(
     fallbackUrl: "http://localhost:3002",
     serviceLabel: "Invoice Service",
     errorMessage: "Invoice service unavailable",
+    pathRewrite: {
+      "^/invoices": "/api/invoices",
+    },
   })
 );
 
@@ -95,6 +101,9 @@ router.use(
     fallbackUrl: "http://localhost:3002",
     serviceLabel: "Invoice Service (clients)",
     errorMessage: "Invoice service unavailable",
+    pathRewrite: {
+      "^/clients": "/api/clients",
+    },
   })
 );
 
@@ -106,6 +115,9 @@ router.use(
     fallbackUrl: "http://localhost:3002",
     serviceLabel: "Invoice Service (companies)",
     errorMessage: "Invoice service unavailable",
+    pathRewrite: {
+      "^/companies": "/api/companies",
+    },
   })
 );
 

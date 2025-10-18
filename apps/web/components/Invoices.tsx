@@ -100,11 +100,19 @@ interface InvoicesProps {
 
 const Invoices: React.FC<InvoicesProps> = ({ setView, lastCreatedInvoice, clearLastCreatedInvoice, onUseSuggestion, subscriptionTier, onVoiceCommandComplete }) => {
     const { playSound } = useSound();
-    const { data, isLoading, isError } = useQuery<DashboardData>({
-        queryKey: ['dashboardData'],
-        queryFn: getDashboardData
+    const [statusFilter, setStatusFilter] = useState<'all' | InvoiceStatus>('all');
+    const [searchTerm, setSearchTerm] = useState('');
+    const [page, setPage] = useState(1);
+    const { data, isLoading, isError, refetch, isFetching } = useQuery({
+        queryKey: ['invoices', { page, statusFilter, searchTerm }],
+        queryFn: () => getInvoices({
+            page,
+            limit: 10,
+            status: statusFilter === 'all' ? undefined : statusFilter,
+            search: searchTerm ? searchTerm : undefined,
+        }),
+        keepPreviousData: true,
     });
-    const [filter, setFilter] = useState<'all' | InvoiceStatus>('all');
     const [isVoiceModalOpen, setIsVoiceModalOpen] = useState(false);
     const isFreeTier = subscriptionTier === 'free';
 
@@ -121,6 +129,7 @@ const Invoices: React.FC<InvoicesProps> = ({ setView, lastCreatedInvoice, clearL
                     const results = await getInvoiceSuggestions(lastCreatedInvoice);
                     setSuggestions(results);
                     if (results.length > 0) playSound('notify');
+                    await refetch();
                 } catch (error) {
                     console.error("Failed to fetch invoice suggestions", error);
                 } finally {
@@ -130,7 +139,7 @@ const Invoices: React.FC<InvoicesProps> = ({ setView, lastCreatedInvoice, clearL
             }
         };
         fetchSuggestions();
-    }, [lastCreatedInvoice, clearLastCreatedInvoice, playSound]);
+    }, [lastCreatedInvoice, clearLastCreatedInvoice, playSound, refetch]);
     
     const handleNewInvoiceClick = () => {
         playSound('open');
@@ -157,13 +166,32 @@ const Invoices: React.FC<InvoicesProps> = ({ setView, lastCreatedInvoice, clearL
         setSuggestions([]);
     }
 
-    const allInvoices: Invoice[] = [
-        ...data?.recentInvoices || [],
-        { id: '4', invoiceNumber: 'INV-002', clientName: 'Innovate Solutions', issueDate: '25/04/2024', dueDate: '25/05/2024', amount: 3000, status: InvoiceStatus.Paid, category: 'Ingreso por Ventas', description: 'Desarrollo de landing page' },
-        { id: '5', invoiceNumber: 'INV-001', clientName: 'García & Asociados', issueDate: '10/04/2024', dueDate: '10/05/2024', amount: 450, status: InvoiceStatus.Paid, category: 'Servicios Profesionales', description: 'Asesoría fiscal Q1' },
-    ];
-    
-    const filteredInvoices = allInvoices.filter(invoice => filter === 'all' || invoice.status === filter);
+    const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+        setPage(1);
+    };
+
+    const handleStatusFilterChange = (value: 'all' | InvoiceStatus) => {
+        setStatusFilter(value);
+        setPage(1);
+    };
+
+    const goToPreviousPage = () => {
+        if (page > 1) {
+            setPage(page - 1);
+        }
+    };
+
+    const goToNextPage = () => {
+        if (page < totalPages) {
+            setPage(page + 1);
+        }
+    };
+
+    const invoices = useMemo(() => data?.items ?? [], [data]);
+    const totalPages = data?.totalPages ?? 1;
+    const totalItems = data?.total ?? invoices.length;
+    const isEmpty = !isLoading && !isFetching && invoices.length === 0;
 
     return (
         <>
@@ -235,16 +263,22 @@ const Invoices: React.FC<InvoicesProps> = ({ setView, lastCreatedInvoice, clearL
             
             <div className="bg-white dark:bg-slate-800 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
                 <div className="flex items-center gap-2 border-b border-slate-200 dark:border-slate-700 pb-3 mb-3">
-                    <input type="search" placeholder="Buscar por cliente o número..." className="w-full bg-slate-100 dark:bg-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 border border-transparent"/>
+                    <input
+                        type="search"
+                        placeholder="Buscar por cliente o número..."
+                        value={searchTerm}
+                        onChange={handleSearchChange}
+                        className="w-full bg-slate-100 dark:bg-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 border border-transparent"
+                    />
                 </div>
                 <div className="flex gap-2">
-                    {(['all', InvoiceStatus.Pending, InvoiceStatus.Paid, InvoiceStatus.Overdue] as const).map(f => (
+                    {(['all', InvoiceStatus.Sent, InvoiceStatus.Paid, InvoiceStatus.Overdue, InvoiceStatus.Draft] as const).map(f => (
                          <button 
                             key={f}
-                            onClick={() => setFilter(f)}
-                            className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${filter === f ? 'bg-orange-500 text-white' : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
+                            onClick={() => handleStatusFilterChange(f)}
+                            className={`px-3 py-1 text-sm font-semibold rounded-full transition-colors ${statusFilter === f ? 'bg-orange-500 text-white' : 'bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600'}`}
                          >
-                            {f === 'all' ? 'Todas' : f}
+                            {f === 'all' ? 'Todas' : InvoiceStatusLabels[f]}
                         </button>
                     ))}
                 </div>
@@ -263,7 +297,7 @@ const Invoices: React.FC<InvoicesProps> = ({ setView, lastCreatedInvoice, clearL
                         </tr>
                     </thead>
                     <tbody className="block sm:table-row-group">
-                        {isLoading && (
+                        {(isLoading || isFetching) && (
                             <tr>
                                 <td colSpan={6} className="block sm:table-cell text-center p-10">Cargando facturas...</td>
                             </tr>
@@ -273,16 +307,39 @@ const Invoices: React.FC<InvoicesProps> = ({ setView, lastCreatedInvoice, clearL
                                 <td colSpan={6} className="block sm:table-cell text-center p-10 text-red-500">Error al cargar las facturas.</td>
                             </tr>
                         )}
-                        {!isLoading && !isError && filteredInvoices.map(invoice => <InvoiceRow key={invoice.id} invoice={invoice} />)}
+                        {!isLoading && !isFetching && !isError && invoices.map(invoice => <InvoiceRow key={invoice.id} invoice={invoice} />)}
                     </tbody>
                 </table>
 
-                {filteredInvoices.length === 0 && !isLoading && (
+                {isEmpty && (
                      <div className="text-center p-10 mt-4 bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700">
                         <DocumentTextIcon className="w-12 h-12 mx-auto text-slate-300 dark:text-slate-600" />
                         <h3 className="mt-4 font-semibold">No se encontraron facturas</h3>
                         <p className="text-slate-500 dark:text-slate-400 text-sm">No hay facturas que coincidan con el filtro actual.</p>
                      </div>
+                )}
+                {!isEmpty && totalPages > 1 && (
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mt-6">
+                        <div className="flex items-center gap-2">
+                            <button
+                                onClick={goToPreviousPage}
+                                disabled={page === 1}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${page === 1 ? 'bg-slate-100 dark:bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white'}`}
+                            >
+                                Anterior
+                            </button>
+                            <button
+                                onClick={goToNextPage}
+                                disabled={page === totalPages}
+                                className={`px-3 py-1.5 rounded-lg text-sm font-semibold transition-colors ${page === totalPages ? 'bg-slate-100 dark:bg-slate-700 text-slate-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600 text-white'}`}
+                            >
+                                Siguiente
+                            </button>
+                        </div>
+                        <p className="text-sm text-slate-500 dark:text-slate-400">
+                            Página {page} de {totalPages} · {totalItems} facturas
+                        </p>
+                    </div>
                 )}
             </div>
         </div>

@@ -1,6 +1,53 @@
 # 💼 Sistema de Facturación para Autónomos
 
-Plataforma completa de gestión de facturación diseñada específicamente para profesionales autónomos en España, con integración directa con la AEAT.
+Plataforma completa de gestión de facturación diseñada específicamente para profesionales autónomos # Instalar dependencias
+pnpm install
+
+# Iniciar base de datos y Redis
+docker-compose up db redis -d
+
+# Ejecutar migraciones de Prisma
+cd packages/database && pnpm prisma migrate dev
+
+# Semilla de datos iniciales
+npm run prisma:seed
+
+# Iniciar servicios en terminales separadas
+pnpm run dev  # Inicia todos los servicios con Turbo
+```
+
+### Database Migrations
+
+After setting up the database, run migrations to create the subscription tables:
+
+```bash
+# Navigate to database package
+cd packages/database
+
+# Run migrations
+npx prisma migrate dev
+
+# Seed subscription plans
+npm run prisma:seed
+```
+
+This will:
+1. Create the `subscription_plans` and `subscriptions` tables
+2. Add subscription status and interval enums
+3. Populate initial subscription plans (Starter, Professional, Enterprise)
+
+### Regenerating Prisma Client
+
+If you modify the Prisma schema, regenerate the client:
+
+```bash
+cd packages/database
+npx prisma generate
+```
+
+## 📦 Requisitos
+
+- Node.js 20+ntegración directa con la AEAT.
 
 ## 🎯 Casos de Uso
 
@@ -86,13 +133,24 @@ facturacion-autonomos-monorepo/
 
 ### 🔌 Puertos de Servicios
 
-- **Web Frontend**: `http://localhost:3000`
+- **Web Frontend**: `http://localhost:5173` (Vite Dev)
 - **API Gateway**: `http://localhost:3001`
 - **Invoice Service**: `http://localhost:3002`
 - **Auth Service**: `http://localhost:3003`
 - **Tax Calculator**: `http://localhost:3004`
 - **PostgreSQL**: `localhost:5432`
 - **Redis**: `localhost:6379`
+
+### ⚙️ Configuración de URLs del Frontend
+
+El frontend se conecta al API Gateway mediante la variable de entorno `VITE_API_BASE_URL`.
+
+**Configuración predeterminada (desarrollo):**
+```bash
+VITE_API_BASE_URL=http://localhost:3001/api
+```
+
+Para instrucciones completas sobre configuración en diferentes ambientes (Docker, producción, etc.), consulta [**FRONTEND_URL_CONFIGURATION.md**](./FRONTEND_URL_CONFIGURATION.md).
 
 ### 📂 Organización del Código
 
@@ -216,6 +274,50 @@ CERTIFICATE_PEM_PATH=/path/to/certificate.pem
 PRIVATE_KEY_PEM_PATH=/path/to/private-key.pem
 ```
 
+```
+
+## 🌐 Cloud Integrations
+
+For detailed information about external service integrations (AEAT, Stripe, digital signatures), see:
+- [Cloud Integrations Status](./CLOUD_INTEGRATIONS_STATUS.md) - Comprehensive analysis of all cloud/external service integrations
+
+**Quick Status:**
+- ✅ Stripe Webhooks: 100% complete (signature verification implemented)
+- ✅ Digital Certificates: 100% complete (ready to use)
+- ✅ XML Digital Signature: 100% complete (not integrated yet)
+- ⚠️ Timestamp Service: Development stub only
+- 🟡 AEAT SII: 85% complete (implemented, pending production testing)
+- ✅ XML Generation: 80% complete (missing signature integration)
+
+### AEAT SII Integration
+
+The AEAT SII (Sistema de Información Inmediata) integration is now implemented and ready for testing:
+- ✅ SOAP XML transformation with complete field mapping
+- ✅ Certificate-based authentication with mutual TLS
+- ✅ Retry logic with exponential backoff
+- ✅ Response parsing and error handling with CSV extraction
+- ✅ Manual submission endpoint: `POST /api/invoices/:id/submit-aeat`
+- ✅ Comprehensive unit tests
+
+**To enable:**
+```bash
+# In .env file:
+AEAT_SII_ENABLED=true
+AEAT_CERTIFICATE_PATH=/path/to/cert.p12
+AEAT_CERTIFICATE_PASSWORD=your_password
+```
+
+**API Usage:**
+```bash
+curl -X POST http://localhost:3002/api/invoices/{invoiceId}/submit-aeat \
+  -H "Authorization: Bearer YOUR_TOKEN" \
+  -H "Content-Type: application/json"
+```
+
+Response includes SII reference (CSV) if successful.
+
 ## 💼 Licencia
 
 Software de código cerrado. Contacto para licenciamiento comercial.
+
+````

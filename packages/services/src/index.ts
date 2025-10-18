@@ -270,4 +270,9 @@ export default {
 // Placeholder for services
 export const servicesVersion = "1.0.0";
 
+// Digital Signing Services
+export { CertificateManager, CertificateData } from './digital-signing/certificate-manager';
+export { XmlDSigSigner } from './digital-signing/xmldsig-signer';
+export { TimestampService, TimestampServiceConfig } from './digital-signing/timestamp-service';
+
 const a = 1; // Selecciona la versión correcta

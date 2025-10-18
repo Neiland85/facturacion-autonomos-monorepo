@@ -12,6 +12,16 @@ import {
 import { httpClient, withIdempotency } from "./httpClient";
 import { v4 as uuidv4 } from "uuid";
 
+// Import new consolidated services
+import {
+  authService,
+  invoiceService,
+  clientService,
+  companyService,
+  dashboardService,
+  subscriptionService,
+} from "../src/services";
+
 export type InvoiceListParams = {
   page?: number;
   limit?: number;

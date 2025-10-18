@@ -4,6 +4,7 @@ import { AuthenticatedRequest } from "../middleware/auth.middleware";
 import { withTransaction, isUniqueConstraintError } from "@facturacion/database";
 import { prisma } from "@facturacion/database";
 import { XmlGeneratorService } from "../services/xml-generator.service";
+import { siiIntegrationService } from "../services/sii-integration.service";
 
 export class InvoiceController {
   /**
@@ -598,6 +599,15 @@ export class InvoiceController {
         return;
       }
 
+      // Validar que la factura tiene datos requeridos
+      if (!invoice.client || !invoice.company || !invoice.lines || invoice.lines.length === 0) {
+        res.status(400).json({
+          success: false,
+          message: "Invoice data incomplete for XML generation",
+        });
+        return;
+      }
+
       let signedXml = invoice.signedXml;
 
       if (!signedXml) {
@@ -613,16 +623,55 @@ export class InvoiceController {
         } catch (generationError) {
           console.error("Error generando XML firmado:", generationError);
 
+          const msg = generationError instanceof Error ? generationError.message : String(generationError);
+
+          // Mapear errores a códigos HTTP específicos
+          if (msg.includes("XML transformer")) {
+            res.status(503).json({
+              success: false,
+              message: "XML generation service temporarily unavailable",
+            });
+            return;
+          }
+
+          if (msg.includes("certificate") || msg.includes("certificado")) {
+            res.status(500).json({
+              success: false,
+              message: "Error loading digital certificate",
+              details: "Check certificate configuration in environment variables",
+            });
+            return;
+          }
+
+          if (msg.includes("sign") || msg.includes("firma")) {
+            res.status(500).json({
+              success: false,
+              message: "Error during XML signing",
+              details: "Check digital signature configuration",
+            });
+            return;
+          }
+
           res.status(500).json({
             success: false,
-            message: "Error generando el XML firmado",
+            message: "Error generating signed XML",
           });
           return;
         }
       }
 
+      // Detectar estado de firma y timestamp
+      const isSigned = signedXml.includes("<ds:Signature>");
+      const hasTimestamp = signedXml.includes("<xades:SigningTime>") || signedXml.includes("<xades:TimeStampToken>");
+
+      // Agregar headers de estado
       res.setHeader("Content-Type", "application/xml");
       res.setHeader("Content-Disposition", `attachment; filename="factura-${invoice.number}.xml"`);
+      res.setHeader("X-Signature-Status", isSigned ? "signed" : "unsigned");
+      res.setHeader("X-Timestamp-Status", hasTimestamp ? "timestamped" : "not-timestamped");
+
+      console.log(`📋 XML descargado: ${invoice.number} (Firma: ${isSigned}, Timestamp: ${hasTimestamp})`);
+
       res.send(signedXml);
     } catch (error) {
       console.error("Get signed XML error:", error);
@@ -630,6 +679,97 @@ export class InvoiceController {
       res.status(500).json({
         success: false,
         message: "Error interno del servidor",
+      });
+    }
+  }
+
+  /**
+   * Submit invoice to AEAT SII
+   */
+  static async submitToAEAT(
+    req: (IdempotentRequest & AuthenticatedRequest) | any,
+    res: Response
+  ): Promise<void> {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: "Usuario no autorizado",
+        });
+        return;
+      }
+
+      // Check if SII is enabled
+      if (!siiIntegrationService.isEnabled()) {
+        res.status(503).json({
+          success: false,
+          message: "Integración AEAT SII no está habilitada",
+        });
+        return;
+      }
+
+      // Fetch invoice with details
+      const invoice = await prisma.invoice.findFirst({
+        where: { id, userId },
+        include: {
+          client: true,
+          company: true,
+          lines: true,
+        },
+      });
+
+      if (!invoice) {
+        res.status(404).json({
+          success: false,
+          message: "Factura no encontrada",
+        });
+        return;
+      }
+
+      // Check if already submitted
+      if (invoice.siiSent) {
+        res.status(409).json({
+          success: false,
+          message: "Factura ya enviada a AEAT",
+          data: {
+            siiReference: invoice.siiReference,
+            siiSentAt: invoice.siiSentAt,
+          },
+        });
+        return;
+      }
+
+      // Submit to AEAT
+      await siiIntegrationService.submitInvoiceToAEAT(invoice as any);
+
+      // Fetch updated invoice
+      const updatedInvoice = await prisma.invoice.findUnique({
+        where: { id },
+        include: {
+          client: true,
+          company: true,
+          lines: true,
+        },
+      });
+
+      res.json({
+        success: true,
+        message: "Factura enviada a AEAT exitosamente",
+        data: {
+          invoice: updatedInvoice,
+          siiReference: updatedInvoice?.siiReference,
+        },
+      });
+    } catch (error) {
+      console.error("Submit to AEAT error:", error);
+
+      res.status(500).json({
+        success: false,
+        message: "Error al enviar factura a AEAT",
+        error: error instanceof Error ? error.message : "Unknown error",
       });
     }
   }

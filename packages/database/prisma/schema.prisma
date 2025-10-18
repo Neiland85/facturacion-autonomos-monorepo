@@ -30,9 +30,10 @@ model User {
   isActive              Boolean  @default(true)
   
   // Relaciones
-  company   Company?
-  invoices  Invoice[]
-  clients   Client[]
+  company        Company?
+  invoices       Invoice[]
+  clients        Client[]
+  subscriptions  Subscription[]
   
   @@map("users")
 }
@@ -274,4 +275,68 @@ model IdempotencyKey {
   
   @@index([key, createdAt])
   @@map("idempotency_keys")
+}
+
+enum SubscriptionStatus {
+  PENDING
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELLED
+  INCOMPLETE
+
+  @@map("subscription_statuses")
+}
+
+enum SubscriptionInterval {
+  MONTH
+  YEAR
+
+  @@map("subscription_intervals")
+}
+
+model SubscriptionPlan {
+  id             String   @id @default(cuid())
+  name           String
+  description    String
+  price          Decimal  @db.Decimal(10, 2)
+  currency       String   @default("EUR")
+  interval       SubscriptionInterval @default(MONTH)
+  features       Json
+  maxInvoices    Int
+  maxClients     Int
+  isPopular      Boolean  @default(false)
+  stripePriceId  String?
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  subscriptions  Subscription[]
+
+  @@map("subscription_plans")
+}
+
+model Subscription {
+  id                    String   @id @default(cuid())
+  userId                String
+  planId                String
+  status                SubscriptionStatus @default(PENDING)
+  currentPeriodStart    DateTime
+  currentPeriodEnd      DateTime
+  cancelAtPeriodEnd     Boolean  @default(false)
+  cancelledAt           DateTime?
+  reactivatedAt         DateTime?
+  activatedAt           DateTime?
+  stripeSubscriptionId  String?  @unique
+  stripeCustomerId      String?
+  stripePaymentIntentId String?
+  createdAt             DateTime @default(now())
+  updatedAt             DateTime @updatedAt
+
+  user  User              @relation(fields: [userId], references: [id])
+  plan  SubscriptionPlan  @relation(fields: [planId], references: [id])
+
+  @@index([userId])
+  @@index([status])
+  @@map("subscriptions")
 }

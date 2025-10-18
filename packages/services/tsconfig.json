@@ -2,10 +2,12 @@
   "extends": "../../tsconfig.base.lib.json",
   "compilerOptions": {
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "../../",
+    "baseUrl": "../../"
   },
   "include": [
-    "src/**/*"
+    "src/**/*",
+    "../../certificate-manager.ts"
   ],
   "exclude": [
     "node_modules",

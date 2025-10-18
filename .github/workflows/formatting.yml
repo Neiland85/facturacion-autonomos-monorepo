@@ -1,0 +1,69 @@
+name: 💅 Code Formatting
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main, develop]
+
+concurrency:
+  group: formatting-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '20.0.0'
+  PNPM_VERSION: '8.15.0'
+
+jobs:
+  format:
+    name: 💅 Format Code
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - uses: pnpm/action-setup@v2
+        with:
+          version: ${{ env.PNPM_VERSION }}
+
+      - uses: actions/cache@v4
+        with:
+          path: |
+            ~/.pnpm-store
+            node_modules
+          key: pnpm-${{ hashFiles('**/pnpm-lock.yaml') }}
+
+      - run: pnpm install --frozen-lockfile
+
+      - name: Check formatting
+        id: format-check
+        run: pnpm format:check || echo "needs_formatting=true" >> $GITHUB_OUTPUT
+
+      - name: Auto-fix formatting
+        if: steps.format-check.outputs.needs_formatting == 'true' && github.event_name == 'pull_request'
+        run: |
+          pnpm format:fix
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add .
+          git commit -m "style: auto-fix formatting" || echo "No changes to commit"
+          git push
+
+      - name: Comment on PR
+        if: steps.format-check.outputs.needs_formatting == 'true' && github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '💅 Code formatting has been automatically fixed. Please review the changes.'
+            })

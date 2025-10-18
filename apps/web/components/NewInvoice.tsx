@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { useQuery } from '@tanstack/react-query';
-import { getClients } from '../services/apiService';
-import { Client, View, Invoice, InvoiceStatus, InvoiceSuggestion, VoiceInvoiceData } from '../types';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { createInvoice, getClients, getMyCompany, CreateInvoicePayload } from '../services/apiService';
+import { Client, View, Invoice, InvoiceSuggestion, VoiceInvoiceData } from '../types';
 import { PaperAirplaneIcon, SparklesIcon } from './icons';
 import { useSound } from '../hooks/useSound';
 
@@ -14,13 +14,22 @@ interface NewInvoiceProps {
 }
 
 const NewInvoice: React.FC<NewInvoiceProps> = ({ setView, ocrData, suggestionData, voiceData, onInvoiceCreated }) => {
-  const { playSound } = useSound();
-  const { data: clients = [] } = useQuery<Client[]>({
-    queryKey: ['clients'],
-    queryFn: getClients
-  });
-  
-  const [invoiceNumber, setInvoiceNumber] = useState('INV-006');
+    const { playSound } = useSound();
+    const { data: clientResult } = useQuery({
+        queryKey: ['clients', 'new-invoice'],
+        queryFn: () => getClients({ limit: 100 }),
+    });
+    const clients: Client[] = clientResult?.items ?? [];
+
+    const { data: company, isLoading: isCompanyLoading, isError: isCompanyError } = useQuery({
+        queryKey: ['company', 'me'],
+        queryFn: getMyCompany,
+        retry: false,
+    });
+
+        const createInvoiceMutation = useMutation(createInvoice);
+
+    const [invoiceNumber] = useState('Se generará automáticamente');
   const [issueDate, setIssueDate] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [selectedClient, setSelectedClient] = useState('');
@@ -34,10 +43,10 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ setView, ocrData, suggestionDat
     issueDate: '',
     dueDate: '',
   });
+    const [formError, setFormError] = useState<string | null>(null);
   
   useEffect(() => {
     if (ocrData) {
-        setInvoiceNumber(ocrData.invoiceNumber || 'INV-007');
         setIssueDate(ocrData.issueDate ? new Date(ocrData.issueDate.split('/').reverse().join('-')).toISOString().split('T')[0] : '');
         setDueDate(ocrData.dueDate ? new Date(ocrData.dueDate.split('/').reverse().join('-')).toISOString().split('T')[0] : '');
         setAmount(ocrData.baseAmount || '');
@@ -103,31 +112,58 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ setView, ocrData, suggestionDat
       return isValid;
   };
 
-  const handleSendInvoice = () => {
+  const isCreating = createInvoiceMutation.isPending;
+
+  const handleSendInvoice = async () => {
       if (!validateForm()) {
           playSound('error');
           return;
       }
-      playSound('success');
-      const newInvoice: Invoice = {
-          id: `inv-${Date.now()}`,
-          invoiceNumber,
-          clientName: clients.find(c => c.id === selectedClient)?.name || 'Cliente desconocido',
-          issueDate: issueDate ? new Date(issueDate).toLocaleDateString('es-ES') : '',
-          dueDate: dueDate ? new Date(dueDate).toLocaleDateString('es-ES') : '',
-          amount: Number(amount),
-          status: InvoiceStatus.Pending,
-          category: 'Ingreso por Ventas',
-          description,
-          invoiceType: isProforma ? 'proforma' : 'official',
-      };
-      onInvoiceCreated(newInvoice);
+
+      if (!company) {
+          setFormError('Debes registrar los datos de tu empresa antes de crear facturas.');
+          playSound('error');
+          return;
+      }
+
+      setFormError(null);
+
+      try {
+          const payload: CreateInvoicePayload = {
+              clientId: selectedClient,
+              companyId: company.id,
+              issueDate,
+              dueDate: dueDate || null,
+              notes: description || null,
+              lines: [
+                  {
+                      description: description || 'Servicios profesionales',
+                      quantity: 1,
+                      price: Number(amount),
+                      vatRate: Number(taxRate) || 0,
+                  },
+              ],
+          };
+
+          const createdInvoice = await createInvoiceMutation.mutateAsync(payload);
+          playSound('success');
+          onInvoiceCreated(createdInvoice);
+      } catch (error) {
+          console.error('Error al crear la factura:', error);
+          setFormError('No se pudo crear la factura. Inténtalo de nuevo más tarde.');
+          playSound('error');
+      }
   };
 
   const inputClasses = "w-full bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500 focus:border-orange-500";
   const labelClasses = "block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1";
   
-  const totalAmount = (Number(amount) || 0) * (1 + (Number(taxRate) || 0) / 100);
+    const totalAmount = (Number(amount) || 0) * (1 + (Number(taxRate) || 0) / 100);
+    const canSubmit = Boolean(company) && !isCreating;
+
+    if (isCompanyLoading) {
+        return <div className="p-6 text-center text-slate-500 dark:text-slate-400">Cargando datos de la empresa...</div>;
+    }
 
   return (
     <div className="p-4 md:p-6">
@@ -165,6 +201,15 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ setView, ocrData, suggestionDat
                 </div>
             </div>
         )}
+
+        {(!company || isCompanyError) && (
+            <div className="mb-6 p-4 bg-amber-500/10 border border-amber-500/20 rounded-xl">
+                <p className="font-semibold text-amber-700 dark:text-amber-300">Debes completar los datos fiscales de tu empresa antes de emitir facturas.</p>
+                <button onClick={() => setView('settings')} className="mt-3 inline-flex items-center px-3 py-1.5 bg-orange-500 hover:bg-orange-600 text-white rounded-lg text-sm font-semibold transition-colors">
+                    Ir a ajustes
+                </button>
+            </div>
+        )}
         
         <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700 space-y-6">
             <h3 className="text-xl font-bold text-slate-900 dark:text-white">Información Básica</h3>
@@ -175,9 +220,10 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ setView, ocrData, suggestionDat
                     type="text"
                     id="invoiceNumber"
                     value={invoiceNumber}
-                    onChange={(e) => setInvoiceNumber(e.target.value)}
-                    className={inputClasses}
+                    disabled
+                    className={`${inputClasses} bg-slate-100 dark:bg-slate-700 cursor-not-allowed`}
                 />
+                <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Se asignará automáticamente al crear la factura.</p>
             </div>
             
             <div className="grid sm:grid-cols-2 gap-6">
@@ -276,6 +322,7 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ setView, ocrData, suggestionDat
                 <p className="text-3xl font-bold text-slate-900 dark:text-white">
                     €{totalAmount.toLocaleString('es-ES', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
                 </p>
+                {formError && <p className="text-sm text-red-500 mt-3">{formError}</p>}
             </div>
         </div>
         
@@ -283,9 +330,13 @@ const NewInvoice: React.FC<NewInvoiceProps> = ({ setView, ocrData, suggestionDat
             <button onClick={() => playSound('click')} className="bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-semibold py-2 px-4 rounded-lg w-full transition-colors">
                 Guardar Borrador
             </button>
-            <button onClick={handleSendInvoice} className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg w-full flex items-center justify-center gap-2 transition-colors">
+            <button
+                onClick={handleSendInvoice}
+                disabled={!canSubmit}
+                className={`bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-4 rounded-lg w-full flex items-center justify-center gap-2 transition-colors ${!canSubmit ? 'opacity-60 cursor-not-allowed hover:bg-orange-500' : ''}`}
+            >
                 <PaperAirplaneIcon className="w-5 h-5"/>
-                Enviar Factura
+                {isCreating ? 'Creando...' : 'Enviar Factura'}
             </button>
         </div>
     </div>

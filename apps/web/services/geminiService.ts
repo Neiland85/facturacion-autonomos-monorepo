@@ -211,15 +211,21 @@ const invoiceSuggestionSchema = {
 };
 
 export const getInvoiceSuggestions = async (lastInvoice: Invoice): Promise<InvoiceSuggestion[]> => {
+    const clientName = lastInvoice.client?.name ?? 'Cliente';
+    const primaryLine = lastInvoice.lines?.[0];
+    const concept = lastInvoice.notes || primaryLine?.description || 'Servicios generales';
+    const amount = primaryLine ? primaryLine.price * primaryLine.quantity : lastInvoice.subtotal || lastInvoice.total;
+    const categoryHint = primaryLine?.description || concept;
+
     const prompt = `
         Basado en la siguiente factura recién creada, genera 2 sugerencias para facturas similares que este usuario podría crear a continuación.
         Esto es útil para facturas recurrentes o para clientes habituales.
         
         Última factura:
-        - Cliente: ${lastInvoice.clientName}
-        - Concepto: ${lastInvoice.description || 'Servicios generales'}
-        - Importe: ${lastInvoice.amount}
-        - Categoría: ${lastInvoice.category || 'Sin categoría'}
+        - Cliente: ${clientName}
+        - Concepto: ${concept}
+        - Importe: ${amount}
+        - Categoría: ${categoryHint}
 
         Sugerencias a generar:
         - Si el concepto es vago (como "Servicios profesionales"), sugiere conceptos más específicos como "Iguala de asesoramiento fiscal" o "Consultoría de marketing".

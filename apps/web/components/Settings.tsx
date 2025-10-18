@@ -1,9 +1,11 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { SubscriptionTier, UserProfile, View, CreditCard } from '../types';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
+import { SubscriptionTier, UserProfile, View, CreditCard, Company } from '../types';
 import { UserCircleIcon, CreditCardIcon, LockClosedIcon, DiamondIcon, CameraIcon, ShieldCheckIcon, LaptopIcon, DeviceMobileIcon, UserIcon, PlusIcon, TrashIcon } from './icons';
 import { useSound } from '../hooks/useSound';
 import CancelSubscriptionModal from './CancelSubscriptionModal';
 import CameraModal from './CameraModal';
+import { createCompany, getMyCompany, updateCompany, UpsertCompanyPayload } from '../services/apiService';
 
 interface SettingsProps {
   subscriptionTier: SubscriptionTier;
@@ -27,6 +29,7 @@ const mockAuditLog = [
 
 const Settings: React.FC<SettingsProps> = ({ subscriptionTier, userProfile, onLogout, onCancelSubscription, setView }) => {
     const { playSound } = useSound();
+    const queryClient = useQueryClient();
     const [activeSection, setActiveSection] = useState<SettingsSection>('profile');
     const [isCancelModalOpen, setIsCancelModalOpen] = useState(false);
     const [profilePicture, setProfilePicture] = useState<string | null>(null);
@@ -45,6 +48,60 @@ const Settings: React.FC<SettingsProps> = ({ subscriptionTier, userProfile, onLo
     const [showAddCardForm, setShowAddCardForm] = useState(false);
     const [newCard, setNewCard] = useState({ cardholderName: '', cardNumber: '', expiryDate: '', cvv: '' });
     const [cardErrors, setCardErrors] = useState({ cardholderName: '', cardNumber: '', expiryDate: '', cvv: '' });
+
+    const { data: company, isLoading: isCompanyLoading, isError: isCompanyError } = useQuery<Company>({
+        queryKey: ['company', 'me'],
+        queryFn: getMyCompany,
+        retry: false,
+    });
+
+    const [companyForm, setCompanyForm] = useState<UpsertCompanyPayload>({
+        name: '',
+        cif: '',
+        address: '',
+        city: '',
+        postalCode: '',
+        province: '',
+        phone: '',
+        email: '',
+        website: '',
+        taxRegime: 'GENERAL',
+    });
+    const [companyFormError, setCompanyFormError] = useState<string | null>(null);
+    const [companyFormSuccess, setCompanyFormSuccess] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (company) {
+            setCompanyForm({
+                name: company.name,
+                cif: company.cif,
+                address: company.address,
+                city: company.city,
+                postalCode: company.postalCode,
+                province: company.province,
+                phone: company.phone ?? '',
+                email: company.email ?? '',
+                website: company.website ?? '',
+                taxRegime: company.taxRegime ?? 'GENERAL',
+            });
+        }
+    }, [company]);
+
+    const companyMutation = useMutation<Company, unknown, UpsertCompanyPayload>({
+        mutationFn: (payload) => (company ? updateCompany(payload) : createCompany(payload)),
+        onSuccess: (updatedCompany) => {
+            queryClient.setQueryData(['company', 'me'], updatedCompany);
+            setCompanyFormSuccess(company ? 'Datos de empresa actualizados correctamente.' : 'Empresa registrada correctamente.');
+            setCompanyFormError(null);
+            playSound('success');
+        },
+        onError: (error) => {
+            console.error('Error al guardar la empresa:', error);
+            setCompanyFormError('No se pudieron guardar los datos de la empresa. Revisa los campos e inténtalo de nuevo.');
+            setCompanyFormSuccess(null);
+            playSound('error');
+        },
+    });
 
     const handleUpgradeClick = () => {
         playSound('click');
@@ -190,6 +247,29 @@ const Settings: React.FC<SettingsProps> = ({ subscriptionTier, userProfile, onLo
     
     const isCardFormValid = Object.values(cardErrors).every(err => err === '') && Object.values(newCard).every(val => typeof val === 'string' && val.trim() !== '');
 
+    const handleCompanyInputChange = (event: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const { name, value } = event.target;
+        setCompanyForm(prev => ({ ...prev, [name]: value }));
+        setCompanyFormError(null);
+        setCompanyFormSuccess(null);
+    };
+
+    const handleCompanySubmit = (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+
+        const requiredFields: Array<keyof UpsertCompanyPayload> = ['name', 'cif', 'address', 'city', 'postalCode', 'province'];
+        const missingField = requiredFields.find((field) => !companyForm[field] || (companyForm[field] as string).trim() === '');
+
+        if (missingField) {
+            setCompanyFormError('Completa los campos obligatorios (nombre, CIF y dirección completa).');
+            setCompanyFormSuccess(null);
+            playSound('error');
+            return;
+        }
+
+        companyMutation.mutate(companyForm);
+    };
+
     const handleAddCard = (e: React.FormEvent) => {
         e.preventDefault();
         if (isCardFormValid) {
@@ -213,7 +293,10 @@ const Settings: React.FC<SettingsProps> = ({ subscriptionTier, userProfile, onLo
     const renderSection = () => {
         const isFreeTier = subscriptionTier === 'free';
         switch (activeSection) {
-            case 'profile':
+            case 'profile': {
+                const companyInputClasses = "w-full bg-slate-100 dark:bg-slate-700 border border-slate-300 dark:border-slate-600 rounded-lg px-3 py-2 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-orange-500";
+                const companyLabelClasses = "block text-sm font-medium text-slate-700 dark:text-slate-300";
+
                 return (
                     <div className="space-y-6">
                         <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
@@ -245,6 +328,84 @@ const Settings: React.FC<SettingsProps> = ({ subscriptionTier, userProfile, onLo
                                 </div>
                             </div>
                         </div>
+
+                        <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
+                            <h3 className="text-lg font-bold text-slate-900 dark:text-white">Datos fiscales de la empresa</h3>
+                            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Esta información se usará en el PDF y en los envíos a tus clientes.</p>
+                            {isCompanyLoading ? (
+                                <p className="mt-4 text-sm text-slate-500 dark:text-slate-400">Cargando datos de empresa...</p>
+                            ) : (
+                                <form onSubmit={handleCompanySubmit} className="mt-4 space-y-4">
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className={companyLabelClasses}>Nombre fiscal *</label>
+                                            <input name="name" value={companyForm.name} onChange={handleCompanyInputChange} className={companyInputClasses} required />
+                                        </div>
+                                        <div>
+                                            <label className={companyLabelClasses}>CIF *</label>
+                                            <input name="cif" value={companyForm.cif} onChange={handleCompanyInputChange} className={companyInputClasses} required />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className={companyLabelClasses}>Dirección *</label>
+                                        <input name="address" value={companyForm.address} onChange={handleCompanyInputChange} className={companyInputClasses} required />
+                                    </div>
+                                    <div className="grid md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className={companyLabelClasses}>Ciudad *</label>
+                                            <input name="city" value={companyForm.city} onChange={handleCompanyInputChange} className={companyInputClasses} required />
+                                        </div>
+                                        <div>
+                                            <label className={companyLabelClasses}>Provincia *</label>
+                                            <input name="province" value={companyForm.province} onChange={handleCompanyInputChange} className={companyInputClasses} required />
+                                        </div>
+                                        <div>
+                                            <label className={companyLabelClasses}>Código Postal *</label>
+                                            <input name="postalCode" value={companyForm.postalCode} onChange={handleCompanyInputChange} className={companyInputClasses} required />
+                                        </div>
+                                    </div>
+                                    <div className="grid md:grid-cols-3 gap-4">
+                                        <div>
+                                            <label className={companyLabelClasses}>Teléfono</label>
+                                            <input name="phone" value={companyForm.phone ?? ''} onChange={handleCompanyInputChange} className={companyInputClasses} />
+                                        </div>
+                                        <div>
+                                            <label className={companyLabelClasses}>Email</label>
+                                            <input type="email" name="email" value={companyForm.email ?? ''} onChange={handleCompanyInputChange} className={companyInputClasses} />
+                                        </div>
+                                        <div>
+                                            <label className={companyLabelClasses}>Web</label>
+                                            <input name="website" value={companyForm.website ?? ''} onChange={handleCompanyInputChange} className={companyInputClasses} />
+                                        </div>
+                                    </div>
+                                    <div className="grid md:grid-cols-2 gap-4">
+                                        <div>
+                                            <label className={companyLabelClasses}>Régimen fiscal</label>
+                                            <select name="taxRegime" value={companyForm.taxRegime ?? 'GENERAL'} onChange={handleCompanyInputChange} className={companyInputClasses}>
+                                                <option value="GENERAL">General</option>
+                                                <option value="SIMPLIFIED">Simplificado</option>
+                                                <option value="AGRICULTURE">Agricultura</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    {companyFormError && <p className="text-sm text-red-500">{companyFormError}</p>}
+                                    {companyFormSuccess && <p className="text-sm text-green-500">{companyFormSuccess}</p>}
+                                    {isCompanyError && !company && (
+                                        <p className="text-sm text-amber-600 dark:text-amber-400">Aún no has registrado tu empresa. Completa el formulario y guarda los datos.</p>
+                                    )}
+                                    <div className="flex justify-end">
+                                        <button
+                                            type="submit"
+                                            disabled={companyMutation.isPending}
+                                            className={`px-4 py-2 rounded-lg font-semibold transition-colors ${companyMutation.isPending ? 'bg-slate-300 dark:bg-slate-700 text-slate-500 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600 text-white'}`}
+                                        >
+                                            {companyMutation.isPending ? 'Guardando...' : company ? 'Actualizar empresa' : 'Registrar empresa'}
+                                        </button>
+                                    </div>
+                                </form>
+                            )}
+                        </div>
+
                         <div className="bg-white dark:bg-slate-800 p-6 rounded-xl border border-slate-200 dark:border-slate-700">
                             <h3 className="text-lg font-bold text-slate-900 dark:text-white">Gestión de Contactos</h3>
                             <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Ahorra tiempo importando tus clientes directamente desde la agenda de tu dispositivo.</p>
@@ -264,6 +425,7 @@ const Settings: React.FC<SettingsProps> = ({ subscriptionTier, userProfile, onLo
                         </div>
                     </div>
                 );
+            }
             case 'security':
                 return (
                     <div className="space-y-6">

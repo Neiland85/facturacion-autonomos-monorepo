@@ -12,5 +12,15 @@
       ]
     },
     "allowImportingTsExtensions": true
-  }
+  },
+  "exclude": [
+    "src",
+    "src/**/*"
+  ],
+  "include": [
+    "./*.ts",
+    "./*.tsx",
+    "./**/*.ts",
+    "./**/*.tsx"
+  ]
 }

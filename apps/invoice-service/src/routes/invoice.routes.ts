@@ -277,7 +277,7 @@ router.get("/:id/pdf", authenticateToken, (req, res) => {
  *       404:
  *         description: Factura no encontrada o XML no disponible
  */
-router.get("/:id/xml/signed", InvoiceController.getSignedXml);
+router.get("/:id/xml/signed", authenticateToken, InvoiceController.getSignedXml);
 
 /**
  * @swagger
@@ -318,4 +318,54 @@ router.get("/:id/xml/signed", InvoiceController.getSignedXml);
  */
 router.post("/:id/send", idempotencyMiddleware(), InvoiceController.sendInvoice);
 
+/**
+ * @swagger
+ * /api/v1/invoices/{id}/submit-aeat:
+ *   post:
+ *     summary: Enviar factura a AEAT SII
+ *     tags: [Invoices]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la factura
+ *     responses:
+ *       200:
+ *         description: Factura enviada a AEAT exitosamente
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 success:
+ *                   type: boolean
+ *                 message:
+ *                   type: string
+ *                 data:
+ *                   type: object
+ *                   properties:
+ *                     siiReference:
+ *                       type: string
+ *                       description: CSV (Código Seguro de Verificación)
+ *       404:
+ *         description: Factura no encontrada
+ *       409:
+ *         description: Factura ya enviada a AEAT
+ *       503:
+ *         description: Integración AEAT SII no habilitada
+ *       500:
+ *         description: Error al enviar a AEAT
+ */
+router.post(
+  "/:id/submit-aeat",
+  authenticateToken,
+  idempotencyMiddleware(),
+  InvoiceController.submitToAEAT
+);
+
 export default router;
+

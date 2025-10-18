@@ -1,6 +1,14 @@
 import { Request, Response } from "express";
+import Stripe from "stripe";
 import { withTransaction, isWebhookDuplicate } from "@facturacion/database";
 import { prisma } from "@facturacion/database";
+
+// Initialize Stripe client
+const stripe = process.env.STRIPE_SECRET_KEY
+  ? new Stripe(process.env.STRIPE_SECRET_KEY, {
+      apiVersion: "2023-10-16",
+    })
+  : null;
 
 export class WebhookController {
   /**
@@ -8,7 +16,40 @@ export class WebhookController {
    */
   static async handleStripeWebhook(req: Request, res: Response): Promise<void> {
     try {
-      const event = req.body;
+      let event;
+      const signature = req.headers["stripe-signature"] as string | undefined;
+
+      // Verify webhook signature
+      if (!stripe) {
+        res.status(500).json({
+          success: false,
+          message: "Stripe not configured",
+        });
+        return;
+      }
+
+      if (process.env.STRIPE_WEBHOOK_SECRET) {
+        try {
+          event = stripe.webhooks.constructEvent(
+            req.body,
+            signature || "",
+            process.env.STRIPE_WEBHOOK_SECRET
+          );
+          console.log("✅ Stripe webhook signature verified");
+        } catch (err: any) {
+          console.error("❌ Webhook signature verification failed:", err.message);
+          res.status(400).json({
+            success: false,
+            message: "Invalid webhook signature",
+          });
+          return;
+        }
+      } else {
+        console.warn(
+          "⚠️ Stripe webhook signature verification skipped (no secret configured)"
+        );
+        event = req.body;
+      }
 
       // Extract event ID for deduplication
       const eventId = event.id;
@@ -68,7 +109,7 @@ export class WebhookController {
 
       // For webhooks, we should still return 200 to prevent retries
       // unless it's a validation error
-      if (error.message?.includes("signature")) {
+      if (error instanceof Error && error.message?.includes("signature")) {
         res.status(400).json({
           success: false,
           message: "Invalid webhook signature",

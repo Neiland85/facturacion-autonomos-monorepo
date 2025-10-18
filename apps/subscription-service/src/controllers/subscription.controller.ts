@@ -9,7 +9,7 @@ export class SubscriptionController {
   static async createSubscription(req: Request, res: Response): Promise<void> {
     try {
       const { planId, paymentMethodId } = req.body;
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.id;
 
       if (!userId) {
         res.status(401).json({
@@ -102,7 +102,7 @@ export class SubscriptionController {
   static async cancelSubscription(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.id;
 
       if (!userId) {
         res.status(401).json({
@@ -169,7 +169,7 @@ export class SubscriptionController {
   static async reactivateSubscription(req: Request, res: Response): Promise<void> {
     try {
       const { id } = req.params;
-      const userId = (req as any).user?.userId;
+      const userId = req.user?.id;
 
       if (!userId) {
         res.status(401).json({
@@ -215,6 +215,245 @@ export class SubscriptionController {
       });
     } catch (error) {
       console.error("Reactivate subscription error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  }
+
+  /**
+   * Get subscription by ID
+   */
+  static async getSubscriptionById(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: "Usuario no autorizado",
+        });
+        return;
+      }
+
+      const subscription = await prisma.subscription.findFirst({
+        where: { id, userId },
+        include: { plan: true },
+      });
+
+      if (!subscription) {
+        res.status(404).json({
+          success: false,
+          message: "Suscripción no encontrada",
+        });
+        return;
+      }
+
+      // Transform status to lowercase for frontend compatibility
+      const transformed = {
+        ...subscription,
+        status: subscription.status.toLowerCase(),
+      };
+
+      res.json({
+        success: true,
+        message: "Suscripción obtenida exitosamente",
+        data: transformed,
+      });
+    } catch (error) {
+      console.error("Get subscription error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  }
+
+  /**
+   * Get subscription plans
+   */
+  static async getSubscriptionPlans(req: Request, res: Response): Promise<void> {
+    try {
+      const plans = await prisma.subscriptionPlan.findMany({
+        where: { isActive: true },
+        orderBy: { price: "asc" },
+      });
+
+      // If no plans exist, return hardcoded plans
+      if (plans.length === 0) {
+        const defaultPlans = [
+          {
+            id: "plan_starter",
+            name: "Starter",
+            description: "Perfecto para freelancers que empiezan",
+            price: 9.99,
+            currency: "EUR",
+            interval: "MONTH",
+            features: [
+              "Hasta 50 facturas al mes",
+              "Hasta 20 clientes",
+              "Soporte por email",
+              "Escaneo OCR básico",
+            ],
+            maxInvoices: 50,
+            maxClients: 20,
+            isPopular: false,
+          },
+          {
+            id: "plan_professional",
+            name: "Professional",
+            description: "Para profesionales con más demanda",
+            price: 19.99,
+            currency: "EUR",
+            interval: "MONTH",
+            features: [
+              "Hasta 200 facturas al mes",
+              "Hasta 100 clientes",
+              "Soporte prioritario",
+              "Escaneo OCR ilimitado",
+              "Integración bancaria",
+            ],
+            maxInvoices: 200,
+            maxClients: 100,
+            isPopular: true,
+          },
+          {
+            id: "plan_enterprise",
+            name: "Enterprise",
+            description: "Soluciones a medida para grandes empresas",
+            price: 49.99,
+            currency: "EUR",
+            interval: "MONTH",
+            features: [
+              "Facturas ilimitadas",
+              "Clientes ilimitados",
+              "Soporte 24/7",
+              "API de acceso",
+              "Gestor de cuenta dedicado",
+              "Informes personalizados",
+            ],
+            maxInvoices: 999999,
+            maxClients: 999999,
+            isPopular: false,
+          },
+        ];
+
+        res.json({
+          success: true,
+          message: "Planes de suscripción obtenidos",
+          data: defaultPlans,
+        });
+        return;
+      }
+
+      res.json({
+        success: true,
+        message: "Planes de suscripción obtenidos",
+        data: plans,
+      });
+    } catch (error) {
+      console.error("Get plans error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  }
+
+  /**
+   * Get user subscriptions
+   */
+  static async getUserSubscriptions(req: Request, res: Response): Promise<void> {
+    try {
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: "Usuario no autorizado",
+        });
+        return;
+      }
+
+      const subscriptions = await prisma.subscription.findMany({
+        where: { userId },
+        include: { plan: true },
+        orderBy: { createdAt: "desc" },
+      });
+
+      // Transform status values to lowercase
+      const transformed = subscriptions.map((sub) => ({
+        ...sub,
+        status: sub.status.toLowerCase(),
+      }));
+
+      res.json({
+        success: true,
+        message: "Suscripciones obtenidas exitosamente",
+        data: transformed,
+      });
+    } catch (error) {
+      console.error("Get user subscriptions error:", error);
+      res.status(500).json({
+        success: false,
+        message: "Error interno del servidor",
+      });
+    }
+  }
+
+  /**
+   * Get payment methods for a subscription
+   */
+  static async getPaymentMethods(req: Request, res: Response): Promise<void> {
+    try {
+      const { id } = req.params;
+      const userId = req.user?.id;
+
+      if (!userId) {
+        res.status(401).json({
+          success: false,
+          message: "Usuario no autorizado",
+        });
+        return;
+      }
+
+      // Verify subscription ownership
+      const subscription = await prisma.subscription.findFirst({
+        where: { id, userId },
+      });
+
+      if (!subscription) {
+        res.status(404).json({
+          success: false,
+          message: "Suscripción no encontrada",
+        });
+        return;
+      }
+
+      // Return mock payment methods
+      const mockPaymentMethods = [
+        {
+          id: "pm_mock_card",
+          type: "card",
+          card: {
+            brand: "visa",
+            last4: "4242",
+            exp_month: 12,
+            exp_year: 2025,
+          },
+          isDefault: true,
+        },
+      ];
+
+      res.json({
+        success: true,
+        message: "Métodos de pago obtenidos",
+        data: mockPaymentMethods,
+      });
+    } catch (error) {
+      console.error("Get payment methods error:", error);
       res.status(500).json({
         success: false,
         message: "Error interno del servidor",
