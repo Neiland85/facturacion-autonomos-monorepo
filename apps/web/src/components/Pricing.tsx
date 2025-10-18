@@ -29,7 +29,7 @@ export default function Pricing({
       if (response.success && response.data) {
         setPlans(response.data);
       } else {
-        handleError(new Error(response.error || 'Error al cargar los planes'));
+        handleError(new Error(response.error ?? 'Error al cargar los planes'));
       }
     } catch (err) {
       handleError(err);

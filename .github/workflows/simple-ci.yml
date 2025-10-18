@@ -2,11 +2,11 @@ name: 🚀 Simplified CI/CD
 
 on:
   push:
-    branches: 
+    branches:
       - main
       - develop
-      - "feature/**"
-      - "hotfix/**"
+      - 'feature/**'
+      - 'hotfix/**'
   pull_request:
     branches:
       - main
@@ -21,7 +21,7 @@ jobs:
   basic-check:
     name: 🔍 Basic Check
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4

@@ -3,7 +3,73 @@
 import { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { AuthUser } from '@/types';
-import { authService } from '@/services/auth.service';
+
+// Simple HTTP client for auth service
+class AuthHttpClient {
+  private baseUrl: string;
+
+  constructor(baseUrl: string) {
+    this.baseUrl = baseUrl;
+  }
+
+  private async request<T>(
+    endpoint: string,
+    options: RequestInit = {}
+  ): Promise<T> {
+    const url = `${this.baseUrl}${endpoint}`;
+    const response = await fetch(url, {
+      ...options,
+      headers: {
+        'Content-Type': 'application/json',
+        ...options.headers,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  }
+
+  async post<T>(endpoint: string, data: any): Promise<T> {
+    return this.request<T>(endpoint, {
+      method: 'POST',
+      body: JSON.stringify(data),
+    });
+  }
+
+  async get<T>(endpoint: string): Promise<T> {
+    return this.request<T>(endpoint);
+  }
+}
+
+// Auth service instance
+const authHttpClient = new AuthHttpClient(
+  process.env.NEXT_PUBLIC_AUTH_SERVICE_URL ?? 'http://localhost:3003'
+);
+
+const authService = {
+  async login(email: string, password: string, remember = false): Promise<any> {
+    return authHttpClient.post('/auth/login', { email, password, remember });
+  },
+
+  async register(userData: {
+    email: string;
+    password: string;
+    name: string;
+  }): Promise<any> {
+    return authHttpClient.post('/auth/register', userData);
+  },
+
+  async logout(): Promise<any> {
+    return authHttpClient.post('/auth/logout', {});
+  },
+
+  async getCurrentUser(): Promise<any> {
+    return authHttpClient.get('/auth/me');
+  },
+};
 
 interface UseAuthReturn {
   user: AuthUser | null;

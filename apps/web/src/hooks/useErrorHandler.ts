@@ -8,7 +8,7 @@ export function useErrorHandler() {
   const redirectingRef = useRef(false); // Prevenir loops de redirección
 
   const handleError = useCallback(
-    (error: unknown, context?: string) => {
+    (error: unknown, _context?: string) => {
       // Lógica principal de manejo
       if (error instanceof ApiError) {
         switch (error.statusCode) {

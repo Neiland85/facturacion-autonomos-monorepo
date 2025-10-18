@@ -205,6 +205,7 @@
       "devtoolSegmentExplorer": true,
       "browserDebugInfoInTerminal": false,
       "optimizeRouterScrolling": false,
+      "middlewareClientMaxBodySize": 10485760,
       "optimizePackageImports": [
         "lucide-react",
         "date-fns",
@@ -316,6 +317,6 @@
     ".next/required-server-files.json"
   ],
   "ignore": [
-    "../../node_modules/.pnpm/next@15.5.3_@babel+core@7.28.4_react-dom@19.1.1_react@19.1.1/node_modules/next/dist/compiled/@ampproject/toolbox-optimizer/**/*"
+    "../../node_modules/.pnpm/next@15.5.6_@babel+core@7.28.4_react-dom@19.1.1_react@19.1.1/node_modules/next/dist/compiled/@ampproject/toolbox-optimizer/**/*"
   ]
 }

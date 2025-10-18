@@ -99,16 +99,30 @@ export class AuthService {
     this.httpClient = new HttpClient(config);
   }
 
-  async login(email: string, password: string): Promise<{ token: string; user: User }> {
-    return this.httpClient.post('/auth/login', { email, password });
+  async login(email: string, password: string, remember = false): Promise<{ success: boolean; user: User; token?: string }> {
+    const response = await this.httpClient.post('/auth/login', { email, password, remember });
+    return {
+      success: true,
+      user: response.user,
+      token: response.token
+    };
   }
 
-  async register(userData: Partial<User>): Promise<{ token: string; user: User }> {
-    return this.httpClient.post('/auth/register', userData);
+  async register(userData: { email: string; password: string; name: string }): Promise<{ success: boolean; user: User; token?: string }> {
+    const response = await this.httpClient.post('/auth/register', userData);
+    return {
+      success: true,
+      user: response.user,
+      token: response.token
+    };
   }
 
   async logout(): Promise<void> {
     return this.httpClient.post('/auth/logout', {});
+  }
+
+  async getCurrentUser(): Promise<User> {
+    return this.httpClient.get('/auth/me');
   }
 
   async refreshToken(): Promise<{ token: string }> {
@@ -264,8 +278,6 @@ export default {
   ClientService,
   TaxCalculatorService,
   ServiceFactory,
-  DEFAULT_API_CONFIG,
-  TAX_CALCULATOR_CONFIG
 };
 // Placeholder for services
 export const servicesVersion = "1.0.0";

@@ -57,7 +57,7 @@ export default function SubscriptionModal({
         }, 2000);
       } else {
         handleError(
-          new Error(response.error || 'Error al crear la suscripción')
+          new Error(response.error ?? 'Error al crear la suscripción')
         );
       }
     } catch (err) {
@@ -94,7 +94,7 @@ export default function SubscriptionModal({
         }, 2000);
       } else {
         handleError(
-          new Error(response.error || 'Error al cancelar la suscripción')
+          new Error(response.error ?? 'Error al cancelar la suscripción')
         );
       }
     } catch (err) {
@@ -122,7 +122,7 @@ export default function SubscriptionModal({
         }, 2000);
       } else {
         handleError(
-          new Error(response.error || 'Error al reactivar la suscripción')
+          new Error(response.error ?? 'Error al reactivar la suscripción')
         );
       }
     } catch (err) {

@@ -48,7 +48,14 @@
     "db:migrate:test": "DATABASE_URL=postgresql://postgres:postgres_test@localhost:5432/facturacion_test ./db/run-migrations.sh",
     "format": "turbo run format",
     "format:check": "turbo run format:check",
-    "audit": "npm audit"
+    "audit": "npm audit",
+    "vercel:setup": "./setup-vercel-env.sh",
+    "github:secrets": "./setup-github-secrets.sh",
+    "github:secrets:update": "./update-secrets.sh",
+    "services:urls": "./setup-service-urls.sh",
+    "system:activate": "./activate-full-system.sh",
+    "env:load": "source ./load-env.sh",
+    "deploy:vercel": "./deploy-to-vercel.sh"
   },
   "devDependencies": {
     "@eslint/js": "^9.35.0",
@@ -58,7 +65,7 @@
     "@types/express": "^5.0.3",
     "@types/jest": "^30.0.0",
     "@types/morgan": "^1.9.10",
-    "@types/node": "^24.3.3",
+    "@types/node": "^20.0.0",
     "@types/react": "^19.1.13",
     "@types/react-dom": "^19.1.0",
     "@types/supertest": "^6.0.3",

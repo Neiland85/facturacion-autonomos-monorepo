@@ -39,7 +39,7 @@ variables:
   cache:
     key: '$CI_COMMIT_REF_SLUG-node'
     paths:
-      - .yarn/cache/
+      - .pnpm-store/
       - node_modules/
     policy: pull-push
 
@@ -57,8 +57,9 @@ variables:
   before_script:
     - apk add --no-cache git
     - corepack enable
-    - yarn --version
-    - yarn install --frozen-lockfile
+    - corepack prepare pnpm@8.15.0 --activate
+    - pnpm --version
+    - pnpm install --frozen-lockfile
   <<: *node_cache
 
 # ============================================
@@ -70,7 +71,7 @@ build:monorepo:
   <<: *node_template
   script:
     - echo "🏗️ Building monorepo..."
-    - yarn build
+    - pnpm build
     - echo "✅ Build completed successfully"
   artifacts:
     expire_in: 1 hour
@@ -92,7 +93,7 @@ test:lint:
   <<: *node_template
   script:
     - echo "🔍 Running ESLint..."
-    - yarn lint
+    - pnpm lint
     - echo "✅ Linting completed successfully"
   only:
     - merge_requests
@@ -104,7 +105,7 @@ test:unit:
   <<: *node_template
   script:
     - echo "🧪 Running unit tests..."
-    - yarn test --coverage
+    - pnpm test --coverage
     - echo "✅ Unit tests completed successfully"
   coverage: '/All files[^|]*\|[^|]*\s+([\d\.]+)/'
   artifacts:
@@ -136,8 +137,8 @@ test:api-integration:
   script:
     - echo "🧪 Running API integration tests..."
     - cd apps/api-facturas
-    - yarn prisma migrate dev --name init
-    - yarn test:integration
+    - pnpm prisma migrate dev --name init
+    - pnpm test:integration
     - echo "✅ API integration tests completed successfully"
   only:
     - merge_requests

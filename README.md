@@ -392,11 +392,13 @@ npm run services:urls
 ##### Servicios Externos Requeridos
 
 **🐘 PostgreSQL:**
+
 - **Desarrollo**: [Neon](https://neon.tech) - Gratuito, serverless
 - **Staging**: [Supabase](https://supabase.com) - Gratuito, con auth integrado
 - **Producción**: [Railway](https://railway.app) - $5/mes, fully managed
 
 **🔴 Redis:**
+
 - **Desarrollo**: [Upstash](https://upstash.com) - Gratuito, serverless
 - **Staging**: [Upstash](https://upstash.com) - Gratuito, serverless
 - **Producción**: [Redis Labs](https://redis.com) - $15/mes, cloud
