@@ -24,14 +24,10 @@ export class SubscriptionService {
 
   async getSubscriptionPlans(): Promise<ApiResponse<SubscriptionPlan[]>> {
     return apiClient.get<ApiResponse<SubscriptionPlan[]>>(
-      
-    
       `${this.baseEndpoint}/plans`
     );
   }
 
-      
-    
   async getUserSubscription(): Promise<ApiResponse<Subscription>> {
     return apiClient.get<ApiResponse<Subscription>>(
       `${this.baseEndpoint}/current`
@@ -39,20 +35,14 @@ export class SubscriptionService {
   }
 
   async createSubscription(
-      
-     
-     
-      request: CreateSubscriptionRequest
-    ): Promise<ApiResponse<Subscription>> {
-      const idempotencyKey = uuidv4();
-      r
-    eturn apiClient.post<ApiResponse<Subscription>>(
+    request: CreateSubscriptionRequest
+  ): Promise<ApiResponse<Subscription>> {
+    const idempotencyKey = uuidv4();
+    return apiClient.postWithHeaders<ApiResponse<Subscription>>(
       this.baseEndpoint,
       request,
       {
-        headers: {
-          'Idempotency-Key': idempotencyKey,
-        },
+        'Idempotency-Key': idempotencyKey,
       }
     );
   }
@@ -63,7 +53,7 @@ export class SubscriptionService {
   ): Promise<ApiResponse<Subscription>> {
     return apiClient.post<ApiResponse<Subscription>>(
       `${this.baseEndpoint}/${subscriptionId}/cancel`,
-      request || {}
+      request ?? {}
     );
   }
 
@@ -73,7 +63,7 @@ export class SubscriptionService {
   ): Promise<ApiResponse<Subscription>> {
     return apiClient.post<ApiResponse<Subscription>>(
       `${this.baseEndpoint}/${subscriptionId}/reactivate`,
-      request || {}
+      request ?? {}
     );
   }
 }

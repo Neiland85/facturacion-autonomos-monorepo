@@ -1,7 +1,6 @@
 import cors from 'cors';
 import 'dotenv/config';
 import express from 'express';
-import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import morgan from 'morgan';
 import path from 'path';
@@ -15,26 +14,18 @@ const { setupSwagger } = require(
 );
 
 const app: express.Application = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT ?? 3001;
 
 // Middleware de seguridad
 app.use(helmet());
 app.use(
   cors({
-    origin: process.env.ALLOWED_ORIGINS?.split(',') || [
+    origin: process.env.ALLOWED_ORIGINS?.split(',') ?? [
       'http://localhost:3000',
     ],
     credentials: true,
   })
 );
-
-// Rate limiting
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutos
-  max: 100, // 100 requests por ventana
-  message: 'Demasiadas solicitudes, inténtalo de nuevo más tarde.',
-});
-app.use(limiter);
 
 // Middleware para parsing
 app.use(express.json({ limit: '10mb' }));
@@ -52,7 +43,7 @@ app.get('/health', (req: express.Request, res: express.Response) => {
     status: 'ok',
     service: 'invoice-service',
     timestamp: new Date().toISOString(),
-    version: process.env.npm_package_version || '1.0.0',
+    version: process.env.npm_package_version ?? '1.0.0',
   });
 });
 
@@ -82,28 +73,22 @@ app.use('*', (req: express.Request, res: express.Response) => {
 // Error handler
 app.use(
   (
-    err: any,
+    err: Error,
     req: express.Request,
     res: express.Response,
-    next: express.NextFunction
+    _next: express.NextFunction
   ) => {
-    console.error('Error:', err);
+    // Log error in production-safe way
+    const errorMessage = err.message || 'Internal server error';
     res.status(500).json({
-      error: 'Internal server error',
+      error: errorMessage,
       timestamp: new Date().toISOString(),
     });
   }
 );
 
 app.listen(PORT, () => {
-  console.log(`📄 Invoice Service running on port ${PORT}`);
-  console.log(
-    `📖 API Documentation available at: http://localhost:${PORT}/api-docs`
-  );
-  console.log(`🔒 Security features enabled:`);
-  console.log(`   ✅ Helmet security headers`);
-  console.log(`   ✅ CORS protection`);
-  console.log(`   ✅ Rate limiting`);
+  // Server started successfully
 });
 
 export default app;

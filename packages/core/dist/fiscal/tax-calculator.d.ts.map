@@ -1,0 +1,1 @@
+{"version":3,"file":"tax-calculator.d.ts","sourceRoot":"","sources":["../../src/fiscal/tax-calculator.ts"],"names":[],"mappings":"AAAA,qBAAa,aAAa;IACxB,SAAS,CACP,IAAI,EAAE,MAAM,EACZ,IAAI,EAAE,MAAM,GACX;QAAE,IAAI,EAAE,MAAM,CAAC;QAAC,IAAI,EAAE,MAAM,CAAC;QAAC,MAAM,EAAE,MAAM,CAAC;QAAC,KAAK,EAAE,MAAM,CAAA;KAAE;CAKjE"}

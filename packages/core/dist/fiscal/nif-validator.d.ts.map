@@ -1,0 +1,1 @@
+{"version":3,"file":"nif-validator.d.ts","sourceRoot":"","sources":["../../src/fiscal/nif-validator.ts"],"names":[],"mappings":"AAAA,qBAAa,YAAY;IACvB,QAAQ,CAAC,GAAG,EAAE,MAAM,GAAG;QAAE,OAAO,EAAE,OAAO,CAAC;QAAC,IAAI,EAAE,MAAM,CAAA;KAAE;CAI1D"}

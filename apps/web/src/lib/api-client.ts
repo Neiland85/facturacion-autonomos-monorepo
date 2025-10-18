@@ -90,6 +90,27 @@ export class ApiClient {
     return this.request<T>(endpoint, options);
   }
 
+  // POST request with custom headers
+  async postWithHeaders<T>(
+    endpoint: string,
+    data?: unknown,
+    headers?: Record<string, string>
+  ): Promise<T> {
+    const options: RequestInit = {
+      method: 'POST',
+      headers: {
+        ...this.getHeaders(),
+        ...headers,
+      },
+    };
+
+    if (data) {
+      options.body = JSON.stringify(data);
+    }
+
+    return this.request<T>(endpoint, options);
+  }
+
   // PUT request
   async put<T>(endpoint: string, data?: unknown): Promise<T> {
     const options: RequestInit = {

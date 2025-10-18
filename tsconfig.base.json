@@ -1,11 +1,7 @@
 {
   "compilerOptions": {
     "target": "ES2022",
-    "lib": [
-      "DOM",
-      "DOM.Iterable",
-      "ES2022"
-    ],
+    "lib": ["DOM", "DOM.Iterable", "ES2022"],
     "allowJs": true,
     "skipLibCheck": true,
     "strict": true,
@@ -21,48 +17,21 @@
     "noUncheckedIndexedAccess": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": [
-        "./src/*"
-      ],
-      "@/core": [
-        "./packages/core/src"
-      ],
-      "@/services": [
-        "./packages/services/src"
-      ],
-      "@/ui": [
-        "./packages/ui/src"
-      ],
-      "@/types": [
-        "./packages/types/src"
-      ],
-      "@/database/*": [
-        "./packages/database/src/*"
-      ],
-      "@/validation/*": [
-        "./packages/validation/src/*"
-      ],
-      "@/api-facturas/*": [
-        "./apps/api-facturas/src/*"
-      ],
-      "@/api-gateway/*": [
-        "./apps/api-gateway/src/*"
-      ],
-      "@/api-tax-calculator/*": [
-        "./apps/api-tax-calculator/src/*"
-      ],
-      "@/auth-service/*": [
-        "./apps/auth-service/src/*"
-      ],
-      "@/invoice-service/*": [
-        "./apps/invoice-service/src/*"
-      ],
-      "@/web/*": [
-        "./apps/web/src/*"
-      ]
+      "@/*": ["./src/*"],
+      "@/core": ["./packages/core/src"],
+      "@/services": ["./packages/services/src"],
+      "@/ui": ["./packages/ui/src"],
+      "@/types": ["./packages/types/src"],
+      "@/database/*": ["./packages/database/src/*"],
+      "@/validation/*": ["./packages/validation/src/*"],
+      "@/api-facturas/*": ["./apps/api-facturas/src/*"],
+      "@/api-gateway/*": ["./apps/api-gateway/src/*"],
+      "@/api-tax-calculator/*": ["./apps/api-tax-calculator/src/*"],
+      "@/auth-service/*": ["./apps/auth-service/src/*"],
+      "@/invoice-service/*": ["./apps/invoice-service/src/*"],
+      "@/web/*": ["./apps/web/src/*"]
     },
-    "allowArbitraryExtensions": true,
-    "ignoreDeprecations": "6.0"
+    "allowArbitraryExtensions": true
   },
   "include": [
     "next-env.d.ts",
@@ -73,10 +42,5 @@
     "apps/**/*",
     "packages/**/*"
   ],
-  "exclude": [
-    "node_modules",
-    ".next",
-    "dist",
-    "build"
-  ]
+  "exclude": ["node_modules", ".next", "dist", "build"]
 }

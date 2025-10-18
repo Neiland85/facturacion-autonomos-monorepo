@@ -20,6 +20,7 @@ import {
  */
 export function mapCompanyToDTO(company: Company): CompanyDTO {
   return {
+    id: company.id,
     name: company.name,
     taxId: company.cif, // Prisma usa 'cif' en lugar de 'taxId'
     address: company.address,
@@ -102,13 +103,15 @@ export function mapInvoiceToDTO(
     id: invoice.id,
     number: invoice.number,
     series: invoice.series,
+    date: invoice.issueDate.toISOString(),
     issueDate: invoice.issueDate.toISOString(),
-    dueDate: invoice.dueDate?.toISOString() ?? undefined,
+    dueDate: invoice.dueDate?.toISOString() ?? new Date().toISOString(),
     status: mapPrismaStatusToDTO(invoice.status),
     subtotal: Number(invoice.subtotal),
     totalTax: Number(invoice.vatAmount),
     totalRetention: 0,
     total: Number(invoice.total),
+    clientId: invoice.client.id,
     client: {
       id: invoice.client.id,
       name: invoice.client.name,
@@ -162,10 +165,14 @@ export function mapInvoiceStatsToDTO(
 
   return {
     totalInvoices: (stats.totalInvoices as number) ?? 0,
+    totalRevenue: (stats.totalRevenue as number) ?? 0,
     totalAmount: (stats.totalAmount as number) ?? 0,
     paidAmount: (stats.paidAmount as number) ?? 0,
     pendingAmount: (stats.pendingAmount as number) ?? 0,
     overdueAmount: (stats.overdueAmount as number) ?? 0,
+    pendingInvoices: (stats.pendingInvoices as number) ?? 0,
+    overdueInvoices: (stats.overdueInvoices as number) ?? 0,
+    paidInvoices: (stats.paidInvoices as number) ?? 0,
     statusBreakdown: {
       [InvoiceStatus.DRAFT]: statusBreakdown.DRAFT ?? 0,
       [InvoiceStatus.SENT]: statusBreakdown.SENT ?? 0,
