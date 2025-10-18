@@ -360,16 +360,19 @@ Configura estas variables específicas del entorno en GitHub Actions secrets:
 - `DATABASE_URL_DEV`, `JWT_SECRET_DEV`, `REDIS_URL_DEV`
 
 **Desarrollo:**
+
 - `DATABASE_URL_DEV`, `JWT_SECRET_DEV`, `REDIS_URL_DEV`
 
 ##### Servicios Recomendados
 
 **🐘 PostgreSQL:**
+
 - [Neon](https://neon.tech) - Serverless PostgreSQL
 - [Supabase](https://supabase.com) - PostgreSQL + Auth
 - [Railway](https://railway.app) - PostgreSQL integrado
 
 **🔴 Redis:**
+
 - [Upstash](https://upstash.com) - Redis serverless
 - [Redis Labs](https://redis.com) - Redis Cloud
 
@@ -381,15 +384,40 @@ npm run github:secrets
 
 # Actualizar JWT secrets con valores seguros
 npm run github:secrets:update
+
+# Configurar URLs de servicios externos
+npm run services:urls
 ```
+
+##### Servicios Externos Requeridos
+
+**🐘 PostgreSQL:**
+- **Desarrollo**: [Neon](https://neon.tech) - Gratuito, serverless
+- **Staging**: [Supabase](https://supabase.com) - Gratuito, con auth integrado
+- **Producción**: [Railway](https://railway.app) - $5/mes, fully managed
+
+**🔴 Redis:**
+- **Desarrollo**: [Upstash](https://upstash.com) - Gratuito, serverless
+- **Staging**: [Upstash](https://upstash.com) - Gratuito, serverless
+- **Producción**: [Redis Labs](https://redis.com) - $15/mes, cloud
+
+##### URLs de Ejemplo Configuradas
+
+Actualmente están configuradas URLs de ejemplo. Para producción real:
+
+1. **Crear cuentas** en los servicios recomendados
+2. **Obtener URLs de conexión** desde los dashboards
+3. **Actualizar secrets** usando `npm run services:urls`
 
 ##### Configuración Manual
 
 Ve a [GitHub Repository Settings](https://github.com/Neiland85/facturacion-autonomos-monorepo/settings/secrets/actions) y actualiza:
 
-1. **DATABASE_URL_PROD**: `postgresql://user:pass@host:5432/db?sslmode=require`
-2. **REDIS_URL_PROD**: `redis://user:pass@host:port/db`
-3. Mantén los JWT secrets generados automáticamente
+1. **DATABASE_URL_PROD**: URL real de PostgreSQL de producción
+2. **DATABASE_URL_STAGING**: URL real de PostgreSQL de staging
+3. **REDIS_URL_PROD**: URL real de Redis de producción
+4. **REDIS_URL_STAGING**: URL real de Redis de staging
+5. Mantén los JWT secrets generados automáticamente
 
 #### Variables de Entorno Requeridas en Vercel
 
