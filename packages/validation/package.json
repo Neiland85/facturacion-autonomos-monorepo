@@ -29,7 +29,7 @@
     "@fal-ai/serverless-client": "^0.15.0",
     "@vercel/blob": "^1.1.1",
     "ai": "^5.0.43",
-    "isomorphic-dompurify": "^2.26.0",
+    "isomorphic-dompurify": "^2.29.0",
     "zod": "^3.23.8"
   },
   "devDependencies": {
